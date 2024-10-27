@@ -13,6 +13,7 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as ForGroupsImport } from './routes/for-groups'
 import { Route as ExploreVenuesImport } from './routes/explore-venues'
 import { Route as IndexImport } from './routes/index'
 import { Route as DashboardIndexImport } from './routes/dashboard/index'
@@ -29,6 +30,12 @@ const AboutLazyRoute = AboutLazyImport.update({
   path: '/about',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/about.lazy').then((d) => d.Route))
+
+const ForGroupsRoute = ForGroupsImport.update({
+  id: '/for-groups',
+  path: '/for-groups',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const ExploreVenuesRoute = ExploreVenuesImport.update({
   id: '/explore-venues',
@@ -72,6 +79,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExploreVenuesImport
       parentRoute: typeof rootRoute
     }
+    '/for-groups': {
+      id: '/for-groups'
+      path: '/for-groups'
+      fullPath: '/for-groups'
+      preLoaderRoute: typeof ForGroupsImport
+      parentRoute: typeof rootRoute
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -101,6 +115,7 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/explore-venues': typeof ExploreVenuesRoute
+  '/for-groups': typeof ForGroupsRoute
   '/about': typeof AboutLazyRoute
   '/venue/$id': typeof VenueIdRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -109,6 +124,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/explore-venues': typeof ExploreVenuesRoute
+  '/for-groups': typeof ForGroupsRoute
   '/about': typeof AboutLazyRoute
   '/venue/$id': typeof VenueIdRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -118,6 +134,7 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/explore-venues': typeof ExploreVenuesRoute
+  '/for-groups': typeof ForGroupsRoute
   '/about': typeof AboutLazyRoute
   '/venue/$id': typeof VenueIdRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -125,13 +142,26 @@ export interface FileRoutesById {
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/explore-venues' | '/about' | '/venue/$id' | '/dashboard'
+  fullPaths:
+    | '/'
+    | '/explore-venues'
+    | '/for-groups'
+    | '/about'
+    | '/venue/$id'
+    | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/explore-venues' | '/about' | '/venue/$id' | '/dashboard'
+  to:
+    | '/'
+    | '/explore-venues'
+    | '/for-groups'
+    | '/about'
+    | '/venue/$id'
+    | '/dashboard'
   id:
     | '__root__'
     | '/'
     | '/explore-venues'
+    | '/for-groups'
     | '/about'
     | '/venue/$id'
     | '/dashboard/'
@@ -141,6 +171,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ExploreVenuesRoute: typeof ExploreVenuesRoute
+  ForGroupsRoute: typeof ForGroupsRoute
   AboutLazyRoute: typeof AboutLazyRoute
   VenueIdRoute: typeof VenueIdRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
@@ -149,6 +180,7 @@ export interface RootRouteChildren {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ExploreVenuesRoute: ExploreVenuesRoute,
+  ForGroupsRoute: ForGroupsRoute,
   AboutLazyRoute: AboutLazyRoute,
   VenueIdRoute: VenueIdRoute,
   DashboardIndexRoute: DashboardIndexRoute,
@@ -168,6 +200,7 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/explore-venues",
+        "/for-groups",
         "/about",
         "/venue/$id",
         "/dashboard/"
@@ -178,6 +211,9 @@ export const routeTree = rootRoute
     },
     "/explore-venues": {
       "filePath": "explore-venues.tsx"
+    },
+    "/for-groups": {
+      "filePath": "for-groups.tsx"
     },
     "/about": {
       "filePath": "about.lazy.tsx"

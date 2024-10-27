@@ -20,7 +20,7 @@ export default function VenueCardSM({ venues, currentFilter }: VenueCardProps) {
         >
           <Link
             to={`/venue/${venue.id}`}
-            className="mb-4 flex flex-col rounded-2xl border border-primary/0 transition-all duration-300 hover:border-primary/100 sm:p-2"
+            className="mb-4 flex flex-col rounded-2xl border border-primary/0 transition-all duration-200 hover:border-primary/100 sm:p-2"
           >
             <img
               src={venue.media?.[0]?.url || "/default-image.jpg"}
