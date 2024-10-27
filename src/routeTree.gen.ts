@@ -16,6 +16,7 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as ExploreVenuesImport } from './routes/explore-venues'
 import { Route as IndexImport } from './routes/index'
 import { Route as DashboardIndexImport } from './routes/dashboard/index'
+import { Route as VenueIdImport } from './routes/venue/$id'
 
 // Create Virtual Routes
 
@@ -47,6 +48,12 @@ const DashboardIndexRoute = DashboardIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const VenueIdRoute = VenueIdImport.update({
+  id: '/venue/$id',
+  path: '/venue/$id',
+  getParentRoute: () => rootRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -72,6 +79,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutLazyImport
       parentRoute: typeof rootRoute
     }
+    '/venue/$id': {
+      id: '/venue/$id'
+      path: '/venue/$id'
+      fullPath: '/venue/$id'
+      preLoaderRoute: typeof VenueIdImport
+      parentRoute: typeof rootRoute
+    }
     '/dashboard/': {
       id: '/dashboard/'
       path: '/dashboard'
@@ -88,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/explore-venues': typeof ExploreVenuesRoute
   '/about': typeof AboutLazyRoute
+  '/venue/$id': typeof VenueIdRoute
   '/dashboard': typeof DashboardIndexRoute
 }
 
@@ -95,6 +110,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/explore-venues': typeof ExploreVenuesRoute
   '/about': typeof AboutLazyRoute
+  '/venue/$id': typeof VenueIdRoute
   '/dashboard': typeof DashboardIndexRoute
 }
 
@@ -103,15 +119,22 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/explore-venues': typeof ExploreVenuesRoute
   '/about': typeof AboutLazyRoute
+  '/venue/$id': typeof VenueIdRoute
   '/dashboard/': typeof DashboardIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/explore-venues' | '/about' | '/dashboard'
+  fullPaths: '/' | '/explore-venues' | '/about' | '/venue/$id' | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/explore-venues' | '/about' | '/dashboard'
-  id: '__root__' | '/' | '/explore-venues' | '/about' | '/dashboard/'
+  to: '/' | '/explore-venues' | '/about' | '/venue/$id' | '/dashboard'
+  id:
+    | '__root__'
+    | '/'
+    | '/explore-venues'
+    | '/about'
+    | '/venue/$id'
+    | '/dashboard/'
   fileRoutesById: FileRoutesById
 }
 
@@ -119,6 +142,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ExploreVenuesRoute: typeof ExploreVenuesRoute
   AboutLazyRoute: typeof AboutLazyRoute
+  VenueIdRoute: typeof VenueIdRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
@@ -126,6 +150,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ExploreVenuesRoute: ExploreVenuesRoute,
   AboutLazyRoute: AboutLazyRoute,
+  VenueIdRoute: VenueIdRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }
 
@@ -144,6 +169,7 @@ export const routeTree = rootRoute
         "/",
         "/explore-venues",
         "/about",
+        "/venue/$id",
         "/dashboard/"
       ]
     },
@@ -155,6 +181,9 @@ export const routeTree = rootRoute
     },
     "/about": {
       "filePath": "about.lazy.tsx"
+    },
+    "/venue/$id": {
+      "filePath": "venue/$id.tsx"
     },
     "/dashboard/": {
       "filePath": "dashboard/index.tsx"

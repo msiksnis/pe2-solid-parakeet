@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
+import { useMediaQuery } from "react-responsive";
 
 import axiosInstance from "@/lib/axiosInstance.ts";
 import { Venue } from "@/lib/types.ts";
@@ -33,7 +34,17 @@ export default function PopularByType() {
   const navigate = useNavigate({ from: Route.fullPath });
   const { filter } = Route.useSearch();
 
-  // Handles filter change, uses null for "All Products"
+  const isMobile = useMediaQuery({ query: "(max-width: 767px)" });
+  const isMedium = useMediaQuery({
+    query: "(min-width: 768px) and (max-width: 1279px)",
+  });
+  const isExtraLarge = useMediaQuery({
+    query: "(min-width: 1280px) ",
+  });
+
+  const sliceCount = isMobile ? 4 : isMedium ? 6 : isExtraLarge ? 8 : 12;
+
+  // Handles filter change, uses null for "All Venues"
   const handleFilterChange = useCallback(
     (newFilter: FilterOption | null) => {
       navigate({
@@ -90,7 +101,7 @@ export default function PopularByType() {
 
       return a.name?.localeCompare(b.name || "") || 0;
     })
-    .slice(0, 12);
+    .slice(0, sliceCount); // Slice based on screen size
 
   return (
     <>
@@ -98,9 +109,11 @@ export default function PopularByType() {
         filter={filter || null}
         handleFilterChange={handleFilterChange}
       />
-      <div className="grid gap-4 py-14 md:grid-cols-3 lg:grid-cols-4 lg:gap-6">
-        <VenueCardSM venues={sortedVenues} />
-      </div>
+      <VenueCardSM
+        key={filter || "all"}
+        venues={sortedVenues}
+        currentFilter={filter || "all"}
+      />
     </>
   );
 }

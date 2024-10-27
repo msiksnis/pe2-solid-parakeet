@@ -51,7 +51,7 @@ export default function TabsBar({ filter, handleFilterChange }: TabsBarProps) {
   }, [activeTab, activeTabElementRef, containerRef]);
 
   return (
-    <div className="mx-auto mt-14 flex w-fit items-center gap-x-2 rounded-full bg-stone-200/90 p-1.5 md:gap-x-4 lg:gap-x-6 xl:gap-x-12">
+    <div className="mx-auto mt-14 hidden w-fit items-center gap-x-2 rounded-full bg-stone-200/90 p-1.5 sm:flex md:gap-x-4 lg:gap-x-6 xl:gap-x-12">
       <div className="relative flex flex-col">
         <ul className="flex w-full justify-center gap-x-2 md:gap-x-4 lg:gap-x-6 xl:gap-x-12">
           {TABS.map((tab) => (

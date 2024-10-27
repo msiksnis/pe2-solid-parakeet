@@ -2,8 +2,8 @@ import LandingImage from "./LandingImage";
 
 export default function LandingSection() {
   return (
-    <div className="relative">
-      <div className="absolute z-20 text-center text-[clamp(1.5rem,5vw,5rem)] font-medium leading-[clamp(1.5rem,5vw,5rem)] tracking-tight sm:left-20 sm:top-10 sm:max-w-[250px] md:left-24 md:top-14 md:max-w-[320px] lg:left-32 lg:top-16 lg:max-w-[390px] xl:max-w-[490px]">
+    <div className="relative hidden sm:block">
+      <div className="absolute z-20 text-center text-[clamp(2.5rem,6vw,5rem)] font-medium leading-[clamp(2.5rem,6vw,5rem)] tracking-tight sm:left-12 sm:top-8 sm:max-w-[280px] md:left-[clamp(1vw,3vw,10rem)] md:top-8 md:max-w-[380px] lg:left-[4rem] lg:top-12 lg:max-w-[470px] xl:left-24 xl:max-w-[490px]">
         Find your best place to stay
       </div>
       <LandingImage />
