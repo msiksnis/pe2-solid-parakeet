@@ -9,7 +9,6 @@ import { Route } from "@/routes";
 import { FilterOption } from "../../../lib/types";
 import { filterVenuesByType } from "@/lib/filterVenues";
 import TabsBar from "@/components/TabsBar";
-import CardMD from "./CardMD";
 import { useScreenSizes } from "@/lib/utils";
 import Loader from "@/components/loader";
 
@@ -36,6 +35,7 @@ export default function PopularByType() {
 
           return updatedSearch;
         },
+        resetScroll: false,
       });
     },
     [navigate],
@@ -66,7 +66,7 @@ export default function PopularByType() {
     .slice(0, sliceCount);
 
   return (
-    <>
+    <div>
       <TabsBar
         filter={filter || null}
         handleFilterChange={handleFilterChange}
@@ -80,9 +80,8 @@ export default function PopularByType() {
             venues={sortedVenues}
             currentFilter={filter || "all"}
           />
-          <CardMD />
         </>
       )}
-    </>
+    </div>
   );
 }

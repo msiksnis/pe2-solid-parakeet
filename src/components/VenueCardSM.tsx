@@ -10,7 +10,7 @@ interface VenueCardProps {
 
 export default function VenueCardSM({ venues, currentFilter }: VenueCardProps) {
   return (
-    <div className="grid gap-4 py-14 md:grid-cols-3 lg:gap-y-0 xl:grid-cols-4">
+    <div className="grid gap-4 pb-8 pt-8 md:grid-cols-3 lg:gap-y-0 xl:grid-cols-4">
       {venues.map((venue, idx) => (
         <BlurFade
           key={`${venue.id}-${currentFilter}-${idx}`}

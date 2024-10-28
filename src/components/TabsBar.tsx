@@ -51,7 +51,7 @@ export default function TabsBar({ filter, handleFilterChange }: TabsBarProps) {
   }, [activeTab, activeTabElementRef, containerRef]);
 
   return (
-    <div className="mx-auto mt-14 hidden w-fit items-center gap-x-2 rounded-full bg-stone-200/90 p-1.5 sm:flex md:gap-x-4 lg:gap-x-6 xl:gap-x-12">
+    <div className="sticky top-4 z-50 mx-auto mt-14 hidden w-fit items-center gap-x-2 rounded-full bg-gradient-to-tr from-[#E9E9E9] to-[#F2EDE9] px-2 py-1.5 shadow-sm sm:flex md:gap-x-4 lg:gap-x-6 xl:gap-x-12">
       <div className="relative flex flex-col">
         <ul className="flex w-full justify-center gap-x-2 md:gap-x-4 lg:gap-x-6 xl:gap-x-12">
           {TABS.map((tab) => (
@@ -76,7 +76,7 @@ export default function TabsBar({ filter, handleFilterChange }: TabsBarProps) {
           ref={containerRef}
           style={{ clipPath: "inset(0 75% 0 0 round 17px)" }}
         >
-          <ul className="flex w-full justify-center gap-x-2 bg-white shadow-sm md:gap-x-4 lg:gap-x-6 xl:gap-x-12">
+          <ul className="flex w-full justify-center gap-x-2 bg-white shadow md:gap-x-4 lg:gap-x-6 xl:gap-x-12">
             {TABS.map((tab) => (
               <li key={tab.name}>
                 <button
