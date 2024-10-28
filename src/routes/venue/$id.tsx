@@ -1,5 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
+import VenueById from "@/components/venueById";
+import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/venue/$id')({
-  component: () => <div>Hello /venue/$id!</div>,
-})
+export const Route = createFileRoute("/venue/$id")({
+  component: VenueById,
+});
