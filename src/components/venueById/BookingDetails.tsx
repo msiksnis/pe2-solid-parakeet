@@ -299,7 +299,7 @@ export default function BookingDetails({ venue }: BookingDetailsProps) {
             Close
           </Button>
 
-          <div className="ml-auto flex w-80 flex-col justify-between">
+          <div className="ml-auto flex w-[21rem] flex-col justify-between">
             <>
               <div className="space-y-4">
                 <div
@@ -441,7 +441,7 @@ export default function BookingDetails({ venue }: BookingDetailsProps) {
             </>
             <>
               <div className="space-y-4">
-                <div className="flex items-center justify-between px-1 text-lg font-bold">
+                <div className="flex items-center justify-between px-2 text-lg font-bold">
                   <span className="selection:bg-card">Total</span>
                   <span>${totalPrice.toLocaleString()}</span>
                 </div>
