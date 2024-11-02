@@ -2,6 +2,7 @@ import { Venue } from "@/lib/types";
 import { MapPinIcon, StarIcon } from "lucide-react";
 import BlurFade from "./ui/blur-fade";
 import { Link } from "@tanstack/react-router";
+import { format } from "date-fns";
 
 interface VenueCardProps {
   venues: Venue[];
@@ -22,12 +23,7 @@ export default function VenueCardSM({ venues, currentFilter }: VenueCardProps) {
             to={`/venue/${venue.id}`}
             search={{
               guests: 2,
-              startDate: new Date().toISOString().split("T")[0],
-              endDate: (() => {
-                const date = new Date();
-                date.setDate(date.getDate() + 1);
-                return date.toISOString().split("T")[0];
-              })(),
+              start_date: format(new Date(), "yyyy-MM-dd"),
             }}
             className="mb-4 flex flex-col rounded-2xl border border-primary/0 transition-all duration-200 hover:border-primary/100 sm:p-2"
           >
