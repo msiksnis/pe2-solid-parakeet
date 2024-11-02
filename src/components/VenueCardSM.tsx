@@ -20,6 +20,15 @@ export default function VenueCardSM({ venues, currentFilter }: VenueCardProps) {
         >
           <Link
             to={`/venue/${venue.id}`}
+            search={{
+              guests: 2,
+              startDate: new Date().toISOString().split("T")[0],
+              endDate: (() => {
+                const date = new Date();
+                date.setDate(date.getDate() + 1);
+                return date.toISOString().split("T")[0];
+              })(),
+            }}
             className="mb-4 flex flex-col rounded-2xl border border-primary/0 transition-all duration-200 hover:border-primary/100 sm:p-2"
           >
             <img

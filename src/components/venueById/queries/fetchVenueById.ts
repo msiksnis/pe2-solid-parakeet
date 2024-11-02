@@ -3,7 +3,9 @@ import { Venue } from "@/lib/types";
 
 export const fetchVenueById = async (id: string): Promise<Venue> => {
   try {
-    const { data } = await axiosInstance.get(`/venues/${id}`);
+    const { data } = await axiosInstance.get(
+      `/venues/${id}?_owner=true&_bookings=true`,
+    );
     return data.data;
   } catch (error: any) {
     if (error.code === "ECONNABORTED") {

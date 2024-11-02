@@ -22,6 +22,30 @@ export interface Location {
   lng: number | null;
 }
 
+export interface Owner {
+  name: string;
+  email: string;
+  bio: string;
+  avatar: {
+    url: string;
+    alt: string;
+  };
+  banner: {
+    url: string;
+    alt: string;
+  };
+}
+
+export interface Booking {
+  id: string;
+  dateFrom: string;
+  dateTo: string;
+  guests: number;
+  created: string;
+  updated: string;
+  customer: Owner;
+}
+
 export interface Venue {
   id: string;
   name: string;
@@ -34,6 +58,11 @@ export interface Venue {
   updated: string;
   meta: MetaData;
   location: Location;
+  owner: Owner;
+  bookings: Booking[];
+  _count: {
+    bookings: number;
+  };
 }
 
 export type FilterOption = (typeof FILTER_OPTIONS)[number];

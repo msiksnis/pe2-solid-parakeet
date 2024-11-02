@@ -57,7 +57,7 @@ export default function LandingSection(): JSX.Element {
       <LandingImage />
 
       {/* Background blur effect */}
-      <div className="absolute left-0 top-0 z-0 h-4/5 w-full rounded-full bg-orange-100/60 blur-[90px]"></div>
+      <div className="absolute left-0 top-0 z-0 h-4/5 w-full rounded-full bg-orange-100/60 blur-[90px]" />
     </div>
   );
 }

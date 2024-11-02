@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
+import { differenceInCalendarDays } from "date-fns";
 import { useMediaQuery } from "react-responsive";
 import { twMerge } from "tailwind-merge";
 
@@ -14,3 +15,17 @@ export const useScreenSizes = () => {
 
   return { isMobile, isMedium, isExtraLarge };
 };
+
+export function calculateTotalPrice(
+  startDate: Date,
+  endDate: Date,
+  pricePerNight: number,
+  // guests: number
+): number {
+  const numberOfNights = differenceInCalendarDays(endDate, startDate);
+  if (numberOfNights <= 0) {
+    return 0;
+  }
+  // Adjust this calculation if price depends on guests
+  return numberOfNights * pricePerNight;
+}
