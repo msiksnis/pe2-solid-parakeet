@@ -94,7 +94,6 @@ export default function BookingDetails({ venue }: BookingDetailsProps) {
 
         // Check if the range overlaps with any booked dates
         if (isDateRangeOverlapping(startDate, endDate, bookedDateRanges)) {
-          // Show an error message or visual feedback
           alert(
             "The selected dates include unavailable dates. Please choose a different range.",
           );
@@ -228,14 +227,19 @@ export default function BookingDetails({ venue }: BookingDetailsProps) {
           return true; // Cannot book at least one night
         }
         return false;
+      } else {
+        if (range.from) {
+          if (date < range.from) {
+            return true; // Disable dates before the selected start date
+          }
+          // Remove the equality check to keep the start date enabled
+          // Disable dates that would result in a range overlapping booked dates
+          const startDate = startOfDay(range.from);
+          const endDate = endOfDay(date);
+          return isDateRangeOverlapping(startDate, endDate, bookedDateRanges);
+        }
+        return true; // Disable all dates if start date is not selected
       }
-      if (range.from) {
-        // Disable dates that would result in a range overlapping booked dates
-        const startDate = startOfDay(range.from);
-        const endDate = endOfDay(date);
-        return isDateRangeOverlapping(startDate, endDate, bookedDateRanges);
-      }
-      return false;
     },
   ];
 
