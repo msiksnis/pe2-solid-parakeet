@@ -447,7 +447,7 @@ export default function BookingDetails({ venue }: BookingDetailsProps) {
                 </div>
                 <Button
                   size="lg"
-                  className="w-full rounded-full bg-gradient-to-br from-amber-400 to-amber-500 py-6 text-lg font-semibold text-primary transition-all duration-300 hover:brightness-95"
+                  className="w-full rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 py-6 text-lg font-semibold text-primary transition-all duration-300 hover:brightness-95"
                 >
                   Reserve
                 </Button>
