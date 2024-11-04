@@ -448,7 +448,7 @@ export default function BookingDetails({ venue }: BookingDetailsProps) {
                 <Button
                   size="lg"
                   variant={"gooeyLeft"}
-                  className="w-full rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 py-6 text-lg font-semibold text-primary after:duration-700"
+                  className="h-14 w-full rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 text-lg font-semibold text-primary after:duration-700"
                 >
                   Reserve
                 </Button>
