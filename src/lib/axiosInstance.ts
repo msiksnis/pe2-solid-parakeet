@@ -6,3 +6,8 @@ const axiosInstance = axios.create({
 });
 
 export default axiosInstance;
+
+export const authClient = axios.create({
+  baseURL: "https://v2.api.noroff.dev/auth",
+  timeout: 5000,
+});

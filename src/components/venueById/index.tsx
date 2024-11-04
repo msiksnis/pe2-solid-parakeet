@@ -6,6 +6,7 @@ import {
   HeartIcon,
   ImagesIcon,
   ShareIcon,
+  User,
   Utensils,
   Wifi,
 } from "lucide-react";
@@ -19,6 +20,7 @@ import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import BookingDetails from "./BookingDetails";
 import { fetchVenueById } from "./queries/fetchVenueById";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export default function VenueById() {
   const { id } = useParams({ from: "/venue/$id" }) as { id: string };
@@ -131,11 +133,15 @@ export default function VenueById() {
           </div>
           <Separator />
           <div className="flex items-center space-x-4">
-            <img
-              src={venue.owner.avatar.url}
-              alt={venue.owner.avatar.alt}
-              className="size-10 rounded-full"
-            />
+            <Avatar className="cursor-pointer">
+              <AvatarImage
+                src={venue.owner.avatar.url}
+                alt={venue.owner.avatar.alt}
+              />
+              <AvatarFallback>
+                <User className="h-5 w-5" />
+              </AvatarFallback>
+            </Avatar>
             <span>
               Hosted by <span className="capitalize">{venue.owner.name}</span>
             </span>
