@@ -8,15 +8,12 @@ import { Button } from "@/components/ui/button";
 interface SignInModalProps {
   isOpen: boolean;
   onClose: () => void;
-  // onConfirm is optional
-  onConfirm?: () => void;
   loading: boolean;
 }
 
 export default function SignInModal({
   isOpen,
   onClose,
-  onConfirm,
   loading,
 }: SignInModalProps) {
   const [alreadyUser, setAlreadyUser] = useState(true);
@@ -27,25 +24,27 @@ export default function SignInModal({
 
   const switchForm = alreadyUser ? (
     <div className="text-muted-foreground">
-      Not a user yet?&nbsp;
+      Not a user yet?
       <Button
-        variant="link"
+        variant="linkHover2"
         onClick={toggleForm}
-        className="h-fit cursor-pointer p-1 text-muted-foreground hover:text-primary"
+        className="ml-1.5 h-fit cursor-pointer px-0 text-muted-foreground after:w-full hover:text-primary"
       >
         Sign up
       </Button>
+      &nbsp;first
     </div>
   ) : (
     <div className="text-muted-foreground">
-      Already have an account?&nbsp;
+      Already have an account?
       <Button
-        variant="link"
+        variant="linkHover2"
         onClick={toggleForm}
-        className="h-fit cursor-pointer p-1 text-muted-foreground hover:text-primary"
+        className="ml-1.5 h-fit cursor-pointer px-0 text-muted-foreground after:w-full hover:text-primary"
       >
         Log in
       </Button>
+      &nbsp;here
     </div>
   );
 
@@ -62,34 +61,11 @@ export default function SignInModal({
 
       <div className="mt-4">
         {alreadyUser ? (
-          <LoginForm onConfirm={onConfirm} loading={loading} />
+          <LoginForm loading={loading} onClose={onClose} />
         ) : (
           <RegisterUserForm loading={loading} setAlreadyUser={setAlreadyUser} />
         )}
       </div>
     </Modal>
   );
-}
-
-{
-  /* <div className="flex w-full items-center justify-end space-x-2 pt-6">
-  <Button
-    variant="outline"
-    size="lg"
-    disabled={loading}
-    onClick={onClose}
-    className="font-normal"
-  >
-    Cancel
-  </Button>
-  <Button
-    variant="destructive"
-    size="lg"
-    disabled={loading}
-    onClick={onConfirm}
-    className="bg-red-500 font-normal text-white hover:bg-red-600"
-  >
-    Delete
-  </Button>
-</div> */
 }

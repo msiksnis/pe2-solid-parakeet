@@ -288,16 +288,16 @@ export default function BookingDetails({ venue }: BookingDetailsProps) {
             </motion.div>
           )}
 
-          <Button
-            variant="link"
+          <div
             className={cn("hidden", {
-              "absolute bottom-4 left-4 block cursor-pointer text-base font-semibold underline underline-offset-4":
+              "absolute bottom-4 left-4 block cursor-pointer text-base font-semibold":
                 isExpanded,
             })}
-            onClick={() => setIsExpanded(false)}
           >
-            Close
-          </Button>
+            <Button variant={"linkHover1"} onClick={() => setIsExpanded(false)}>
+              Close
+            </Button>
+          </div>
 
           <div className="ml-auto flex w-[21rem] flex-col justify-between">
             <>
@@ -306,11 +306,11 @@ export default function BookingDetails({ venue }: BookingDetailsProps) {
                   className="mt-2 flex w-full items-center justify-between gap-4"
                   onClick={() => setIsExpanded(true)}
                 >
-                  <button
+                  <Button
                     className={cn(
-                      "grid w-full grid-cols-3 rounded-xl border border-gray-500 py-1 outline-none",
+                      "grid h-fit w-full grid-cols-3 rounded-xl border border-gray-500 bg-card py-1 text-primary outline-none ring-offset-background transition-all duration-300 hover:bg-card",
                       {
-                        "ring-2 ring-primary ring-offset-1":
+                        "ring-2 ring-primary ring-offset-2":
                           isSelectingStartDate && isExpanded,
                       },
                     )}
@@ -331,12 +331,12 @@ export default function BookingDetails({ venue }: BookingDetailsProps) {
                           : "Select date"}
                       </span>
                     </div>
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     className={cn(
-                      "grid w-full grid-cols-3 rounded-xl border border-gray-500 py-1 outline-none",
+                      "grid h-fit w-full grid-cols-3 rounded-xl border border-gray-500 bg-card py-1 text-primary outline-none ring-offset-background transition-all duration-300 hover:bg-card",
                       {
-                        "ring-2 ring-primary ring-offset-1":
+                        "ring-2 ring-primary ring-offset-2":
                           !isSelectingStartDate && isExpanded,
                       },
                     )}
@@ -358,7 +358,7 @@ export default function BookingDetails({ venue }: BookingDetailsProps) {
                         {range.to ? format(range.to, "dd MMM") : "Select date"}
                       </span>
                     </div>
-                  </button>
+                  </Button>
                 </div>
 
                 <div
@@ -400,7 +400,7 @@ export default function BookingDetails({ venue }: BookingDetailsProps) {
                       <Button
                         variant="outline"
                         size="icon"
-                        className="size-7 rounded-full"
+                        className="size-6 rounded-full border-gray-500"
                         onClick={() => {
                           navigate({
                             search: (prev) => ({
@@ -420,7 +420,7 @@ export default function BookingDetails({ venue }: BookingDetailsProps) {
                       <Button
                         variant="outline"
                         size="icon"
-                        className="size-7 rounded-full"
+                        className="size-6 rounded-full border-gray-500"
                         onClick={() => {
                           navigate({
                             search: (prev) => ({
@@ -447,7 +447,8 @@ export default function BookingDetails({ venue }: BookingDetailsProps) {
                 </div>
                 <Button
                   size="lg"
-                  className="w-full rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 py-6 text-lg font-semibold text-primary transition-all duration-300 hover:brightness-95"
+                  variant={"gooeyLeft"}
+                  className="w-full rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 py-6 text-lg font-semibold text-primary after:duration-700"
                 >
                   Reserve
                 </Button>

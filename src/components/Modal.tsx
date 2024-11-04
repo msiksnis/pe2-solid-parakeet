@@ -1,11 +1,11 @@
 import {
-  Dialog,
-  DialogOverlay,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-  DialogHeader,
-} from "@/components/ui/dialog";
+  ResponsiveModal,
+  ResponsiveModalOverlay,
+  ResponsiveModalContent,
+  ResponsiveModalTitle,
+  ResponsiveModalDescription,
+  ResponsiveModalHeader,
+} from "./ui/responsive-nodal";
 
 interface ModalProps {
   isOpen: boolean;
@@ -20,16 +20,16 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
     }
   };
   return (
-    <Dialog open={isOpen} onOpenChange={onChange}>
-      <DialogOverlay>
-        <DialogContent className="overflow-y-hidden !rounded-xl">
-          <DialogHeader className="sr-only">
-            <DialogTitle>Modal Title</DialogTitle>
-            <DialogDescription>Description</DialogDescription>
-          </DialogHeader>
+    <ResponsiveModal open={isOpen} onOpenChange={onChange}>
+      <ResponsiveModalOverlay>
+        <ResponsiveModalContent className="overflow-y-hidden">
+          <ResponsiveModalHeader className="sr-only">
+            <ResponsiveModalTitle>Modal Title</ResponsiveModalTitle>
+            <ResponsiveModalDescription>Description</ResponsiveModalDescription>
+          </ResponsiveModalHeader>
           {children}
-        </DialogContent>
-      </DialogOverlay>
-    </Dialog>
+        </ResponsiveModalContent>
+      </ResponsiveModalOverlay>
+    </ResponsiveModal>
   );
 }

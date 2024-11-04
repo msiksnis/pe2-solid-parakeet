@@ -71,16 +71,16 @@ export default function RegisterUserForm({
             render={({ field }) => (
               <FormItem
                 className={cn(
-                  "relative h-14 space-y-0 rounded-xl border border-gray-400",
+                  "relative h-14 space-y-0 rounded-xl border border-gray-400 transition-all duration-300",
                   {
-                    "border-primary ring-1 ring-primary ring-offset-1":
+                    "border-primary ring-2 ring-primary ring-offset-2 ring-offset-card":
                       isNameFocused,
                   },
                   {
                     "border-destructive": form.formState.errors.name,
                   },
                   {
-                    "ring-1 ring-destructive ring-offset-1":
+                    "ring-2 ring-destructive ring-offset-2":
                       form.formState.errors.name && isNameFocused,
                   },
                 )}
@@ -100,7 +100,7 @@ export default function RegisterUserForm({
                     {...field}
                     onFocus={() => setIsNameFocused(true)}
                     onBlur={() => setIsNameFocused(false)}
-                    className="focus-visible: h-14 rounded-xl border-transparent pt-5 text-lg shadow-none focus-visible:ring-0"
+                    className="h-full rounded-xl border-transparent pt-5 text-lg shadow-none focus-visible:ring-0"
                   />
                 </FormControl>
                 <FormMessage className="pl-1 pt-0.5" />
@@ -113,16 +113,16 @@ export default function RegisterUserForm({
             render={({ field }) => (
               <FormItem
                 className={cn(
-                  "relative h-14 space-y-0 rounded-xl border border-gray-400",
+                  "relative h-14 space-y-0 rounded-xl border border-gray-400 transition-all duration-300",
                   {
-                    "border-primary ring-1 ring-primary ring-offset-1":
+                    "border-primary ring-2 ring-primary ring-offset-2 ring-offset-card":
                       isEmailFocused,
                   },
                   {
                     "border-destructive": form.formState.errors.email,
                   },
                   {
-                    "ring-1 ring-destructive ring-offset-1":
+                    "ring-2 ring-destructive ring-offset-2":
                       form.formState.errors.email && isEmailFocused,
                   },
                 )}
@@ -142,7 +142,7 @@ export default function RegisterUserForm({
                     {...field}
                     onFocus={() => setIsEmailFocused(true)}
                     onBlur={() => setIsEmailFocused(false)}
-                    className="focus-visible: h-14 rounded-xl border-transparent pt-5 text-lg shadow-none focus-visible:ring-0"
+                    className="h-full rounded-xl border-transparent pt-5 text-lg shadow-none focus-visible:ring-0"
                   />
                 </FormControl>
                 <FormMessage className="pl-1 pt-0.5" />
@@ -155,16 +155,16 @@ export default function RegisterUserForm({
             render={({ field }) => (
               <FormItem
                 className={cn(
-                  "relative h-14 space-y-0 rounded-xl border border-gray-400",
+                  "relative h-14 space-y-0 rounded-xl border border-gray-400 transition-all duration-300",
                   {
-                    "border-primary ring-1 ring-primary ring-offset-1":
+                    "border-primary ring-2 ring-primary ring-offset-2 ring-offset-card":
                       isPasswordFocused,
                   },
                   {
                     "border-destructive": form.formState.errors.password,
                   },
                   {
-                    "ring-1 ring-destructive ring-offset-1":
+                    "ring-2 ring-destructive ring-offset-2":
                       form.formState.errors.password && isPasswordFocused,
                   },
                 )}
@@ -185,7 +185,7 @@ export default function RegisterUserForm({
                     {...field}
                     onFocus={() => setIsPasswordFocused(true)}
                     onBlur={() => setIsPasswordFocused(false)}
-                    className="focus-visible: h-14 rounded-xl border-transparent pt-5 text-lg shadow-none focus-visible:ring-0"
+                    className="h-full rounded-xl border-transparent pt-5 text-lg shadow-none focus-visible:ring-0"
                   />
                 </FormControl>
                 <FormMessage className="pl-1 pt-0.5" />
@@ -215,7 +215,8 @@ export default function RegisterUserForm({
         <Button
           type="submit"
           disabled={mutation.isPending}
-          className="relative flex h-12 w-full rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 text-lg font-semibold text-primary transition-all duration-300 hover:brightness-95"
+          variant={"gooeyLeft"}
+          className="h-14 w-full rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 text-lg font-semibold text-primary after:duration-700"
         >
           {mutation.isPending ? (
             <span className="flex gap-x-2">

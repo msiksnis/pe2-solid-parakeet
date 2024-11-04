@@ -20,15 +20,16 @@ import { useAuthStore } from "@/hooks/useAuthStore";
 import { loginUser } from "@/api/auth";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
+import axios from "axios";
 
 interface LoginProps {
-  onConfirm?: () => void;
   loading: boolean;
+  onClose: () => void;
 }
 
 type LoginType = z.infer<typeof LoginUserSchema>;
 
-export default function LoginForm({ onConfirm, loading }: LoginProps) {
+export default function LoginForm({ loading, onClose }: LoginProps) {
   const [isEmailFocused, setIsEmailFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
@@ -49,40 +50,39 @@ export default function LoginForm({ onConfirm, loading }: LoginProps) {
         venueManager,
       );
       toast.success("Logged in successfully");
-      onConfirm?.();
+      onClose();
     },
     onError: (error) => {
-      console.error("Login failed:", error);
-      toast.error(error.message || "Login failed. Please try again.");
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        toast.error("Invalid email or password. Please try again.");
+      } else {
+        toast.error(error.message || "Login failed. Please try again.");
+      }
     },
   });
-
-  const { venueManager } = useAuthStore();
-
-  console.log("venueManager:", venueManager);
 
   const onSubmit = (data: LoginType) => mutation.mutate(data);
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="space-y-8">
+        <div className="mb-4 space-y-8">
           <FormField
             control={form.control}
             name="email"
             render={({ field }) => (
               <FormItem
                 className={cn(
-                  "relative h-14 space-y-0 rounded-xl border border-gray-400",
+                  "relative h-14 space-y-0 rounded-xl border border-gray-400 transition-all duration-300",
                   {
-                    "border-primary ring-1 ring-primary ring-offset-1":
+                    "border-primary ring-2 ring-primary ring-offset-2 ring-offset-card":
                       isEmailFocused,
                   },
                   {
                     "border-destructive": form.formState.errors.email,
                   },
                   {
-                    "ring-1 ring-destructive ring-offset-1":
+                    "ring-2 ring-destructive ring-offset-2":
                       form.formState.errors.email && isEmailFocused,
                   },
                 )}
@@ -102,7 +102,7 @@ export default function LoginForm({ onConfirm, loading }: LoginProps) {
                     {...field}
                     onFocus={() => setIsEmailFocused(true)}
                     onBlur={() => setIsEmailFocused(false)}
-                    className="focus-visible: h-14 rounded-xl border-transparent pt-5 text-lg shadow-none focus-visible:ring-0"
+                    className="h-full rounded-xl border-transparent pt-5 text-lg shadow-none focus-visible:ring-0"
                   />
                 </FormControl>
                 <FormMessage className="pl-1 pt-0.5" />
@@ -115,16 +115,16 @@ export default function LoginForm({ onConfirm, loading }: LoginProps) {
             render={({ field }) => (
               <FormItem
                 className={cn(
-                  "relative h-14 space-y-0 rounded-xl border border-gray-400",
+                  "relative h-14 space-y-0 rounded-xl border border-gray-400 transition-all duration-300",
                   {
-                    "border-primary ring-1 ring-primary ring-offset-1":
+                    "border-primary ring-2 ring-primary ring-offset-2 ring-offset-card":
                       isPasswordFocused,
                   },
                   {
                     "border-destructive": form.formState.errors.password,
                   },
                   {
-                    "ring-1 ring-destructive ring-offset-1":
+                    "ring-2 ring-destructive ring-offset-2":
                       form.formState.errors.password && isPasswordFocused,
                   },
                 )}
@@ -145,7 +145,7 @@ export default function LoginForm({ onConfirm, loading }: LoginProps) {
                     {...field}
                     onFocus={() => setIsPasswordFocused(true)}
                     onBlur={() => setIsPasswordFocused(false)}
-                    className="focus-visible: h-14 rounded-xl border-transparent pt-5 text-lg shadow-none focus-visible:ring-0"
+                    className="h- h-full rounded-xl border-transparent pt-5 text-lg shadow-none focus-visible:ring-0"
                   />
                 </FormControl>
                 <FormMessage className="pl-1 pt-0.5" />
@@ -156,7 +156,8 @@ export default function LoginForm({ onConfirm, loading }: LoginProps) {
         <Button
           type="submit"
           disabled={loading}
-          className="relative flex h-12 w-full rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 text-lg font-semibold text-primary transition-all duration-300 hover:brightness-95"
+          variant={"gooeyLeft"}
+          className="h-14 w-full rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 text-lg font-semibold text-primary after:duration-700"
         >
           {loading ? (
             <span className="flex gap-x-2">
