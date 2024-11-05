@@ -19,6 +19,9 @@ import { DayClickEventHandler } from "react-day-picker";
 import { Button } from "../ui/button";
 import { Calendar } from "../ui/calendar";
 import { Separator } from "../ui/separator";
+import { useSignInModalStore } from "@/hooks/useSignInModalStore";
+import { useAuthStatus } from "@/hooks/useAuthStatus";
+import { toast } from "sonner";
 
 interface BookingDetailsProps {
   venue: Venue;
@@ -43,6 +46,9 @@ export default function BookingDetailsMobile({ venue }: BookingDetailsProps) {
   const [range, setRange] = useState<Range>({ from: startDate, to: endDate });
   const [guestControlExpanded, setGuestControlExpanded] = useState(false);
   const [isSelectingStartDate, setIsSelectingStartDate] = useState(true);
+
+  const { openSignInModal } = useSignInModalStore();
+  const { isLoggedIn } = useAuthStatus();
 
   useEffect(() => {
     if (range.from && range.to && range.from > range.to) {
@@ -189,6 +195,19 @@ export default function BookingDetailsMobile({ venue }: BookingDetailsProps) {
   ];
 
   const { smCalendarContainer } = useScreenSizes();
+
+  const handleReserve = () => {
+    if (!isLoggedIn) {
+      openSignInModal(); // Call the function to open the modal
+      return; // Exit the function early, so the reservation logic doesn't proceed
+    }
+
+    if (range.from && range.to) {
+      // Logic to reserve the venue will go here
+    } else {
+      toast.warning("Please select dates to reserve the venue.");
+    }
+  };
 
   return (
     <div className={cn("hidden", { block: smCalendarContainer })}>
@@ -349,6 +368,7 @@ export default function BookingDetailsMobile({ venue }: BookingDetailsProps) {
           <Button
             size="lg"
             variant={"gooeyLeft"}
+            onClick={handleReserve}
             className="h-14 w-full rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 text-lg font-semibold text-primary after:duration-700"
           >
             Reserve

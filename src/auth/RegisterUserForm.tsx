@@ -35,8 +35,15 @@ export default function RegisterUserForm({
   const [isNameFocused, setIsNameFocused] = useState(false);
   const [isEmailFocused, setIsEmailFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+
   const form = useForm<RegisterUserType>({
     resolver: zodResolver(RegisterUserSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      venueManager: false,
+    },
   });
 
   const mutation = useMutation<

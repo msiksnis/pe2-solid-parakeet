@@ -1,12 +1,13 @@
+import SignInModal from "@/auth/SignInModal";
+import { useAuthStatus } from "@/hooks/useAuthStatus";
+import { useSignInModalStore } from "@/hooks/useSignInModalStore";
 import { Link } from "@tanstack/react-router";
 import { Button } from "./ui/button";
-import SignInModal from "@/auth/SignInModal";
-import { useState } from "react";
-import { useAuthStatus } from "@/hooks/useAuthStatus";
 import UserButton from "./UserButton";
 
 export default function Navbar() {
-  const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
+  const { isSignInModalOpen, openSignInModal, closeSignInModal } =
+    useSignInModalStore();
 
   const { isLoggedIn } = useAuthStatus();
 
@@ -16,8 +17,8 @@ export default function Navbar() {
         <Link to="/">
           <img src="/Logo.png" className="max-h-14" />
         </Link>
-        <nav className="ml-auto hidden items-center space-x-32 sm:flex">
-          <div className="space-x-10">
+        <nav className="ml-auto flex items-center space-x-32">
+          <div className="hidden space-x-10 sm:flex">
             <Link
               to="/"
               className="text-lg underline-offset-4 [&.active]:underline"
@@ -41,7 +42,7 @@ export default function Navbar() {
             <UserButton />
           ) : (
             <Button
-              onClick={() => setIsSignInModalOpen(true)}
+              onClick={openSignInModal}
               variant="outline"
               className="rounded-full border-primary"
             >
@@ -52,7 +53,7 @@ export default function Navbar() {
       </header>
       <SignInModal
         isOpen={isSignInModalOpen}
-        onClose={() => setIsSignInModalOpen(false)}
+        onClose={closeSignInModal}
         loading={false}
       />
     </>

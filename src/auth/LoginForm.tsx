@@ -35,6 +35,10 @@ export default function LoginForm({ loading, onClose }: LoginProps) {
 
   const form = useForm<LoginType>({
     resolver: zodResolver(LoginUserSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
   });
 
   const setAuth = useAuthStore((state) => state.setAuth);

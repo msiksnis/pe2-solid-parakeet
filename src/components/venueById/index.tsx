@@ -66,13 +66,15 @@ export default function VenueById() {
           ? "grid-cols-3 grid-rows-2"
           : "grid-cols-4 grid-rows-2";
 
+  const mobileImages = venue.media?.slice(0, 3) || [];
+
   const handleShowAllPhotos = () => {
     // Logic to show all photos will go here
     console.log("Show all photos");
   };
 
   return (
-    <div className="mx-auto mt-10 max-w-7xl space-y-6 px-4 sm:px-6 md:px-10 xl:px-6">
+    <div className="mt-10 max-w-7xl space-y-6 px-4 sm:px-6 md:px-10 xl:px-6">
       {/* Venue Header */}
       <div className="flex flex-col justify-between space-y-4 lg:flex-row lg:items-end lg:space-y-0">
         <div className="flex flex-col text-3xl font-medium lg:flex-row lg:items-center">
@@ -107,8 +109,8 @@ export default function VenueById() {
       </div>
 
       {/* Image Gallery */}
-      <div className="relative aspect-[2/1] w-full overflow-hidden rounded-2xl">
-        <div className={`grid ${gridClasses} h-full gap-2`}>
+      <div className="relative w-full overflow-hidden md:aspect-[2/1] md:rounded-2xl">
+        <div className={`hidden md:grid ${gridClasses} h-full gap-2`}>
           {images.map((media, index) => (
             <img
               key={media.url}
@@ -119,6 +121,33 @@ export default function VenueById() {
               }`}
             />
           ))}
+        </div>
+        <div className="grid w-[calc(100vw)] grid-cols-2 grid-rows-2 gap-2 md:hidden">
+          {mobileImages.map((media, index) => {
+            const className = cn(
+              "w-full object-cover",
+              mobileImages.length === 1
+                ? "col-span-2 row-span-2"
+                : mobileImages.length === 2
+                  ? index === 0
+                    ? "col-span-2 row-start-1 aspect-[2/1]"
+                    : "col-span-2 row-start-2 aspect-[2/1]"
+                  : mobileImages.length === 3 && index === 0
+                    ? "col-span-2 row-start-1 aspect-[2/1]"
+                    : index === 1
+                      ? "col-span-1 row-start-2 aspect-square"
+                      : "col-span-1 col-start-2 row-start-2 aspect-square",
+            );
+
+            return (
+              <img
+                key={media.url}
+                src={media.url}
+                alt={media.alt || "Venue image"}
+                className={className}
+              />
+            );
+          })}
         </div>
         {totalImages > 5 && (
           <div className="absolute bottom-4 right-4">
@@ -167,28 +196,36 @@ export default function VenueById() {
             <h2 className="text-2xl font-semibold">Features and services</h2>
             <div className="my-8 grid grid-cols-1 sm:grid-cols-3">
               <div className="space-y-2">
-                <div className="">Max Guests: {venue.maxGuests}</div>
+                <div className="text-lg">Max Guests: {venue.maxGuests}</div>
                 {venue.rating > 0 ? <RatingStars rating={venue.rating} /> : ""}
               </div>
-              <div className="mt-2 space-y-2 sm:mt-0">
-                <span className="flex">
-                  <Wifi className="mr-2 size-5" />
-                  Wifi
-                </span>
-                <span className="flex">
-                  <CircleParking className="mr-2 size-5" />
-                  Parking
-                </span>
+              <div className="mt-8 space-y-2 sm:mt-0">
+                {venue.meta.wifi && (
+                  <span className="flex">
+                    <Wifi className="mr-2 size-5" />
+                    Wifi
+                  </span>
+                )}
+                {venue.meta.parking && (
+                  <span className="flex">
+                    <CircleParking className="mr-2 size-5" />
+                    Parking
+                  </span>
+                )}
               </div>
               <div className="mt-2 space-y-2 sm:mt-0">
-                <span className="flex">
-                  <Utensils className="mr-2 size-5" />
-                  Breakfast
-                </span>
-                <span className="flex">
-                  <Cat className="mr-2 size-5" />
-                  Pets
-                </span>
+                {venue.meta.breakfast && (
+                  <span className="flex">
+                    <Utensils className="mr-2 size-5" />
+                    Breakfast
+                  </span>
+                )}
+                {venue.meta.pets && (
+                  <span className="flex">
+                    <Cat className="mr-2 size-5" />
+                    Pets
+                  </span>
+                )}
               </div>
             </div>
           </div>
