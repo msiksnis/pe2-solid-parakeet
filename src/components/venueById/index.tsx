@@ -74,7 +74,7 @@ export default function VenueById() {
   };
 
   return (
-    <div className="mt-10 max-w-7xl space-y-6 px-4 sm:px-6 md:px-10 xl:px-6">
+    <div className="mx-auto mt-10 max-w-7xl space-y-6 px-4 sm:px-6 md:px-10 xl:px-6">
       {/* Venue Header */}
       <div className="flex flex-col justify-between space-y-4 lg:flex-row lg:items-end lg:space-y-0">
         <div className="flex flex-col text-3xl font-medium lg:flex-row lg:items-center">
