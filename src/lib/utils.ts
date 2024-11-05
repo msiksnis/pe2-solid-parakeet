@@ -12,8 +12,20 @@ export const useScreenSizes = () => {
     query: "(min-width: 768px) and (max-width: 1279px)",
   });
   const isExtraLarge = useMediaQuery({ query: "(min-width: 1280px)" });
+  const smCalendarContainer = useMediaQuery({
+    query: "(max-width: 779px)",
+  });
+  const mdCalendarContainer = useMediaQuery({
+    query: "(min-width: 780px) and (max-width: 1060px)",
+  });
 
-  return { isMobile, isMedium, isExtraLarge };
+  return {
+    isMobile,
+    isMedium,
+    isExtraLarge,
+    smCalendarContainer,
+    mdCalendarContainer,
+  };
 };
 
 export function calculateTotalPrice(

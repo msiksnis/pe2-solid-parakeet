@@ -1,5 +1,5 @@
 import { Venue } from "@/lib/types";
-import { calculateTotalPrice, cn } from "@/lib/utils";
+import { calculateTotalPrice, cn, useScreenSizes } from "@/lib/utils";
 import { Route } from "@/routes/venue/$id";
 import { useNavigate } from "@tanstack/react-router";
 import {
@@ -47,6 +47,8 @@ export default function BookingDetails({ venue }: BookingDetailsProps) {
 
   const calendarRef = useRef<HTMLDivElement>(null);
   const guestsRef = useRef<HTMLDivElement>(null);
+
+  const { smCalendarContainer, mdCalendarContainer } = useScreenSizes();
 
   useEffect(() => {
     if (range.from && range.to && range.from > range.to) {
@@ -244,10 +246,14 @@ export default function BookingDetails({ venue }: BookingDetailsProps) {
   ];
 
   return (
-    <div className="flex flex-col">
+    <div
+      className={cn("flex flex-col", {
+        hidden: smCalendarContainer,
+      })}
+    >
       <div
         ref={calendarRef}
-        className="shadow-custom space-y- relative flex flex-col rounded-2xl border bg-card px-6 py-4"
+        className="shadow-custom relative flex flex-col rounded-2xl bg-card px-6 py-4"
       >
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -260,7 +266,7 @@ export default function BookingDetails({ venue }: BookingDetailsProps) {
               </span>
             </div>
           )}
-          <div className="w-80">
+          <div className="w-[336px]">
             <div className="flex flex-col">
               <span className="text-2xl font-semibold">${venue?.price}</span>
               <span className="pb-0.5 text-muted-foreground">Per night</span>
@@ -279,7 +285,9 @@ export default function BookingDetails({ venue }: BookingDetailsProps) {
             >
               <Calendar
                 mode="range"
-                numberOfMonths={2}
+                numberOfMonths={
+                  smCalendarContainer || mdCalendarContainer ? 1 : 2
+                }
                 weekStartsOn={1}
                 selected={range}
                 onDayClick={handleDateSelect}
@@ -308,7 +316,7 @@ export default function BookingDetails({ venue }: BookingDetailsProps) {
                 >
                   <Button
                     className={cn(
-                      "grid h-fit w-full grid-cols-3 rounded-xl border border-gray-500 bg-card py-1 text-primary outline-none ring-offset-background transition-all duration-300 hover:bg-card",
+                      "grid h-fit w-full grid-cols-3 rounded-xl border border-gray-500 bg-card px-0 py-1 text-primary outline-none ring-offset-background transition-all duration-300 hover:bg-card",
                       {
                         "ring-2 ring-primary ring-offset-2":
                           isSelectingStartDate && isExpanded,
@@ -325,7 +333,11 @@ export default function BookingDetails({ venue }: BookingDetailsProps) {
                       <span className="whitespace-nowrap text-sm">
                         Start date
                       </span>
-                      <span className="whitespace-nowrap text-lg">
+                      <span
+                        className={cn("whitespace-nowrap text-lg", {
+                          "text-base": smCalendarContainer,
+                        })}
+                      >
                         {range.from
                           ? format(range.from, "dd MMM")
                           : "Select date"}
@@ -334,7 +346,7 @@ export default function BookingDetails({ venue }: BookingDetailsProps) {
                   </Button>
                   <Button
                     className={cn(
-                      "grid h-fit w-full grid-cols-3 rounded-xl border border-gray-500 bg-card py-1 text-primary outline-none ring-offset-background transition-all duration-300 hover:bg-card",
+                      "grid h-fit w-full grid-cols-3 rounded-xl border border-gray-500 bg-card px-0 py-1 text-primary outline-none ring-offset-background transition-all duration-300 hover:bg-card",
                       {
                         "ring-2 ring-primary ring-offset-2":
                           !isSelectingStartDate && isExpanded,
@@ -354,7 +366,11 @@ export default function BookingDetails({ venue }: BookingDetailsProps) {
                       <span className="whitespace-nowrap text-sm">
                         End date
                       </span>
-                      <span className="whitespace-nowrap text-lg">
+                      <span
+                        className={cn("whitespace-nowrap text-lg", {
+                          "text-base": smCalendarContainer,
+                        })}
+                      >
                         {range.to ? format(range.to, "dd MMM") : "Select date"}
                       </span>
                     </div>

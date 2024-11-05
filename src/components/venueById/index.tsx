@@ -13,17 +13,21 @@ import {
 import { titleCase } from "title-case";
 
 import { Venue } from "@/lib/types";
+import { cn, useScreenSizes } from "@/lib/utils";
 import ErrorLoadingButton from "../ErrorLoadingButton";
 import Loader from "../loader";
 import RatingStars from "../RatingStars";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import BookingDetails from "./BookingDetails";
+import BookingDetailsMobile from "./BookingDetailsMobile";
 import { fetchVenueById } from "./queries/fetchVenueById";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export default function VenueById() {
   const { id } = useParams({ from: "/venue/$id" }) as { id: string };
+
+  const { smCalendarContainer } = useScreenSizes();
 
   const {
     data: venue,
@@ -70,30 +74,35 @@ export default function VenueById() {
   return (
     <div className="mx-auto mt-10 max-w-7xl space-y-6 px-4 sm:px-6 md:px-10 xl:px-6">
       {/* Venue Header */}
-      <div className="flex items-end justify-between">
-        <div className="flex items-center text-3xl font-medium">
+      <div className="flex flex-col justify-between space-y-4 lg:flex-row lg:items-end lg:space-y-0">
+        <div className="flex flex-col text-3xl font-medium lg:flex-row lg:items-center">
           <h1>{titleCase(venue.name)}</h1>
-          {venue.location?.city && (
-            <span className="capitalize">
-              &nbsp;|&nbsp;{venue.location.city}
-            </span>
-          )}
-          {venue.location?.country && (
-            <span className="capitalize">
-              {venue.location.city ? ", " : "&nbsp;|&nbsp;"}
-              {venue.location.country}
-            </span>
-          )}
+          <span>
+            {venue.location?.city && (
+              <span className="capitalize">
+                <span className="hidden font-normal lg:inline">
+                  &nbsp;|&nbsp;
+                </span>
+                {venue.location.city}
+              </span>
+            )}
+            {venue.location?.country && (
+              <span className="capitalize">
+                {venue.location.city ? ", " : "&nbsp;|&nbsp;"}
+                {venue.location.country}
+              </span>
+            )}
+          </span>
         </div>
         <div className="flex items-center gap-8">
-          <Button variant="ghost" className="flex items-center text-lg">
+          <button className="flex items-center rounded-md text-lg lg:px-4 lg:py-2 lg:hover:bg-accent lg:hover:text-accent-foreground">
             <ShareIcon className="mr-2 size-6" />
             Share
-          </Button>
-          <Button variant="ghost" className="flex items-center text-lg">
+          </button>
+          <button className="flex items-center rounded-md text-lg lg:px-4 lg:py-2 lg:hover:bg-accent lg:hover:text-accent-foreground">
             <HeartIcon className="mr-2 size-6" />
             Save
-          </Button>
+          </button>
         </div>
       </div>
 
@@ -125,14 +134,21 @@ export default function VenueById() {
       </div>
 
       {/* Venue Details and Booking */}
-      <div className="relative flex items-start justify-between gap-14 px-4">
-        <div className="w-2/3 space-y-6">
+      <div className="relative flex items-start justify-between gap-14 px-4 xl:px-0">
+        <div
+          className={cn(
+            "w-[calc(100%-400px)] space-y-6 xl:w-[calc(100%-420px)]",
+            {
+              "w-full": smCalendarContainer,
+            },
+          )}
+        >
           {/* Todo: AI generated heading here */}
           <div className="text-paragraph text-pretty pb-6 text-lg font-light">
             {venue.description}
           </div>
           <Separator />
-          <div className="flex items-center space-x-4">
+          <div className="hidden items-center space-x-4 md:flex">
             <Avatar className="cursor-pointer">
               <AvatarImage
                 src={venue.owner.avatar.url}
@@ -146,15 +162,15 @@ export default function VenueById() {
               Hosted by <span className="capitalize">{venue.owner.name}</span>
             </span>
           </div>
-          <Separator />
+          <Separator className="hidden md:flex" />
           <div>
             <h2 className="text-2xl font-semibold">Features and services</h2>
-            <div className="mt-8 grid grid-cols-3">
+            <div className="my-8 grid grid-cols-1 sm:grid-cols-3">
               <div className="space-y-2">
                 <div className="">Max Guests: {venue.maxGuests}</div>
                 {venue.rating > 0 ? <RatingStars rating={venue.rating} /> : ""}
               </div>
-              <div className="space-y-2">
+              <div className="mt-2 space-y-2 sm:mt-0">
                 <span className="flex">
                   <Wifi className="mr-2 size-5" />
                   Wifi
@@ -164,7 +180,7 @@ export default function VenueById() {
                   Parking
                 </span>
               </div>
-              <div className="space-y-2">
+              <div className="mt-2 space-y-2 sm:mt-0">
                 <span className="flex">
                   <Utensils className="mr-2 size-5" />
                   Breakfast
@@ -176,8 +192,28 @@ export default function VenueById() {
               </div>
             </div>
           </div>
+
+          <BookingDetailsMobile venue={venue} />
+          <div className="space-y-6 md:hidden">
+            <Separator />
+            <div className="flex items-center space-x-4">
+              <Avatar className="cursor-pointer">
+                <AvatarImage
+                  src={venue.owner.avatar.url}
+                  alt={venue.owner.avatar.alt}
+                />
+                <AvatarFallback>
+                  <User className="h-5 w-5" />
+                </AvatarFallback>
+              </Avatar>
+              <span>
+                Hosted by <span className="capitalize">{venue.owner.name}</span>
+              </span>
+            </div>
+            <Separator />
+          </div>
         </div>
-        <div className="absolute right-4">
+        <div className="absolute right-0 xl:right-4">
           <BookingDetails venue={venue} />
         </div>
       </div>
