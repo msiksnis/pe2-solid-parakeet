@@ -170,7 +170,7 @@ export default function HostVenue() {
                 {fields.map((mediaField, index) => (
                   <div
                     key={mediaField.id}
-                    className="flex items-center space-x-4"
+                    className="flex w-full flex-col space-y-4 md:flex-row md:items-center md:space-x-4 md:space-y-0"
                   >
                     {/* URL Field */}
                     <div className="flex-1">
@@ -234,14 +234,14 @@ export default function HostVenue() {
                                 )}
                               >
                                 {imagePreview ? (
-                                  <div className="group relative">
+                                  <div className="group relative cursor-pointer">
                                     <img
                                       src={imagePreview}
                                       alt="Preview"
                                       className="size-14 object-cover"
                                     />
                                     {/* Hover Popup */}
-                                    <div className="absolute left-14 top-0 z-10 hidden size-48 items-center justify-center rounded-lg bg-white shadow-lg group-hover:flex">
+                                    <div className="absolute -left-16 -top-52 hidden size-48 items-center justify-center rounded-md shadow-lg group-hover:flex group-hover:cursor-pointer">
                                       <img
                                         src={imagePreview}
                                         alt="Preview Enlarged"
@@ -265,55 +265,58 @@ export default function HostVenue() {
                     </div>
 
                     {/* Alt Field */}
-                    <FormField
-                      control={control}
-                      name={`media.${index}.alt`}
-                      render={({ field }) => (
-                        <FormItem
-                          className={cn(
-                            "relative h-14 space-y-0 rounded-md border border-gray-400 transition-all duration-300",
-                            {
-                              "border-primary ring-2 ring-primary ring-offset-2 ring-offset-card":
-                                focusStates[`${mediaField.id}-alt`],
-                            },
-                          )}
-                        >
-                          <FormLabel
+                    <div className="flex items-center space-x-4">
+                      <FormField
+                        control={control}
+                        name={`media.${index}.alt`}
+                        render={({ field }) => (
+                          <FormItem
                             className={cn(
-                              "absolute left-3 text-lg text-muted-foreground transition-all",
-                              focusStates[`${mediaField.id}-alt`] || field.value
-                                ? "top-1.5 text-sm"
-                                : "top-3.5",
+                              "relative h-14 flex-1 space-y-0 rounded-md border border-gray-400 transition-all duration-300",
+                              {
+                                "border-primary ring-2 ring-primary ring-offset-2 ring-offset-card":
+                                  focusStates[`${mediaField.id}-alt`],
+                              },
                             )}
                           >
-                            Alt Text
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              onFocus={() =>
-                                handleFocus(`${mediaField.id}-alt`, true)
-                              }
-                              onBlur={() =>
-                                handleFocus(`${mediaField.id}-alt`, false)
-                              }
-                              className="h-full rounded-md border-transparent pt-5 text-lg shadow-none focus-visible:ring-0"
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
+                            <FormLabel
+                              className={cn(
+                                "absolute left-3 text-lg text-muted-foreground transition-all",
+                                focusStates[`${mediaField.id}-alt`] ||
+                                  field.value
+                                  ? "top-1.5 text-sm"
+                                  : "top-3.5",
+                              )}
+                            >
+                              Alt Text
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                onFocus={() =>
+                                  handleFocus(`${mediaField.id}-alt`, true)
+                                }
+                                onBlur={() =>
+                                  handleFocus(`${mediaField.id}-alt`, false)
+                                }
+                                className="h-full rounded-md border-transparent pt-5 text-lg shadow-none focus-visible:ring-0"
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
 
-                    {/* Remove Button */}
-                    <Button
-                      type="button"
-                      variant={"destructive"}
-                      size={"icon"}
-                      onClick={() => remove(index)}
-                      className="size-14 border border-destructive bg-red-200 text-primary transition-all duration-200 hover:bg-red-300 hover:underline"
-                    >
-                      <Trash2Icon className="size-5" />
-                    </Button>
+                      {/* Remove Button */}
+                      <Button
+                        type="button"
+                        variant={"destructive"}
+                        size={"icon"}
+                        onClick={() => remove(index)}
+                        className="size-14 border border-destructive bg-red-200 text-primary transition-all duration-200 hover:bg-red-300 hover:underline"
+                      >
+                        <Trash2Icon className="size-5" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
