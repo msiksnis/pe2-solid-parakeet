@@ -32,12 +32,19 @@ export function calculateTotalPrice(
   startDate: Date,
   endDate: Date,
   pricePerNight: number,
-  // guests: number
 ): number {
   const numberOfNights = differenceInCalendarDays(endDate, startDate);
   if (numberOfNights <= 0) {
     return 0;
   }
-  // Adjust this calculation if price depends on guests
   return numberOfNights * pricePerNight;
+}
+
+export function getAuthStatus() {
+  const isLoggedIn = Boolean(localStorage.getItem("state.token"));
+  const isVenueManager =
+    JSON.parse(localStorage.getItem("state.venueManager") || "{}") ===
+    "venueManager";
+
+  return { isLoggedIn, isVenueManager };
 }

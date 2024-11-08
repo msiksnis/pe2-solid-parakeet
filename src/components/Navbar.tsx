@@ -31,12 +31,6 @@ export default function Navbar() {
             >
               Explore Venues
             </Link>
-            <Link
-              to="/about"
-              className="text-lg underline-offset-4 [&.active]:underline"
-            >
-              About
-            </Link>
           </div>
           {isLoggedIn ? (
             <UserButton />
@@ -44,7 +38,7 @@ export default function Navbar() {
             <Button
               onClick={openSignInModal}
               variant="outline"
-              className="rounded-full border-primary"
+              className="rounded-full border-primary px-6"
             >
               Log in
             </Button>

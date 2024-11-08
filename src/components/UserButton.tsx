@@ -1,5 +1,4 @@
-import { useAuthStatus } from "@/hooks/useAuthStatus";
-import { useAuthStore } from "@/hooks/useAuthStore";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,15 +8,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAuthStatus } from "@/hooks/useAuthStatus";
+import { useAuthStore } from "@/hooks/useAuthStore";
+import { Link } from "@tanstack/react-router";
 import {
-  CalendarDays,
-  HousePlus,
-  LayoutGrid,
-  LogOut,
-  Megaphone,
-  User,
-  UserCircle,
+  CalendarDaysIcon,
+  HeartIcon,
+  HousePlusIcon,
+  LayoutGridIcon,
+  LogOutIcon,
+  UserCircleIcon,
+  UserIcon,
 } from "lucide-react";
 
 interface UserButtonProps {}
@@ -34,12 +35,12 @@ export default function UserButton({}: UserButtonProps) {
             <Avatar className="size-10 transform cursor-pointer transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-lg">
               <AvatarImage src={userAvatar?.url} alt={`${userName}'s avatar`} />
               <AvatarFallback>
-                <User className="h-5 w-5" />
+                <UserIcon className="size-5" />
               </AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="mt-2 w-fit min-w-80 rounded-xl p-0 shadow-xl"
+            className="shadow-custom mt-2 w-fit min-w-80 rounded-xl p-0"
             align="end"
           >
             <DropdownMenuGroup className="flex gap-x-2 px-4 py-2 pb-1">
@@ -49,51 +50,61 @@ export default function UserButton({}: UserButtonProps) {
                   alt={`${userName}'s avatar`}
                 />
                 <AvatarFallback>
-                  <User className="size-5" />
+                  <UserIcon className="size-5" />
                 </AvatarFallback>
               </Avatar>
-              <DropdownMenuLabel className="flex flex-col">
+              <DropdownMenuLabel className="flex max-w-52 flex-col text-base">
                 <span>Welcome</span>
-                <span>{userName}</span>
+                <span className="truncate">{userName}</span>
               </DropdownMenuLabel>
             </DropdownMenuGroup>
             <DropdownMenuSeparator className="my-0" />
 
             <DropdownMenuGroup>
-              <DropdownMenuItem className="flex cursor-pointer gap-4 rounded-none p-4">
-                <UserCircle />
-                Manage account
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex cursor-pointer gap-4 rounded-none p-4">
-                <CalendarDays />
-                Manage reservations
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex cursor-pointer gap-4 rounded-none p-4">
-                <Megaphone />
-                Notifications
-              </DropdownMenuItem>
+              <Link to="/account">
+                <DropdownMenuItem className="flex cursor-pointer gap-4 rounded-none p-4 text-base">
+                  <UserCircleIcon className="!size-6" />
+                  Manage account
+                </DropdownMenuItem>
+              </Link>
+              <Link to="/manage-reservations">
+                <DropdownMenuItem className="flex cursor-pointer gap-4 rounded-none p-4 text-base">
+                  <CalendarDaysIcon className="!size-6" />
+                  Manage reservations
+                </DropdownMenuItem>
+              </Link>
+              <Link to="/favorites">
+                <DropdownMenuItem className="flex cursor-pointer gap-4 rounded-none p-4 text-base">
+                  <HeartIcon className="!size-6" />
+                  Favorite venues
+                </DropdownMenuItem>
+              </Link>
             </DropdownMenuGroup>
             <DropdownMenuSeparator className="my-0" />
 
             {isVenueManager && (
               <DropdownMenuGroup>
-                <DropdownMenuItem className="flex cursor-pointer gap-4 rounded-none p-4">
-                  <HousePlus />
-                  Host a venue
-                </DropdownMenuItem>
-                <DropdownMenuItem className="flex cursor-pointer gap-4 rounded-none p-4">
-                  <LayoutGrid />
-                  Manage your venues
-                </DropdownMenuItem>
+                <Link to="/manage-venues/host-venue">
+                  <DropdownMenuItem className="flex cursor-pointer gap-4 rounded-none p-4 text-base">
+                    <HousePlusIcon className="!size-6" />
+                    Host a venue
+                  </DropdownMenuItem>
+                </Link>
+                <Link to="/manage-venues">
+                  <DropdownMenuItem className="flex cursor-pointer gap-4 rounded-none p-4 text-base">
+                    <LayoutGridIcon className="!size-6" />
+                    Manage your venues
+                  </DropdownMenuItem>
+                </Link>
               </DropdownMenuGroup>
             )}
             <DropdownMenuSeparator className="my-0" />
 
             <DropdownMenuItem
               onClick={clearAuth}
-              className="flex cursor-pointer gap-4 rounded-none p-4"
+              className="flex cursor-pointer gap-4 rounded-none p-4 text-base"
             >
-              <LogOut />
+              <LogOutIcon className="!size-6" />
               Sign out
             </DropdownMenuItem>
           </DropdownMenuContent>

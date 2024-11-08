@@ -35,6 +35,7 @@ export default function RegisterUserForm({
   const [isNameFocused, setIsNameFocused] = useState(false);
   const [isEmailFocused, setIsEmailFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<RegisterUserType>({
     resolver: zodResolver(RegisterUserSchema),
@@ -67,6 +68,8 @@ export default function RegisterUserForm({
   const onSubmit = (data: RegisterUserType) => {
     mutation.mutate(data);
   };
+
+  const toggleShowPassword = () => setShowPassword(!showPassword);
 
   return (
     <Form {...form}>
@@ -188,13 +191,22 @@ export default function RegisterUserForm({
                 </FormLabel>
                 <FormControl>
                   <Input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     {...field}
                     onFocus={() => setIsPasswordFocused(true)}
                     onBlur={() => setIsPasswordFocused(false)}
                     className="h-full rounded-xl border-transparent pt-5 text-lg shadow-none focus-visible:ring-0"
                   />
                 </FormControl>
+                {field.value && (
+                  <button
+                    type="button"
+                    onClick={toggleShowPassword}
+                    className="text-small absolute right-0 top-0 z-10 flex h-full w-16 items-center justify-start rounded-e-xl bg-card px-2 text-muted-foreground"
+                  >
+                    {showPassword ? "Hide" : "Show"}
+                  </button>
+                )}
                 <FormMessage className="pl-1 pt-0.5" />
               </FormItem>
             )}
@@ -219,6 +231,7 @@ export default function RegisterUserForm({
             </FormItem>
           )}
         />
+
         <Button
           type="submit"
           disabled={mutation.isPending}

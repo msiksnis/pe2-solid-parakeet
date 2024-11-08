@@ -77,20 +77,15 @@ export default function VenueById() {
     <div className="mx-auto mt-10 max-w-7xl space-y-6 px-4 sm:px-6 md:px-10 xl:px-6">
       {/* Venue Header */}
       <div className="flex flex-col justify-between space-y-4 lg:flex-row lg:items-end lg:space-y-0">
-        <div className="flex flex-col text-3xl font-medium lg:flex-row lg:items-center">
-          <h1>{titleCase(venue.name)}</h1>
-          <span>
+        <div className="flex flex-col font-medium">
+          <h1 className="text-3xl">{titleCase(venue.name)}</h1>
+          <span className="text-lg text-paragraph">
             {venue.location?.city && (
-              <span className="capitalize">
-                <span className="hidden font-normal lg:inline">
-                  &nbsp;|&nbsp;
-                </span>
-                {venue.location.city}
-              </span>
+              <span className="capitalize">{venue.location.city}</span>
             )}
             {venue.location?.country && (
               <span className="capitalize">
-                {venue.location.city ? ", " : "&nbsp;|&nbsp;"}
+                {venue.location.city && ", "}
                 {venue.location.country}
               </span>
             )}
@@ -163,7 +158,7 @@ export default function VenueById() {
       </div>
 
       {/* Venue Details and Booking */}
-      <div className="relative flex items-start justify-between gap-14 px-4 xl:px-0">
+      <div className="relative flex items-start justify-between gap-14 px-0 xl:px-4">
         <div
           className={cn(
             "w-[calc(100%-400px)] space-y-6 xl:w-[calc(100%-420px)]",
@@ -173,7 +168,7 @@ export default function VenueById() {
           )}
         >
           {/* Todo: AI generated heading here */}
-          <div className="text-paragraph text-pretty pb-6 text-lg font-light">
+          <div className="text-pretty pb-6 text-lg font-light text-paragraph">
             {venue.description}
           </div>
           <Separator />

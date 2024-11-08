@@ -1,6 +1,3 @@
-import z from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
@@ -9,29 +6,34 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
+import { loginUser } from "@/api/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { LoginResponseType, LoginUserSchema } from "./UserValidation";
+import { useAuthStore } from "@/hooks/useAuthStore";
 import { cn } from "@/lib/utils";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
 import { LoaderCircleIcon } from "lucide-react";
 import { useState } from "react";
-import { useAuthStore } from "@/hooks/useAuthStore";
-import { loginUser } from "@/api/auth";
-import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import axios from "axios";
+import {
+  LoginResponseType,
+  LoginType,
+  LoginUserSchema,
+} from "./UserValidation";
 
 interface LoginProps {
   loading: boolean;
   onClose: () => void;
 }
 
-type LoginType = z.infer<typeof LoginUserSchema>;
-
 export default function LoginForm({ loading, onClose }: LoginProps) {
   const [isEmailFocused, setIsEmailFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<LoginType>({
     resolver: zodResolver(LoginUserSchema),
@@ -66,6 +68,8 @@ export default function LoginForm({ loading, onClose }: LoginProps) {
   });
 
   const onSubmit = (data: LoginType) => mutation.mutate(data);
+
+  const toggleShowPassword = () => setShowPassword(!showPassword);
 
   return (
     <Form {...form}>
@@ -145,13 +149,22 @@ export default function LoginForm({ loading, onClose }: LoginProps) {
                 </FormLabel>
                 <FormControl>
                   <Input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     {...field}
                     onFocus={() => setIsPasswordFocused(true)}
                     onBlur={() => setIsPasswordFocused(false)}
                     className="h- h-full rounded-xl border-transparent pt-5 text-lg shadow-none focus-visible:ring-0"
                   />
                 </FormControl>
+                {field.value && (
+                  <button
+                    type="button"
+                    onClick={toggleShowPassword}
+                    className="text-small absolute right-0 top-0 z-10 flex h-full w-16 items-center justify-start rounded-e-xl bg-card px-2 text-muted-foreground"
+                  >
+                    {showPassword ? "Hide" : "Show"}
+                  </button>
+                )}
                 <FormMessage className="pl-1 pt-0.5" />
               </FormItem>
             )}

@@ -1,14 +1,19 @@
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
+import { AuthContext } from "@/hooks/useAuthStatus";
 import { cn } from "@/lib/utils";
 import {
-  createRootRoute,
+  createRootRouteWithContext,
   Outlet,
   ScrollRestoration,
   useLocation,
 } from "@tanstack/react-router";
 
-export const Route = createRootRoute({
+interface RouterContext {
+  authentication: AuthContext;
+}
+
+export const Route = createRootRouteWithContext<RouterContext>()({
   component: () => {
     const location = useLocation();
     const isHome = location.pathname === "/";

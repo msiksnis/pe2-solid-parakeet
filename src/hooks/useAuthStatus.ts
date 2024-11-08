@@ -13,3 +13,5 @@ export function useAuthStatus(): AuthStatus {
     isVenueManager: venueManager,
   };
 }
+
+export type AuthContext = ReturnType<typeof useAuthStatus>;
