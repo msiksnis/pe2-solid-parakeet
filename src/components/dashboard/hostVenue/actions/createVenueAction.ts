@@ -1,5 +1,5 @@
 import { axiosInstance } from "@/lib/axiosInstance";
-import { Venue } from "./VenueValidation";
+import { Venue } from "../VenueValidation";
 
 export async function createVenueAction(data: Venue) {
   const persistedState = JSON.parse(

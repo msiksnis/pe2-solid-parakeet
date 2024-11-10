@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import { z } from "zod";
 
 const MediaSchema = z.object({
@@ -41,6 +42,7 @@ const LocationSchema = z.object({
 });
 
 export const VenueSchema = z.object({
+  id: z.string().optional(),
   name: z.string().min(1, "Add a name for the venue"),
   description: z.string().trim().min(1, "Add a description"),
   media: z.array(MediaSchema).optional(),
@@ -55,6 +57,8 @@ export const VenueSchema = z.object({
   rating: z.number().optional().default(0),
   meta: MetaSchema.optional(),
   location: LocationSchema.optional(),
+  created: z.string().optional(),
+  updated: z.string().optional(),
 });
 
 export type Venue = z.infer<typeof VenueSchema>;
@@ -86,3 +90,30 @@ export const defaultValues = {
     lng: null,
   },
 };
+
+export const createTempVenue = (data: Partial<Venue>): Venue => ({
+  id: `temp-${Date.now()}`,
+  name: data.name ?? "Temporary Name",
+  description: data.description ?? "Temporary Description",
+  price: data.price ?? 0,
+  maxGuests: data.maxGuests ?? 1,
+  rating: data.rating ?? 0,
+  media: data.media ?? [],
+  meta: data.meta ?? {
+    wifi: false,
+    parking: false,
+    breakfast: false,
+    pets: false,
+  },
+  location: data.location ?? {
+    address: null,
+    city: null,
+    zip: null,
+    country: null,
+    continent: null,
+    lat: null,
+    lng: null,
+  },
+  created: format(new Date(), "yyyy-MM-dd"),
+  updated: format(new Date(), "yyyy-MM-dd"),
+});
