@@ -1,7 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate, useParams } from "@tanstack/react-router";
-import { ImageIcon, LoaderCircle, PlusIcon, Trash2Icon } from "lucide-react";
+import { Link, useNavigate, useParams } from "@tanstack/react-router";
+import {
+  ImageIcon,
+  LoaderCircle,
+  MoveLeft,
+  PlusIcon,
+  Trash2Icon,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 
@@ -25,9 +31,10 @@ import { AutosizeTextarea } from "../../ui/textarea";
 import { useFocusStates } from "./hooks/useFocusStates";
 import { useImagePreview } from "./hooks/useImagePreview";
 import { useVenueMutation } from "./mutations/useVenueMutation";
-import { defaultValues, Venue, VenueSchema } from "./VenueValidation";
+import { defaultValues, VenueSchema } from "./VenueValidation";
 import { useDeleteVenueMutation } from "./mutations/useDeleteVenueMutation";
 import AlertModal from "@/components/alert-modal";
+import { Venue } from "@/lib/types";
 
 export default function HostVenueForm() {
   const [openAlertModal, setOpenAlertModal] = useState(false);
@@ -115,16 +122,25 @@ export default function HostVenueForm() {
     );
   };
 
-  // Prevent unauthorized access
-  if (!isCreating && selectedVenue && selectedVenue?.owner?.name !== userName) {
-    return (
-      <div className="my-24 flex justify-center text-2xl">
-        You are not the owner of this venue!
-      </div>
-    );
-  }
+  if (!isCreating) {
+    if (isFetchingData) {
+      return <Loader className="mt-24" />;
+    }
 
-  if (!isCreating && isFetchingData) return <Loader className="mt-24" />;
+    const isNotOwner =
+      (selectedVenue &&
+        (selectedVenue.owner?.name !== userName ||
+          selectedVenue.owner?.name === undefined)) ||
+      venue?.owner?.name !== userName;
+
+    if (isNotOwner) {
+      return (
+        <div className="my-24 flex justify-center text-2xl">
+          You are not the owner of this venue!
+        </div>
+      );
+    }
+  }
 
   const handleDelete = () => {
     deleteVenue(id, {
@@ -143,7 +159,12 @@ export default function HostVenueForm() {
         onConfirm={handleDelete}
         loading={isDeleting}
       />
-      <div className="mx-auto my-10 max-w-2xl px-4 md:px-0">
+      <div className="mx-auto my-10 max-w-7xl px-4">
+        <Link to="/manage-venues" className="text-primary">
+          <MoveLeft className="hover:-motion-translate-x-out-[10%]" />
+        </Link>
+      </div>
+      <div className="mx-auto max-w-2xl px-4 md:px-0">
         <h1 className="text-3xl font-semibold">
           {isCreating ? "Create Venue" : "Edit Venue"}
         </h1>
@@ -988,14 +1009,16 @@ export default function HostVenueForm() {
                 {isCreating ? (
                   mutation.isPending ? (
                     <span className="flex items-center">
-                      Creating <LoaderCircle className="ml-2 size-5" />
+                      Creating{" "}
+                      <LoaderCircle className="ml-2 size-5 animate-spin" />
                     </span>
                   ) : (
                     "Create Venue"
                   )
                 ) : mutation.isPending ? (
                   <span className="flex items-center">
-                    Updating <LoaderCircle className="ml-2 size-5" />
+                    Updating{" "}
+                    <LoaderCircle className="ml-2 size-5 animate-spin" />
                   </span>
                 ) : (
                   "Update Venue"

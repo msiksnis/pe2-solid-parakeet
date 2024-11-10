@@ -6,7 +6,7 @@ import { createTempVenue, Venue } from "../VenueValidation";
 
 export function useVenueMutation() {
   const queryClient = useQueryClient();
-  const queryKey: QueryKey = ["venuesByUser"] as const;
+  const queryKey: QueryKey = ["venue"] as const;
 
   const handleCreateVenue = (data: Venue) => createVenueAction(data);
   const handleUpdateVenue = (venueId: string, data: Venue) =>
