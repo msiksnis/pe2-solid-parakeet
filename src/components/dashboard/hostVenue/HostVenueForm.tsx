@@ -160,9 +160,11 @@ export default function HostVenueForm() {
         loading={isDeleting}
       />
       <div className="mx-auto my-10 max-w-7xl px-4">
-        <Link to="/manage-venues" className="text-primary">
-          <MoveLeft className="hover:-motion-translate-x-out-[10%]" />
-        </Link>
+        {!isCreating && (
+          <Link to="/manage-venues" className="text-primary">
+            <MoveLeft className="hover:-motion-translate-x-out-[10%]" />
+          </Link>
+        )}
       </div>
       <div className="mx-auto max-w-2xl px-4 md:px-0">
         <h1 className="text-3xl font-semibold">
@@ -263,11 +265,11 @@ export default function HostVenueForm() {
               {/* Dynamic Media Fields */}
               <div>
                 <h2 className="mb-2 text-lg font-medium">Images</h2>
-                <div className="space-y-4">
+                <div className="space-y-4 md:space-y-4">
                   {fields.map((mediaField, index) => (
                     <div
                       key={mediaField.id}
-                      className="flex w-full flex-col space-y-4 md:flex-row md:items-center md:space-x-4 md:space-y-0"
+                      className="flex w-full flex-col space-y-4 border-b pb-4 md:flex-row md:items-center md:space-x-4 md:space-y-0 md:border-none"
                     >
                       {/* URL Field */}
                       <div className="flex-1">
