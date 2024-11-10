@@ -84,7 +84,10 @@ export default function UserButton({}: UserButtonProps) {
 
             {isVenueManager && (
               <DropdownMenuGroup>
-                <Link to="/manage-venues/host-venue">
+                <Link
+                  to="/manage-venues/host-venue/$id"
+                  params={{ id: "new-venue" }}
+                >
                   <DropdownMenuItem className="flex cursor-pointer gap-4 rounded-none p-4 text-base">
                     <HousePlusIcon className="!size-6" />
                     Host a venue

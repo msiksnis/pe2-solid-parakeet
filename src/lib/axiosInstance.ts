@@ -1,13 +1,45 @@
 import axios from "axios";
 
+export const authClient = axios.create({
+  baseURL: "https://v2.api.noroff.dev/auth",
+  timeout: 5000,
+});
+
+// For unauthenticated requests
 const axiosInstance = axios.create({
   baseURL: "https://v2.api.noroff.dev/holidaze",
   timeout: 5000,
 });
 
-export default axiosInstance;
-
-export const authClient = axios.create({
-  baseURL: "https://v2.api.noroff.dev/auth",
+// For authenticated requests
+const authenticatedAxiosInstance = axios.create({
+  baseURL: "https://v2.api.noroff.dev/holidaze",
   timeout: 5000,
 });
+
+authenticatedAxiosInstance.interceptors.request.use(
+  (config) => {
+    const persistedState = JSON.parse(
+      localStorage.getItem("auth-object") || "{}",
+    );
+
+    const token = persistedState?.state?.token || null;
+
+    const apiKey = import.meta.env.VITE_API_KEY;
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    if (apiKey) {
+      config.headers["X-Noroff-API-Key"] = apiKey;
+    }
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
+);
+
+export { axiosInstance, authenticatedAxiosInstance };

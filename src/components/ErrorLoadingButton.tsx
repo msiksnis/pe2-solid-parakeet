@@ -1,4 +1,5 @@
 import { cn } from "../lib/utils";
+import { Button } from "./ui/button";
 
 interface ErrorButtonProps {
   errorMessage: string;
@@ -14,17 +15,18 @@ export default function ErrorLoadingButton({
   return (
     <div
       className={cn(
-        "mt-32 flex flex-col items-center justify-center space-y-4",
+        "mt-32 flex flex-col items-center justify-center space-y-6",
         className,
       )}
     >
       <p className="text-red-500">{errorMessage}</p>
-      <button
+      <Button
+        variant={"ringHover"}
         onClick={onRetry}
-        className="hover:bg-muted rounded-full border px-4 py-1.5 shadow-sm transition-all duration-200"
+        className="rounded-full border border-primary bg-card px-6 py-1.5 text-primary shadow-sm transition-all duration-200 hover:bg-muted"
       >
         Retry
-      </button>
+      </Button>
     </div>
   );
 }

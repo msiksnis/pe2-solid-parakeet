@@ -1,3 +1,4 @@
+import Loader from "@/components/loader";
 import {
   Form,
   FormControl,
@@ -6,72 +7,117 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { fetchVenueById } from "@/components/venueById/queries/fetchVenueById";
+import { useAuthData } from "@/hooks/useAuthData";
+import { useVenueStore } from "@/hooks/useVenueStore";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
-import { ImageIcon, PlusIcon, Trash2Icon } from "lucide-react";
-import { useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useParams } from "@tanstack/react-router";
+import { ImageIcon, LoaderCircle, PlusIcon, Trash2Icon } from "lucide-react";
+import { useEffect } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import { AutosizeTextarea } from "../ui/textarea";
+import { Button } from "../../ui/button";
+import { Checkbox } from "../../ui/checkbox";
+import { Input } from "../../ui/input";
+import { AutosizeTextarea } from "../../ui/textarea";
 import { createVenueAction } from "./createVenueAction";
+import { useFocusStates } from "./hooks/useFocusStates";
+import { useImagePreview } from "./hooks/useImagePreview";
 import { defaultValues, Venue, VenueSchema } from "./VenueValidation";
-import { Checkbox } from "../ui/checkbox";
-import { useImagePreview } from "./useImagePreview";
 
-export default function HostVenue() {
-  const [isNameFocused, setIsNameFocused] = useState(false);
-  const [isDescriptionFocused, setIsDescriptionFocused] = useState(false);
-  const [isPriceFocused, setIsPriceFocused] = useState(false);
-  const [isMaxGuestsFocused, setIsMaxGuestsFocused] = useState(false);
-  const [isAddressFocused, setIsAddressFocused] = useState(false);
-  const [isZipFocused, setIsZipFocused] = useState(false);
-  const [isCityFocused, setIsCityFocused] = useState(false);
-  const [isCountryFocused, setIsCountryFocused] = useState(false);
-  const [isContinentFocused, setIsContinentFocused] = useState(false);
-  const [isLatFocused, setIsLatFocused] = useState(false);
-  const [isLngFocused, setIsLngFocused] = useState(false);
+export default function HostVenueForm() {
+  const { id } = useParams({
+    from: "/_authenticated/manage-venues/host-venue/$id",
+  });
+  const { selectedVenue } = useVenueStore();
 
-  // Focus state for each field
-  const [focusStates, setFocusStates] = useState<Record<string, boolean>>({});
+  const { userName } = useAuthData();
+  const isCreating = id === "new-venue";
 
-  const handleFocus = (id: string, isFocused: boolean) => {
-    setFocusStates((prev) => ({ ...prev, [id]: isFocused }));
-  };
+  const { focusStates, handleFocus } = useFocusStates<
+    | "name"
+    | "description"
+    | `media-${number}-url`
+    | `media-${number}-alt`
+    | "price"
+    | "maxGuests"
+    | "address"
+    | "zip"
+    | "city"
+    | "country"
+    | "continent"
+    | "lat"
+    | "lng"
+  >();
 
   const form = useForm<Venue>({
     resolver: zodResolver(VenueSchema),
-    defaultValues,
+    defaultValues: selectedVenue || defaultValues,
   });
 
   const { control, handleSubmit, formState, reset } = form;
 
-  // UseFieldArray for dynamic media fields
   const { fields, append, remove } = useFieldArray({
     control,
-    name: "media", // The array name in your form state
+    name: "media",
   });
+
+  // React Query for fetching venue
+  const { data: venue, isPending: isFetchingData } = useQuery<Venue>({
+    queryKey: ["venue", id],
+    queryFn: () =>
+      id ? fetchVenueById(id) : Promise.reject(new Error("No ID provided")),
+    enabled: !isCreating, // Only fetch if editing
+    initialData: selectedVenue ?? undefined, // Use store data if available
+    staleTime: 1000 * 60 * 5, // Cache data for 5 minutes
+  });
+
+  // Reset form when venue data changes or when creating a new venue
+  useEffect(() => {
+    if (venue && !isCreating) {
+      reset(venue);
+    } else if (isCreating) {
+      reset(defaultValues);
+    }
+  }, [venue, isCreating, reset]);
 
   const mutation = useMutation<Venue, Error, Venue>({
     mutationFn: createVenueAction,
     onSuccess: (data) => {
       console.log("Venue created successfully:", data);
       reset();
-      toast.success("Venue created successfully!");
+      toast.success(
+        isCreating
+          ? "Venue created successfully!"
+          : "Venue updated successfully!",
+      );
     },
     onError: (error) => {
-      console.error("Error creating venue:", error);
+      console.error("Error creating/updating venue:", error);
       toast.error(error.message || "Failed to create venue. Please try again.");
     },
   });
 
   const onSubmit = (data: Venue) => mutation.mutate(data);
 
+  // Prevent unauthorized access
+  if (!isCreating && selectedVenue && selectedVenue?.owner?.name !== userName) {
+    return (
+      <div className="my-24 flex justify-center text-2xl">
+        You are not the owner of this venue!
+      </div>
+    );
+  }
+
+  if (isFetchingData) return <Loader className="mt-24" />;
+
   return (
     <div className="mx-auto my-10 max-w-2xl px-4 md:px-0">
-      <h1 className="text-3xl font-semibold">Create a Venue</h1>
+      <h1 className="text-3xl font-semibold">
+        {isCreating ? "Create Venue" : "Edit Venue"}
+      </h1>
       <Form {...form}>
         <form onSubmit={handleSubmit(onSubmit)} className="my-6 space-y-6">
           <div className="space-y-8">
@@ -85,21 +131,21 @@ export default function HostVenue() {
                     "relative h-14 space-y-0 rounded-md border border-gray-400 transition-all duration-300",
                     {
                       "border-primary ring-2 ring-primary ring-offset-2 ring-offset-card":
-                        isNameFocused,
+                        focusStates["name"],
                     },
                     {
                       "border-destructive": formState.errors.name,
                     },
                     {
                       "ring-2 ring-destructive ring-offset-2":
-                        formState.errors.name && isNameFocused,
+                        formState.errors.name && focusStates["name"],
                     },
                   )}
                 >
                   <FormLabel
                     className={cn(
                       "absolute left-3 text-lg text-muted-foreground transition-all",
-                      isNameFocused || field.value
+                      focusStates["name"] || field.value
                         ? "top-1.5 text-sm"
                         : "top-3.5",
                     )}
@@ -109,8 +155,8 @@ export default function HostVenue() {
                   <FormControl>
                     <Input
                       {...field}
-                      onFocus={() => setIsNameFocused(true)}
-                      onBlur={() => setIsNameFocused(false)}
+                      onFocus={() => handleFocus("name", true)}
+                      onBlur={() => handleFocus("name", false)}
                       className="h-full rounded-md border-transparent pt-5 text-lg shadow-none focus-visible:ring-0"
                     />
                   </FormControl>
@@ -129,21 +175,22 @@ export default function HostVenue() {
                     "relative space-y-0 rounded-md border border-gray-400 transition-all duration-300",
                     {
                       "border-primary ring-2 ring-primary ring-offset-2 ring-offset-card":
-                        isDescriptionFocused,
+                        focusStates["description"],
                     },
                     {
                       "border-destructive": formState.errors.description,
                     },
                     {
                       "ring-2 ring-destructive ring-offset-2":
-                        formState.errors.description && isDescriptionFocused,
+                        formState.errors.description &&
+                        focusStates["description"],
                     },
                   )}
                 >
                   <FormLabel
                     className={cn(
                       "absolute left-3 text-lg text-muted-foreground transition-all",
-                      isDescriptionFocused || field.value
+                      focusStates["description"] || field.value
                         ? "top-1.5 text-sm"
                         : "top-3.5",
                     )}
@@ -153,8 +200,8 @@ export default function HostVenue() {
                   <FormControl>
                     <AutosizeTextarea
                       {...field}
-                      onFocus={() => setIsDescriptionFocused(true)}
-                      onBlur={() => setIsDescriptionFocused(false)}
+                      onFocus={() => handleFocus("description", true)}
+                      onBlur={() => handleFocus("description", false)}
                       className="min-h-14 resize-none rounded-md border-transparent pt-5 !text-lg !leading-6 shadow-none focus-visible:ring-0"
                     />
                   </FormControl>
@@ -178,8 +225,8 @@ export default function HostVenue() {
                         control={control}
                         name={`media.${index}.url`}
                         render={({ field }) => {
-                          const { imagePreview, handleImageChange } =
-                            useImagePreview();
+                          const { imagePreview, isLoading, handleImageChange } =
+                            useImagePreview(field.value);
 
                           return (
                             <FormItem
@@ -187,7 +234,7 @@ export default function HostVenue() {
                                 "relative mr-[4.25rem] flex items-center space-x-4 rounded-md border border-gray-400 transition-all duration-300",
                                 {
                                   "border-primary ring-2 ring-primary ring-offset-2 ring-offset-card":
-                                    focusStates[mediaField.id],
+                                    focusStates[`media-${index}-url`],
                                 },
                               )}
                             >
@@ -195,7 +242,8 @@ export default function HostVenue() {
                                 <FormLabel
                                   className={cn(
                                     "absolute left-3 text-lg text-muted-foreground transition-all",
-                                    focusStates[mediaField.id] || field.value
+                                    focusStates[`media-${index}-url`] ||
+                                      field.value
                                       ? "top-1.5 text-sm"
                                       : "top-3.5",
                                   )}
@@ -213,27 +261,31 @@ export default function HostVenue() {
                                       )
                                     }
                                     onFocus={() =>
-                                      handleFocus(mediaField.id, true)
+                                      handleFocus(`media-${index}-url`, true)
                                     }
                                     onBlur={() =>
-                                      handleFocus(mediaField.id, false)
+                                      handleFocus(`media-${index}-url`, false)
                                     }
                                     className="h-14 rounded-md border-none pt-5 text-lg shadow-none focus-visible:ring-0"
                                   />
                                 </FormControl>
                               </div>
 
-                              {/* Placeholder or Image Preview */}
+                              {/* Placeholder or Image Preview with Loader */}
                               <div
                                 className={cn(
                                   "absolute -right-[4.5rem] -top-[9px] size-[58px] flex-shrink-0 overflow-hidden rounded-md border border-gray-400 transition-all duration-300",
                                   {
                                     "border-primary ring-2 ring-primary ring-offset-2 ring-offset-card":
-                                      focusStates[mediaField.id],
+                                      focusStates[`media-${index}-url`],
                                   },
                                 )}
                               >
-                                {imagePreview ? (
+                                {isLoading ? (
+                                  <div className="flex h-full w-full items-center justify-center">
+                                    <LoaderCircle className="animate-spin opacity-50" />
+                                  </div>
+                                ) : imagePreview ? (
                                   <div className="group relative cursor-pointer">
                                     <img
                                       src={imagePreview}
@@ -275,15 +327,14 @@ export default function HostVenue() {
                               "relative h-14 flex-1 space-y-0 rounded-md border border-gray-400 transition-all duration-300",
                               {
                                 "border-primary ring-2 ring-primary ring-offset-2 ring-offset-card":
-                                  focusStates[`${mediaField.id}-alt`],
+                                  focusStates[`media-${index}-alt`],
                               },
                             )}
                           >
                             <FormLabel
                               className={cn(
                                 "absolute left-3 text-lg text-muted-foreground transition-all",
-                                focusStates[`${mediaField.id}-alt`] ||
-                                  field.value
+                                focusStates[`media-${index}-alt`] || field.value
                                   ? "top-1.5 text-sm"
                                   : "top-3.5",
                               )}
@@ -294,10 +345,10 @@ export default function HostVenue() {
                               <Input
                                 {...field}
                                 onFocus={() =>
-                                  handleFocus(`${mediaField.id}-alt`, true)
+                                  handleFocus(`media-${index}-alt`, true)
                                 }
                                 onBlur={() =>
-                                  handleFocus(`${mediaField.id}-alt`, false)
+                                  handleFocus(`media-${index}-alt`, false)
                                 }
                                 className="h-full rounded-md border-transparent pt-5 text-lg shadow-none focus-visible:ring-0"
                               />
@@ -347,21 +398,21 @@ export default function HostVenue() {
                     "relative h-14 flex-1 space-y-0 rounded-md border border-gray-400 transition-all duration-300",
                     {
                       "border-primary ring-2 ring-primary ring-offset-2 ring-offset-card":
-                        isPriceFocused,
+                        focusStates["price"],
                     },
                     {
                       "border-destructive": formState.errors.price,
                     },
                     {
                       "ring-2 ring-destructive ring-offset-2":
-                        formState.errors.price && isPriceFocused,
+                        formState.errors.price && focusStates["price"],
                     },
                   )}
                 >
                   <FormLabel
                     className={cn(
                       "absolute left-3 text-lg text-muted-foreground transition-all",
-                      isPriceFocused || field.value
+                      focusStates["price"] || field.value
                         ? "top-1.5 text-sm"
                         : "top-3.5",
                     )}
@@ -379,8 +430,8 @@ export default function HostVenue() {
                             : parseFloat(e.target.value),
                         )
                       }
-                      onFocus={() => setIsPriceFocused(true)}
-                      onBlur={() => setIsPriceFocused(false)}
+                      onFocus={() => handleFocus("price", true)}
+                      onBlur={() => handleFocus("price", false)}
                       className="h-full rounded-md border-transparent pt-5 text-lg shadow-none focus-visible:ring-0"
                     />
                   </FormControl>
@@ -399,21 +450,21 @@ export default function HostVenue() {
                     "relative h-14 flex-1 space-y-0 rounded-md border border-gray-400 transition-all duration-300",
                     {
                       "border-primary ring-2 ring-primary ring-offset-2 ring-offset-card":
-                        isMaxGuestsFocused,
+                        focusStates["maxGuests"],
                     },
                     {
                       "border-destructive": formState.errors.maxGuests,
                     },
                     {
                       "ring-2 ring-destructive ring-offset-2":
-                        formState.errors.maxGuests && isMaxGuestsFocused,
+                        formState.errors.maxGuests && focusStates["maxGuests"],
                     },
                   )}
                 >
                   <FormLabel
                     className={cn(
                       "absolute left-3 text-lg text-muted-foreground transition-all",
-                      isMaxGuestsFocused || field.value
+                      focusStates["maxGuests"] || field.value
                         ? "top-1.5 text-sm"
                         : "top-3.5",
                     )}
@@ -431,8 +482,8 @@ export default function HostVenue() {
                             : parseFloat(e.target.value),
                         )
                       }
-                      onFocus={() => setIsMaxGuestsFocused(true)}
-                      onBlur={() => setIsMaxGuestsFocused(false)}
+                      onFocus={() => handleFocus("maxGuests", true)}
+                      onBlur={() => handleFocus("maxGuests", false)}
                       className="h-full rounded-md border-transparent pt-5 text-lg shadow-none focus-visible:ring-0"
                     />
                   </FormControl>
@@ -453,21 +504,22 @@ export default function HostVenue() {
                     "relative h-14 space-y-0 rounded-md border border-gray-400 transition-all duration-300",
                     {
                       "border-primary ring-2 ring-primary ring-offset-2 ring-offset-card":
-                        isAddressFocused,
+                        focusStates["address"],
                     },
                     {
                       "border-destructive": formState.errors.location?.address,
                     },
                     {
                       "ring-2 ring-destructive ring-offset-2":
-                        formState.errors.location?.address && isAddressFocused,
+                        formState.errors.location?.address &&
+                        focusStates["address"],
                     },
                   )}
                 >
                   <FormLabel
                     className={cn(
                       "absolute left-3 text-lg text-muted-foreground transition-all",
-                      isAddressFocused || field.value
+                      focusStates["address"] || field.value
                         ? "top-1.5 text-sm"
                         : "top-3.5",
                     )}
@@ -483,8 +535,8 @@ export default function HostVenue() {
                           e.target.value === "" ? null : e.target.value,
                         )
                       }
-                      onFocus={() => setIsAddressFocused(true)}
-                      onBlur={() => setIsAddressFocused(false)}
+                      onFocus={() => handleFocus("address", true)}
+                      onBlur={() => handleFocus("address", false)}
                       className="h-full rounded-md border-transparent pt-5 text-lg shadow-none focus-visible:ring-0"
                     />
                   </FormControl>
@@ -502,21 +554,21 @@ export default function HostVenue() {
                       "relative h-14 space-y-0 rounded-md border border-gray-400 transition-all duration-300",
                       {
                         "border-primary ring-2 ring-primary ring-offset-2 ring-offset-card":
-                          isZipFocused,
+                          focusStates["zip"],
                       },
                       {
                         "border-destructive": formState.errors.location?.zip,
                       },
                       {
                         "ring-2 ring-destructive ring-offset-2":
-                          formState.errors.location?.zip && isZipFocused,
+                          formState.errors.location?.zip && focusStates["zip"],
                       },
                     )}
                   >
                     <FormLabel
                       className={cn(
                         "absolute left-3 text-lg text-muted-foreground transition-all",
-                        isZipFocused || field.value
+                        focusStates["zip"] || field.value
                           ? "top-1.5 text-sm"
                           : "top-3.5",
                       )}
@@ -532,8 +584,8 @@ export default function HostVenue() {
                             e.target.value === "" ? null : e.target.value,
                           )
                         }
-                        onFocus={() => setIsZipFocused(true)}
-                        onBlur={() => setIsZipFocused(false)}
+                        onFocus={() => handleFocus("zip", true)}
+                        onBlur={() => handleFocus("zip", false)}
                         className="h-full rounded-md border-transparent pt-5 text-lg shadow-none focus-visible:ring-0"
                       />
                     </FormControl>
@@ -550,21 +602,22 @@ export default function HostVenue() {
                       "relative h-14 flex-1 space-y-0 rounded-md border border-gray-400 transition-all duration-300",
                       {
                         "border-primary ring-2 ring-primary ring-offset-2 ring-offset-card":
-                          isCityFocused,
+                          focusStates["city"],
                       },
                       {
                         "border-destructive": formState.errors.location?.city,
                       },
                       {
                         "ring-2 ring-destructive ring-offset-2":
-                          formState.errors.location?.city && isCityFocused,
+                          formState.errors.location?.city &&
+                          focusStates["city"],
                       },
                     )}
                   >
                     <FormLabel
                       className={cn(
                         "absolute left-3 text-lg text-muted-foreground transition-all",
-                        isCityFocused || field.value
+                        focusStates["city"] || field.value
                           ? "top-1.5 text-sm"
                           : "top-3.5",
                       )}
@@ -580,8 +633,8 @@ export default function HostVenue() {
                             e.target.value === "" ? null : e.target.value,
                           )
                         }
-                        onFocus={() => setIsCityFocused(true)}
-                        onBlur={() => setIsCityFocused(false)}
+                        onFocus={() => handleFocus("city", true)}
+                        onBlur={() => handleFocus("city", false)}
                         className="h-full rounded-md border-transparent pt-5 text-lg shadow-none focus-visible:ring-0"
                       />
                     </FormControl>
@@ -600,7 +653,7 @@ export default function HostVenue() {
                       "relative h-14 flex-1 space-y-0 rounded-md border border-gray-400 transition-all duration-300",
                       {
                         "border-primary ring-2 ring-primary ring-offset-2 ring-offset-card":
-                          isCountryFocused,
+                          focusStates["country"],
                       },
                       {
                         "border-destructive":
@@ -609,14 +662,14 @@ export default function HostVenue() {
                       {
                         "ring-2 ring-destructive ring-offset-2":
                           formState.errors.location?.country &&
-                          isCountryFocused,
+                          focusStates["country"],
                       },
                     )}
                   >
                     <FormLabel
                       className={cn(
                         "absolute left-3 text-lg text-muted-foreground transition-all",
-                        isCountryFocused || field.value
+                        focusStates["country"] || field.value
                           ? "top-1.5 text-sm"
                           : "top-3.5",
                       )}
@@ -632,8 +685,8 @@ export default function HostVenue() {
                             e.target.value === "" ? null : e.target.value,
                           )
                         }
-                        onFocus={() => setIsCountryFocused(true)}
-                        onBlur={() => setIsCountryFocused(false)}
+                        onFocus={() => handleFocus("country", true)}
+                        onBlur={() => handleFocus("country", false)}
                         className="h-full rounded-md border-transparent pt-5 text-lg shadow-none focus-visible:ring-0"
                       />
                     </FormControl>
@@ -650,7 +703,7 @@ export default function HostVenue() {
                       "relative h-14 flex-1 space-y-0 rounded-md border border-gray-400 transition-all duration-300",
                       {
                         "border-primary ring-2 ring-primary ring-offset-2 ring-offset-card":
-                          isContinentFocused,
+                          focusStates["continent"],
                       },
                       {
                         "border-destructive":
@@ -659,14 +712,14 @@ export default function HostVenue() {
                       {
                         "ring-2 ring-destructive ring-offset-2":
                           formState.errors.location?.continent &&
-                          isContinentFocused,
+                          focusStates["continent"],
                       },
                     )}
                   >
                     <FormLabel
                       className={cn(
                         "absolute left-3 text-lg text-muted-foreground transition-all",
-                        isContinentFocused || field.value
+                        focusStates["continent"] || field.value
                           ? "top-1.5 text-sm"
                           : "top-3.5",
                       )}
@@ -682,8 +735,8 @@ export default function HostVenue() {
                             e.target.value === "" ? null : e.target.value,
                           )
                         }
-                        onFocus={() => setIsContinentFocused(true)}
-                        onBlur={() => setIsContinentFocused(false)}
+                        onFocus={() => handleFocus("continent", true)}
+                        onBlur={() => handleFocus("continent", false)}
                         className="h-full rounded-md border-transparent pt-5 text-lg shadow-none focus-visible:ring-0"
                       />
                     </FormControl>
@@ -703,21 +756,21 @@ export default function HostVenue() {
                       "relative h-14 flex-1 space-y-0 rounded-md border border-gray-400 transition-all duration-300",
                       {
                         "border-primary ring-2 ring-primary ring-offset-2 ring-offset-card":
-                          isLatFocused,
+                          focusStates["lat"],
                       },
                       {
                         "border-destructive": formState.errors.location?.lat,
                       },
                       {
                         "ring-2 ring-destructive ring-offset-2":
-                          formState.errors.location?.lat && isLatFocused,
+                          formState.errors.location?.lat && focusStates["lat"],
                       },
                     )}
                   >
                     <FormLabel
                       className={cn(
                         "absolute left-3 text-lg text-muted-foreground transition-all",
-                        isLatFocused || field.value
+                        focusStates["lat"] || field.value
                           ? "top-1.5 text-sm"
                           : "top-3.5",
                       )}
@@ -735,8 +788,8 @@ export default function HostVenue() {
                               : parseFloat(e.target.value),
                           )
                         }
-                        onFocus={() => setIsLatFocused(true)}
-                        onBlur={() => setIsLatFocused(false)}
+                        onFocus={() => handleFocus("lat", true)}
+                        onBlur={() => handleFocus("lat", false)}
                         className="h-full rounded-md border-transparent pt-5 text-lg shadow-none focus-visible:ring-0"
                       />
                     </FormControl>
@@ -753,21 +806,21 @@ export default function HostVenue() {
                       "relative h-14 flex-1 space-y-0 rounded-md border border-gray-400 transition-all duration-300",
                       {
                         "border-primary ring-2 ring-primary ring-offset-2 ring-offset-card":
-                          isLngFocused,
+                          focusStates["lng"],
                       },
                       {
                         "border-destructive": formState.errors.location?.lng,
                       },
                       {
                         "ring-2 ring-destructive ring-offset-2":
-                          formState.errors.location?.lng && isLngFocused,
+                          formState.errors.location?.lng && focusStates["lng"],
                       },
                     )}
                   >
                     <FormLabel
                       className={cn(
                         "absolute left-3 text-lg text-muted-foreground transition-all",
-                        isLngFocused || field.value
+                        focusStates["lng"] || field.value
                           ? "top-1.5 text-sm"
                           : "top-3.5",
                       )}
@@ -785,8 +838,8 @@ export default function HostVenue() {
                               : parseFloat(e.target.value),
                           )
                         }
-                        onFocus={() => setIsLngFocused(true)}
-                        onBlur={() => setIsLngFocused(false)}
+                        onFocus={() => handleFocus("lng", true)}
+                        onBlur={() => handleFocus("lng", false)}
                         className="h-full rounded-md border-transparent pt-5 text-lg shadow-none focus-visible:ring-0"
                       />
                     </FormControl>
@@ -809,13 +862,10 @@ export default function HostVenue() {
                     <Checkbox
                       checked={field.value}
                       onCheckedChange={field.onChange}
-                      id="venueManager"
+                      id="breakfast"
                     />
                   </FormControl>
-                  <FormLabel
-                    htmlFor="venueManager"
-                    className="pb-1.5 text-base"
-                  >
+                  <FormLabel htmlFor="breakfast" className="pb-1.5 text-base">
                     Breakfast
                   </FormLabel>
                 </FormItem>
@@ -830,13 +880,10 @@ export default function HostVenue() {
                     <Checkbox
                       checked={field.value}
                       onCheckedChange={field.onChange}
-                      id="venueManager"
+                      id="parking"
                     />
                   </FormControl>
-                  <FormLabel
-                    htmlFor="venueManager"
-                    className="pb-1.5 text-base"
-                  >
+                  <FormLabel htmlFor="parking" className="pb-1.5 text-base">
                     Parking
                   </FormLabel>
                 </FormItem>
@@ -851,13 +898,10 @@ export default function HostVenue() {
                     <Checkbox
                       checked={field.value}
                       onCheckedChange={field.onChange}
-                      id="venueManager"
+                      id="wifi"
                     />
                   </FormControl>
-                  <FormLabel
-                    htmlFor="venueManager"
-                    className="pb-1.5 text-base"
-                  >
+                  <FormLabel htmlFor="wifi" className="pb-1.5 text-base">
                     Wifi
                   </FormLabel>
                 </FormItem>
@@ -872,13 +916,10 @@ export default function HostVenue() {
                     <Checkbox
                       checked={field.value}
                       onCheckedChange={field.onChange}
-                      id="venueManager"
+                      id="pets"
                     />
                   </FormControl>
-                  <FormLabel
-                    htmlFor="venueManager"
-                    className="pb-1.5 text-base"
-                  >
+                  <FormLabel htmlFor="pets" className="pb-1.5 text-base">
                     Pets
                   </FormLabel>
                 </FormItem>
@@ -897,7 +938,21 @@ export default function HostVenue() {
                 "cursor-not-allowed opacity-50": mutation.isPending,
               })}
             >
-              {mutation.isPending ? "Submitting..." : "Create Venue"}
+              {mutation.isPending ? (
+                isCreating ? (
+                  <span className="flex items-center">
+                    Creating <LoaderCircle className="ml-2 size-5" />
+                  </span>
+                ) : (
+                  <span className="flex items-center">
+                    Updating <LoaderCircle className="ml-2 size-5" />
+                  </span>
+                )
+              ) : isCreating ? (
+                "Create Venue"
+              ) : (
+                "Update Venue"
+              )}
             </Button>
           </div>
         </form>

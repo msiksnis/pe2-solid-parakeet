@@ -6,7 +6,7 @@ import { format } from "date-fns";
 
 interface VenueCardProps {
   venues: Venue[];
-  currentFilter: string;
+  currentFilter?: string;
 }
 
 export default function VenueCardSM({ venues, currentFilter }: VenueCardProps) {

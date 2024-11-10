@@ -2,7 +2,7 @@ import { FILTER_OPTIONS } from "./filterVenues";
 
 export interface MediaObject {
   url: string;
-  alt?: string;
+  alt: string;
 }
 
 export interface MetaData {
@@ -58,8 +58,8 @@ export interface Venue {
   updated: string;
   meta: MetaData;
   location: Location;
-  owner: Owner;
-  bookings: Booking[];
+  owner?: Owner;
+  bookings?: Booking[];
   _count: {
     bookings: number;
   };

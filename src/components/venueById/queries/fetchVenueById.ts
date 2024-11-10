@@ -1,4 +1,4 @@
-import axiosInstance from "@/lib/axiosInstance";
+import { axiosInstance } from "@/lib/axiosInstance";
 import { Venue } from "@/lib/types";
 
 export const fetchVenueById = async (id: string): Promise<Venue> => {
