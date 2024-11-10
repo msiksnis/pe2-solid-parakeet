@@ -27,7 +27,7 @@ export const useImagePreview = (initialUrl: string | undefined = "") => {
       img.onload = () => setIsLoading(false);
       img.onerror = () => {
         setIsLoading(false);
-        setImagePreview(undefined); // Optionally reset if there's an error
+        setImagePreview(undefined);
       };
     }
   }, [imagePreview]);

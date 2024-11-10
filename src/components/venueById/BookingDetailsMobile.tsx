@@ -63,7 +63,7 @@ export default function BookingDetailsMobile({ venue }: BookingDetailsProps) {
     }
   }, [range.from, range.to, navigate]);
 
-  const bookedDateRanges = venue.bookings
+  const bookedDateRanges = (venue.bookings ?? [])
     .map((booking) => ({
       from: startOfDay(parseISO(booking.dateFrom)),
       to: endOfDay(parseISO(booking.dateTo)),

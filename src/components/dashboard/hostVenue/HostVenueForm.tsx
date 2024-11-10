@@ -1,3 +1,15 @@
+import { useEffect } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useParams } from "@tanstack/react-router";
+import { ImageIcon, LoaderCircle, PlusIcon, Trash2Icon } from "lucide-react";
+
+import { useAuthData } from "@/hooks/useAuthData";
+import { useVenueStore } from "@/hooks/useVenueStore";
+import { cn } from "@/lib/utils";
+import { fetchVenueById } from "@/components/venueById/queries/fetchVenueById";
 import Loader from "@/components/loader";
 import {
   Form,
@@ -7,17 +19,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { fetchVenueById } from "@/components/venueById/queries/fetchVenueById";
-import { useAuthData } from "@/hooks/useAuthData";
-import { useVenueStore } from "@/hooks/useVenueStore";
-import { cn } from "@/lib/utils";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useParams } from "@tanstack/react-router";
-import { ImageIcon, LoaderCircle, PlusIcon, Trash2Icon } from "lucide-react";
-import { useEffect } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { Button } from "../../ui/button";
 import { Checkbox } from "../../ui/checkbox";
 import { Input } from "../../ui/input";

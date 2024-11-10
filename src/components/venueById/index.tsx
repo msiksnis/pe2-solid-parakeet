@@ -175,15 +175,15 @@ export default function VenueById() {
           <div className="hidden items-center space-x-4 md:flex">
             <Avatar className="cursor-pointer">
               <AvatarImage
-                src={venue.owner.avatar.url}
-                alt={venue.owner.avatar.alt}
+                src={venue.owner?.avatar.url}
+                alt={venue.owner?.avatar.alt}
               />
               <AvatarFallback>
                 <User className="h-5 w-5" />
               </AvatarFallback>
             </Avatar>
             <span>
-              Hosted by <span className="capitalize">{venue.owner.name}</span>
+              Hosted by <span className="capitalize">{venue.owner?.name}</span>
             </span>
           </div>
           <Separator className="hidden md:flex" />
@@ -231,15 +231,16 @@ export default function VenueById() {
             <div className="flex items-center space-x-4">
               <Avatar className="cursor-pointer">
                 <AvatarImage
-                  src={venue.owner.avatar.url}
-                  alt={venue.owner.avatar.alt}
+                  src={venue.owner?.avatar.url}
+                  alt={venue.owner?.avatar.alt}
                 />
                 <AvatarFallback>
                   <User className="h-5 w-5" />
                 </AvatarFallback>
               </Avatar>
               <span>
-                Hosted by <span className="capitalize">{venue.owner.name}</span>
+                Hosted by{" "}
+                <span className="capitalize">{venue.owner?.name}</span>
               </span>
             </div>
             <Separator />
