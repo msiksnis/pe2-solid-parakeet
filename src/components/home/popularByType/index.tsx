@@ -61,7 +61,7 @@ export default function PopularByType() {
       if (a.location.city && !b.location.city) return -1;
       if (!a.location.city && b.location.city) return 1;
 
-      return a.name?.localeCompare(b.name || "") || 0;
+      return b.created?.localeCompare(a.created || "") || 0;
     })
     .slice(0, sliceCount);
 
