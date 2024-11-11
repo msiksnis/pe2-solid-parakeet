@@ -3,6 +3,14 @@ import { MapPinIcon, StarIcon } from "lucide-react";
 import BlurFade from "./ui/blur-fade";
 import { Link } from "@tanstack/react-router";
 import { format } from "date-fns";
+import {
+  Carousel,
+  CarouselBullets,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "./Carousel";
 
 interface VenueCardProps {
   venues: Venue[];
@@ -25,13 +33,25 @@ export default function VenueCardSM({ venues, currentFilter }: VenueCardProps) {
               guests: 2,
               start_date: format(new Date(), "yyyy-MM-dd"),
             }}
-            className="mb-4 flex flex-col rounded-2xl border-primary/0 transition-all duration-200 hover:border-primary/100 sm:p-2 md:border"
+            className="group/card relative mb-4 flex flex-col rounded-2xl border-primary/0 transition-all duration-200 hover:border-primary/100 sm:p-2 md:border"
           >
-            <img
-              src={venue.media?.[0]?.url || "/default-image.jpg"}
-              alt={venue.media?.[0]?.alt || "Default alt text"}
-              className="h-60 w-full rounded-2xl object-cover md:h-48"
-            />
+            <Carousel className="w-full">
+              <CarouselContent>
+                {venue.media?.length > 0 &&
+                  venue.media.map((media, i) => (
+                    <CarouselItem key={i}>
+                      <img
+                        src={media.url || "/default-image.jpg"}
+                        alt={media.alt || "Default alt text"}
+                        className="h-60 w-full rounded-2xl object-cover md:h-48"
+                      />
+                    </CarouselItem>
+                  ))}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+              <CarouselBullets />
+            </Carousel>
 
             <div className="flex h-[7.5rem] flex-col justify-between">
               <div className="mb-2 mt-4 flex h-12 items-start justify-between">
