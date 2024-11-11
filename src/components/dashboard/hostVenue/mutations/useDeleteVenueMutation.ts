@@ -5,37 +5,53 @@ import { Venue } from "../VenueValidation";
 
 export const useDeleteVenueMutation = () => {
   const queryClient = useQueryClient();
-  const queryKey: QueryKey = ["venuesByUser"] as const;
+  const baseQueryKeys: QueryKey[] = [["venuesByUser"], ["venues"]];
 
   const mutation = useMutation<
     void, // Return type from mutationFn
     Error, // Error type
     string, // Input type to mutationFn (venueId)
-    { previousVenues: Venue[] | undefined } // Context type for rollback
+    { previousData: Record<string, Venue[] | undefined> } // Context type for rollback
   >({
     mutationFn: async (venueId) => {
       await authenticatedAxiosInstance.delete(`/venues/${venueId}`);
     },
     onMutate: async (venueId) => {
-      await queryClient.cancelQueries({ queryKey });
+      // Cancel any ongoing queries
+      await queryClient.cancelQueries();
 
-      const previousVenues = queryClient.getQueryData<Venue[]>(queryKey);
+      // Store previous data for all relevant query keys
+      const previousData: Record<string, Venue[] | undefined> = {};
 
-      queryClient.setQueryData<Venue[]>(queryKey, (oldVenues = []) =>
-        oldVenues.filter((venue) => venue.id !== venueId),
-      );
+      // Optimistically update all relevant queries
+      baseQueryKeys.forEach((key) => {
+        const previous = queryClient.getQueryData<Venue[]>(key);
+        if (previous) {
+          previousData[key.join()] = previous;
+          queryClient.setQueryData<Venue[]>(key, (oldVenues = []) =>
+            oldVenues.filter((venue) => venue.id !== venueId),
+          );
+        }
+      });
 
-      // Return the context with previous data for rollback
-      return { previousVenues };
+      // Return previous data for rollback
+      return { previousData };
     },
     onSuccess: (venueId) => {
-      queryClient.invalidateQueries({ queryKey });
+      // Invalidate all relevant queries to refetch fresh data
+      baseQueryKeys.forEach((key) => {
+        queryClient.invalidateQueries({ queryKey: key });
+      });
+
+      // Remove individual venue query cache
       queryClient.removeQueries({ queryKey: ["venue", venueId] });
 
       toast.success("Venue deleted successfully!");
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey });
+      baseQueryKeys.forEach((key) =>
+        queryClient.invalidateQueries({ queryKey: key }),
+      );
     },
   });
 

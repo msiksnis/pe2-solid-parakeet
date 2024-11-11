@@ -42,7 +42,7 @@ export default function VenueCardSM({ venues, currentFilter }: VenueCardProps) {
                     <CarouselItem key={i}>
                       <img
                         src={media.url || "/default-image.jpg"}
-                        alt={media.alt || "Default alt text"}
+                        alt={media.alt || "Venue Image"}
                         className="h-60 w-full rounded-2xl object-cover md:h-48"
                       />
                     </CarouselItem>
@@ -52,7 +52,6 @@ export default function VenueCardSM({ venues, currentFilter }: VenueCardProps) {
               <CarouselNext />
               <CarouselBullets />
             </Carousel>
-
             <div className="flex h-[7.5rem] flex-col justify-between">
               <div className="mb-2 mt-4 flex h-12 items-start justify-between">
                 <h1 className="line-clamp-2 w-44 text-lg font-medium capitalize leading-6">

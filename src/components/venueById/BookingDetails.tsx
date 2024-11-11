@@ -25,6 +25,7 @@ import { useSignInModalStore } from "@/hooks/useSignInModalStore";
 
 interface BookingDetailsProps {
   venue: Venue;
+  className?: string;
 }
 
 interface Range {
@@ -32,7 +33,10 @@ interface Range {
   to: Date | undefined;
 }
 
-export default function BookingDetails({ venue }: BookingDetailsProps) {
+export default function BookingDetails({
+  venue,
+  className,
+}: BookingDetailsProps) {
   const {
     guests,
     start_date: startDateParam,
@@ -266,9 +270,13 @@ export default function BookingDetails({ venue }: BookingDetailsProps) {
 
   return (
     <div
-      className={cn("flex flex-col", {
-        hidden: smCalendarContainer,
-      })}
+      className={cn(
+        "flex flex-col",
+        {
+          hidden: smCalendarContainer,
+        },
+        className,
+      )}
     >
       <div
         ref={calendarRef}

@@ -6,7 +6,7 @@ import { createTempVenue, Venue } from "../VenueValidation";
 
 export function useVenueMutation() {
   const queryClient = useQueryClient();
-  const queryKey: QueryKey = ["venue"] as const;
+  const baseQueryKeys: QueryKey[] = [["venue"], ["venuesByUser"], ["venues"]];
 
   const handleCreateVenue = (data: Venue) => createVenueAction(data);
   const handleUpdateVenue = (venueId: string, data: Venue) =>
@@ -16,7 +16,7 @@ export function useVenueMutation() {
     Venue,
     Error,
     { isUpdate: boolean; venueId?: string; data: Partial<Venue> },
-    { previousVenues?: Venue[] }
+    { previousData: Record<string, Venue[]> }
   >({
     mutationFn: async ({ isUpdate, venueId, data }) => {
       if (isUpdate && venueId) {
@@ -26,36 +26,50 @@ export function useVenueMutation() {
     },
 
     onMutate: async ({ isUpdate, venueId, data }) => {
-      await queryClient.cancelQueries({ queryKey });
+      await queryClient.cancelQueries();
 
-      const previousVenues = queryClient.getQueryData<Venue[]>(queryKey);
+      const previousData: Record<string, Venue[]> = {};
 
-      queryClient.setQueryData<Venue[]>(queryKey, (oldVenues = []) => {
-        if (isUpdate && venueId) {
-          return oldVenues.map((venue) =>
-            venue.id === venueId ? { ...venue, ...data } : venue,
-          );
+      // Optimistically update all relevant query keys
+      baseQueryKeys.forEach((key) => {
+        const previous = queryClient.getQueryData<Venue[]>(key);
+        if (previous) {
+          previousData[key.join()] = previous;
+          queryClient.setQueryData<Venue[]>(key, (oldVenues = []) => {
+            if (isUpdate && venueId) {
+              return oldVenues.map((venue) =>
+                venue.id === venueId ? { ...venue, ...data } : venue,
+              );
+            }
+            return [...oldVenues, createTempVenue(data)];
+          });
         }
-        return [...oldVenues, createTempVenue(data)];
       });
 
-      return { previousVenues };
+      return { previousData };
     },
-    onSuccess: (isUpdate) => {
-      queryClient.invalidateQueries({
-        predicate: (query) =>
-          query.queryKey.includes(queryKey) || query.queryKey.includes("venue"),
-      });
+
+    onSuccess: (variables) => {
+      // Invalidate all relevant queries on success
+      baseQueryKeys.forEach((key) =>
+        queryClient.invalidateQueries({
+          queryKey: key,
+        }),
+      );
 
       toast.success(
-        isUpdate
+        variables.updated
           ? "Venue updated successfully!"
           : "Venue created successfully!",
       );
     },
+
     onError: (error, variables, context) => {
-      if (context?.previousVenues) {
-        queryClient.setQueryData(["venuesByUser"], context.previousVenues);
+      // Rollback to previous data for all affected queries
+      if (context?.previousData) {
+        Object.entries(context.previousData).forEach(([key, data]) => {
+          queryClient.setQueryData(key.split(","), data);
+        });
       }
 
       toast.error(
