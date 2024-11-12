@@ -1,3 +1,4 @@
+import { useRef, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
 import {
@@ -11,6 +12,9 @@ import {
   Wifi,
 } from "lucide-react";
 import { titleCase } from "title-case";
+
+import LightGallery from "lightgallery/react";
+import "lightgallery/css/lightgallery.css";
 
 import { Venue } from "@/lib/types";
 import { cn, useScreenSizes } from "@/lib/utils";
@@ -26,6 +30,7 @@ import { fetchVenueById } from "./queries/fetchVenueById";
 
 export default function VenueById() {
   const { id } = useParams({ from: "/venue/$id" }) as { id: string };
+  const galleryRef = useRef<any>(null);
 
   const { smCalendarContainer } = useScreenSizes();
 
@@ -40,6 +45,15 @@ export default function VenueById() {
     enabled: !!id,
     retry: 2,
   });
+
+  const handleOpenGallery = useCallback(
+    (index: number) => {
+      if (galleryRef.current) {
+        galleryRef.current.openGallery(index);
+      }
+    },
+    [galleryRef],
+  );
 
   if (isLoading) return <Loader className="mt-60" />;
 
@@ -67,11 +81,6 @@ export default function VenueById() {
           : "grid-cols-4 grid-rows-2";
 
   const mobileImages = venue.media?.slice(0, 3) || [];
-
-  const handleShowAllPhotos = () => {
-    // Logic to show all photos will go here
-    console.log("Show all photos");
-  };
 
   return (
     <div className="mx-auto mt-10 max-w-7xl space-y-6 px-4 sm:px-6 md:px-10 xl:px-6">
@@ -111,9 +120,10 @@ export default function VenueById() {
               key={media.url}
               src={media.url}
               alt={media.alt || "Venue image"}
-              className={`h-full w-full object-cover ${
+              className={`h-full w-full cursor-pointer object-cover ${
                 index === 0 && images.length >= 3 ? "col-span-2 row-span-2" : ""
               }`}
+              onClick={() => handleOpenGallery(index)}
             />
           ))}
         </div>
@@ -140,6 +150,7 @@ export default function VenueById() {
                 src={media.url}
                 alt={media.alt || "Venue image"}
                 className={className}
+                onClick={() => handleOpenGallery(index)}
               />
             );
           })}
@@ -147,7 +158,7 @@ export default function VenueById() {
         {totalImages > 5 && (
           <div className="absolute bottom-4 right-4">
             <Button
-              onClick={handleShowAllPhotos}
+              onClick={() => handleOpenGallery(0)}
               className="bg-primary/80 text-lg transition-all duration-300 hover:bg-primary/100"
             >
               <ImagesIcon className="mr-1 size-6" />
@@ -249,6 +260,24 @@ export default function VenueById() {
         <div className="absolute right-0 xl:right-4">
           <BookingDetails venue={venue} />
         </div>
+
+        {/* LightGallery */}
+        <LightGallery
+          onInit={(detail) => {
+            galleryRef.current = detail.instance;
+          }}
+          // plugins={[lgZoom]}
+          dynamic
+          dynamicEl={venue.media?.map((media) => ({
+            src: media.url,
+            thumb: media.url,
+            subHtml: `<div class="lightGallery-caption">${media.alt || ""}</div>`,
+          }))}
+          index={0}
+          closable
+          hideBarsDelay={2000}
+          counter
+        />
       </div>
     </div>
   );
