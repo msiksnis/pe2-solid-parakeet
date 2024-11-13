@@ -1,8 +1,9 @@
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
 import {
   Cat,
+  ChevronRight,
   CircleParking,
   HeartIcon,
   ImagesIcon,
@@ -27,9 +28,13 @@ import { Separator } from "../ui/separator";
 import BookingDetails from "./BookingDetails";
 import BookingDetailsMobile from "./BookingDetailsMobile";
 import { fetchVenueById } from "./queries/fetchVenueById";
+import DescriptionModal from "../DescriptionModal";
 
 export default function VenueById() {
   const { id } = useParams({ from: "/venue/$id" }) as { id: string };
+
+  const [openDescriptionModal, sEtOpenDescriptionModal] = useState(false);
+
   const galleryRef = useRef<any>(null);
 
   const { smCalendarContainer } = useScreenSizes();
@@ -169,7 +174,7 @@ export default function VenueById() {
       </div>
 
       {/* Venue Details and Booking */}
-      <div className="relative flex items-start justify-between gap-14 px-0 xl:px-4">
+      <div className="relative flex items-start justify-between px-0 xl:px-4">
         <div
           className={cn(
             "w-[calc(100%-400px)] space-y-6 xl:w-[calc(100%-420px)]",
@@ -178,9 +183,24 @@ export default function VenueById() {
             },
           )}
         >
-          {/* Todo: AI generated heading here */}
-          <div className="text-pretty pb-6 text-lg font-light text-paragraph">
-            {venue.description}
+          <div className="flex h-40 flex-col items-start justify-between overflow-hidden">
+            {/* Todo: AI generated heading here */}
+            <div className="line-clamp-4 text-lg font-light text-paragraph">
+              {venue.description}
+            </div>
+            <Button
+              variant={"linkHover1"}
+              className="group/button px-0 after:w-full"
+              onClick={() => sEtOpenDescriptionModal(true)}
+            >
+              <span className="">Show more</span>
+              <ChevronRight className="ml-1 size-4" />
+            </Button>
+            <DescriptionModal
+              description={venue.description}
+              isOpen={openDescriptionModal}
+              onClose={() => sEtOpenDescriptionModal(false)}
+            />
           </div>
           <Separator />
           <div className="hidden items-center space-x-4 md:flex">

@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { Modal } from "./Modal";
 import { Button } from "./ui/button";
 
@@ -15,14 +14,6 @@ export default function AlertModal({
   onConfirm,
   loading,
 }: AlertModalProps) {
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  if (!isMounted) return null;
-
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div>

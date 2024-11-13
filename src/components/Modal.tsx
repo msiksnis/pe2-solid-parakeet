@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import {
   ResponsiveModal,
   ResponsiveModalOverlay,
@@ -11,9 +12,10 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   children?: React.ReactNode;
+  className?: string;
 }
 
-export function Modal({ isOpen, onClose, children }: ModalProps) {
+export function Modal({ isOpen, onClose, children, className }: ModalProps) {
   const onChange = (open: boolean) => {
     if (!open) {
       onClose();
@@ -22,7 +24,7 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
   return (
     <ResponsiveModal open={isOpen} onOpenChange={onChange}>
       <ResponsiveModalOverlay>
-        <ResponsiveModalContent className="overflow-y-hidden">
+        <ResponsiveModalContent className={cn("overflow-y-hidden", className)}>
           <ResponsiveModalHeader className="sr-only">
             <ResponsiveModalTitle>Modal Title</ResponsiveModalTitle>
             <ResponsiveModalDescription>Description</ResponsiveModalDescription>

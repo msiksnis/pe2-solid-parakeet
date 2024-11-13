@@ -33,7 +33,7 @@ import { useImagePreview } from "./hooks/useImagePreview";
 import { useVenueMutation } from "./mutations/useVenueMutation";
 import { defaultValues, VenueSchema } from "./VenueValidation";
 import { useDeleteVenueMutation } from "./mutations/useDeleteVenueMutation";
-import AlertModal from "@/components/alert-modal";
+import AlertModal from "@/components/AlertModal";
 import { Venue } from "@/lib/types";
 
 export default function HostVenueForm() {
