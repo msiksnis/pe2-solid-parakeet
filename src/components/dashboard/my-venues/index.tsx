@@ -1,5 +1,5 @@
 import ErrorLoadingButton from "@/components/ErrorLoadingButton";
-import Loader from "@/components/loader";
+import Loader from "@/components/Loader";
 import { Venue } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 import OwnersVenuesCard from "./components/OwnersVenueCard";

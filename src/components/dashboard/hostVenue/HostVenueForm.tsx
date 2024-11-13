@@ -11,7 +11,7 @@ import {
 import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 
-import Loader from "@/components/loader";
+import Loader from "@/components/Loader";
 import {
   Form,
   FormControl,

@@ -20,7 +20,7 @@ import "lightgallery/css/lightgallery.css";
 import { Venue } from "@/lib/types";
 import { cn, useScreenSizes } from "@/lib/utils";
 import ErrorLoadingButton from "../ErrorLoadingButton";
-import Loader from "../loader";
+import Loader from "../Loader";
 import RatingStars from "../RatingStars";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
@@ -174,7 +174,7 @@ export default function VenueById() {
       </div>
 
       {/* Venue Details and Booking */}
-      <div className="relative flex items-start justify-between px-0 xl:px-4">
+      <div className="relative flex min-h-[500px] items-start justify-between px-0 pb-20 md:pb-32 xl:px-4">
         <div
           className={cn(
             "w-[calc(100%-400px)] space-y-6 xl:w-[calc(100%-420px)]",
@@ -194,7 +194,7 @@ export default function VenueById() {
               onClick={() => sEtOpenDescriptionModal(true)}
             >
               <span className="">Show more</span>
-              <ChevronRight className="ml-1 size-4" />
+              <ChevronRight className="ml-1 size-4 transition-transform duration-300 group-hover/button:translate-x-1" />
             </Button>
             <DescriptionModal
               description={venue.description}
