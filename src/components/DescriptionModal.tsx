@@ -1,4 +1,5 @@
 import { Modal } from "./Modal";
+import { Separator } from "./ui/separator";
 
 interface DescriptionModalProps {
   isOpen: boolean;
@@ -12,15 +13,14 @@ export default function DescriptionModal({
   description,
 }: DescriptionModalProps) {
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      className="max-h-[60vh] overflow-y-auto"
-    >
+    <Modal isOpen={isOpen} onClose={onClose} className="">
       <div>
-        <div className="text-2xl">Description</div>
+        <div className="pb-2 text-2xl">Description</div>
+        <Separator />
+        <div className="no-scrollbar max-h-[70vh] overflow-y-auto pb-10 pt-4">
+          {description}
+        </div>
       </div>
-      <div className="pb-10 pt-4">{description}</div>
     </Modal>
   );
 }
