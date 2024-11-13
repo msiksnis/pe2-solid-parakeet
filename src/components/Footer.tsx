@@ -100,7 +100,7 @@ export default function Footer() {
 
       <div className="pt-10">
         <Separator className="bg-primary/40" />
-        <p className="p-4 text-sm text-muted-foreground">
+        <p className="p-4 text-center text-sm text-muted-foreground">
           2024 © designed & developed by devmarty.com
         </p>
       </div>

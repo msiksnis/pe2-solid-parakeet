@@ -1,5 +1,3 @@
-// /lib/filterVenues.ts
-
 import { Venue } from "./types";
 
 export const FILTER_OPTIONS = [
@@ -31,7 +29,6 @@ export function filterSunnyBeaches(venues: Venue[]): Venue[] {
   const keywords = [
     "beach",
     "sand",
-    "sunny",
     "see",
     "ocean",
     "water",
