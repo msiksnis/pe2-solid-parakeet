@@ -1,3 +1,5 @@
+import { useAuthStatus } from "@/hooks/useAuthStatus";
+import { useSignInModalStore } from "@/hooks/useSignInModalStore";
 import { Venue } from "@/lib/types";
 import { calculateTotalPrice, cn, useScreenSizes } from "@/lib/utils";
 import { Route } from "@/routes/venue/$id";
@@ -5,7 +7,6 @@ import { useNavigate } from "@tanstack/react-router";
 import {
   addDays,
   areIntervalsOverlapping,
-  differenceInCalendarDays,
   endOfDay,
   format,
   isWithinInterval,
@@ -15,14 +16,13 @@ import {
 import { motion } from "framer-motion";
 import { CalendarDays, ChevronDown, Minus, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
-import { DayClickEventHandler } from "react-day-picker";
+import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Calendar } from "../ui/calendar";
 import { Separator } from "../ui/separator";
-import { useSignInModalStore } from "@/hooks/useSignInModalStore";
-import { useAuthStatus } from "@/hooks/useAuthStatus";
-import { toast } from "sonner";
 import { Booking } from "./BookingValidation";
+import { useDateRangeSelection } from "./hooks/useDateRangeSelection";
+import { calculateSingleDayGaps } from "./utils/utils";
 
 interface BookingDetailsProps {
   onReserve: (data: Booking) => void;
@@ -75,52 +75,14 @@ export default function BookingDetailsMobile({
     }))
     .sort((a, b) => a.from.getTime() - b.from.getTime());
 
-  const handleDateSelect: DayClickEventHandler = (selectedDate, modifiers) => {
-    if (modifiers.disabled) {
-      return; // Ignore clicks on disabled dates
-    }
-
-    if (isSelectingStartDate) {
-      // Reset the end date when selecting a new start date
-      setRange({ from: selectedDate, to: undefined });
-      setIsSelectingStartDate(false);
-
-      // Update URL parameters - reset end_date
-      navigate({
-        search: (prev) => ({
-          ...prev,
-          start_date: format(selectedDate, "yyyy-MM-dd"),
-          end_date: undefined,
-        }),
-        resetScroll: false,
-      });
-    } else {
-      if (range.from && selectedDate > range.from) {
-        const startDate = startOfDay(range.from);
-        const endDate = endOfDay(selectedDate);
-
-        // Check if the range overlaps with any booked dates
-        if (isDateRangeOverlapping(startDate, endDate, bookedDateRanges)) {
-          alert(
-            "The selected dates include unavailable dates. Please choose a different range.",
-          );
-          return;
-        }
-
-        // Update the end date
-        setRange((prevRange) => ({ ...prevRange, to: selectedDate }));
-
-        // Update end_date in URL parameters
-        navigate({
-          search: (prev) => ({
-            ...prev,
-            end_date: format(selectedDate, "yyyy-MM-dd"),
-          }),
-          resetScroll: false,
-        });
-      }
-    }
-  };
+  const { handleDateSelect } = useDateRangeSelection(
+    bookedDateRanges,
+    navigate,
+    range,
+    setRange,
+    isSelectingStartDate,
+    setIsSelectingStartDate,
+  );
 
   const toggleGuestControl = () => {
     setGuestControlExpanded((prev) => !prev);
@@ -130,25 +92,6 @@ export default function BookingDetailsMobile({
     range.from && range.to
       ? calculateTotalPrice(range.from, range.to, venue.price)
       : 0;
-
-  const singleDayGaps: Date[] = [];
-
-  for (let i = 0; i < bookedDateRanges.length - 1; i++) {
-    const currentBooking = bookedDateRanges[i];
-    const nextBooking = bookedDateRanges[i + 1];
-
-    // The day after the current booking ends
-    const gapStart = addDays(currentBooking.to, 1);
-    // The day before the next booking starts
-    const gapEnd = addDays(nextBooking.from, -1);
-
-    const gapDays = differenceInCalendarDays(gapEnd, gapStart) + 1;
-
-    if (gapDays === 1) {
-      // Only one day available between bookings; disable it
-      singleDayGaps.push(gapStart);
-    }
-  }
 
   function isDateRangeOverlapping(
     startDate: Date,
@@ -166,7 +109,7 @@ export default function BookingDetailsMobile({
 
   const disabledDates = [
     ...bookedDateRanges,
-    ...singleDayGaps,
+    ...calculateSingleDayGaps(bookedDateRanges),
     (date: Date) => {
       const today = startOfDay(new Date());
       if (date < today) {

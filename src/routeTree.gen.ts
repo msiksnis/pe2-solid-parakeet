@@ -11,24 +11,18 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as ManageReservationsImport } from './routes/manage-reservations'
 import { Route as ForGroupsImport } from './routes/for-groups'
 import { Route as FavoritesImport } from './routes/favorites'
 import { Route as ExploreVenuesImport } from './routes/explore-venues'
 import { Route as AccountImport } from './routes/account'
 import { Route as AuthenticatedImport } from './routes/_authenticated'
 import { Route as IndexImport } from './routes/index'
+import { Route as ManageReservationsIndexImport } from './routes/manage-reservations/index'
 import { Route as VenueIdImport } from './routes/venue/$id'
 import { Route as AuthenticatedManageVenuesIndexImport } from './routes/_authenticated/manage-venues/index'
 import { Route as AuthenticatedManageVenuesHostVenueIdImport } from './routes/_authenticated/manage-venues/host-venue/$id'
 
 // Create/Update Routes
-
-const ManageReservationsRoute = ManageReservationsImport.update({
-  id: '/manage-reservations',
-  path: '/manage-reservations',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const ForGroupsRoute = ForGroupsImport.update({
   id: '/for-groups',
@@ -62,6 +56,12 @@ const AuthenticatedRoute = AuthenticatedImport.update({
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ManageReservationsIndexRoute = ManageReservationsIndexImport.update({
+  id: '/manage-reservations/',
+  path: '/manage-reservations/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -131,18 +131,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForGroupsImport
       parentRoute: typeof rootRoute
     }
-    '/manage-reservations': {
-      id: '/manage-reservations'
-      path: '/manage-reservations'
-      fullPath: '/manage-reservations'
-      preLoaderRoute: typeof ManageReservationsImport
-      parentRoute: typeof rootRoute
-    }
     '/venue/$id': {
       id: '/venue/$id'
       path: '/venue/$id'
       fullPath: '/venue/$id'
       preLoaderRoute: typeof VenueIdImport
+      parentRoute: typeof rootRoute
+    }
+    '/manage-reservations/': {
+      id: '/manage-reservations/'
+      path: '/manage-reservations'
+      fullPath: '/manage-reservations'
+      preLoaderRoute: typeof ManageReservationsIndexImport
       parentRoute: typeof rootRoute
     }
     '/_authenticated/manage-venues/': {
@@ -186,8 +186,8 @@ export interface FileRoutesByFullPath {
   '/explore-venues': typeof ExploreVenuesRoute
   '/favorites': typeof FavoritesRoute
   '/for-groups': typeof ForGroupsRoute
-  '/manage-reservations': typeof ManageReservationsRoute
   '/venue/$id': typeof VenueIdRoute
+  '/manage-reservations': typeof ManageReservationsIndexRoute
   '/manage-venues': typeof AuthenticatedManageVenuesIndexRoute
   '/manage-venues/host-venue/$id': typeof AuthenticatedManageVenuesHostVenueIdRoute
 }
@@ -199,8 +199,8 @@ export interface FileRoutesByTo {
   '/explore-venues': typeof ExploreVenuesRoute
   '/favorites': typeof FavoritesRoute
   '/for-groups': typeof ForGroupsRoute
-  '/manage-reservations': typeof ManageReservationsRoute
   '/venue/$id': typeof VenueIdRoute
+  '/manage-reservations': typeof ManageReservationsIndexRoute
   '/manage-venues': typeof AuthenticatedManageVenuesIndexRoute
   '/manage-venues/host-venue/$id': typeof AuthenticatedManageVenuesHostVenueIdRoute
 }
@@ -213,8 +213,8 @@ export interface FileRoutesById {
   '/explore-venues': typeof ExploreVenuesRoute
   '/favorites': typeof FavoritesRoute
   '/for-groups': typeof ForGroupsRoute
-  '/manage-reservations': typeof ManageReservationsRoute
   '/venue/$id': typeof VenueIdRoute
+  '/manage-reservations/': typeof ManageReservationsIndexRoute
   '/_authenticated/manage-venues/': typeof AuthenticatedManageVenuesIndexRoute
   '/_authenticated/manage-venues/host-venue/$id': typeof AuthenticatedManageVenuesHostVenueIdRoute
 }
@@ -228,8 +228,8 @@ export interface FileRouteTypes {
     | '/explore-venues'
     | '/favorites'
     | '/for-groups'
-    | '/manage-reservations'
     | '/venue/$id'
+    | '/manage-reservations'
     | '/manage-venues'
     | '/manage-venues/host-venue/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -240,8 +240,8 @@ export interface FileRouteTypes {
     | '/explore-venues'
     | '/favorites'
     | '/for-groups'
-    | '/manage-reservations'
     | '/venue/$id'
+    | '/manage-reservations'
     | '/manage-venues'
     | '/manage-venues/host-venue/$id'
   id:
@@ -252,8 +252,8 @@ export interface FileRouteTypes {
     | '/explore-venues'
     | '/favorites'
     | '/for-groups'
-    | '/manage-reservations'
     | '/venue/$id'
+    | '/manage-reservations/'
     | '/_authenticated/manage-venues/'
     | '/_authenticated/manage-venues/host-venue/$id'
   fileRoutesById: FileRoutesById
@@ -266,8 +266,8 @@ export interface RootRouteChildren {
   ExploreVenuesRoute: typeof ExploreVenuesRoute
   FavoritesRoute: typeof FavoritesRoute
   ForGroupsRoute: typeof ForGroupsRoute
-  ManageReservationsRoute: typeof ManageReservationsRoute
   VenueIdRoute: typeof VenueIdRoute
+  ManageReservationsIndexRoute: typeof ManageReservationsIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -277,8 +277,8 @@ const rootRouteChildren: RootRouteChildren = {
   ExploreVenuesRoute: ExploreVenuesRoute,
   FavoritesRoute: FavoritesRoute,
   ForGroupsRoute: ForGroupsRoute,
-  ManageReservationsRoute: ManageReservationsRoute,
   VenueIdRoute: VenueIdRoute,
+  ManageReservationsIndexRoute: ManageReservationsIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -299,8 +299,8 @@ export const routeTree = rootRoute
         "/explore-venues",
         "/favorites",
         "/for-groups",
-        "/manage-reservations",
-        "/venue/$id"
+        "/venue/$id",
+        "/manage-reservations/"
       ]
     },
     "/": {
@@ -325,11 +325,11 @@ export const routeTree = rootRoute
     "/for-groups": {
       "filePath": "for-groups.tsx"
     },
-    "/manage-reservations": {
-      "filePath": "manage-reservations.tsx"
-    },
     "/venue/$id": {
       "filePath": "venue/$id.tsx"
+    },
+    "/manage-reservations/": {
+      "filePath": "manage-reservations/index.tsx"
     },
     "/_authenticated/manage-venues/": {
       "filePath": "_authenticated/manage-venues/index.tsx",
