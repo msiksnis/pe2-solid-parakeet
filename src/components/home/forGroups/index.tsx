@@ -4,7 +4,7 @@ import { filterVenuesByType } from "@/lib/filterVenues";
 import VenueCardSM from "@/components/VenueCardSM";
 import { fetchVenues } from "../queries/fetchVenues";
 import { useSearch } from "@tanstack/react-router";
-import Loader from "@/components/Loader";
+import MainLoader from "@/components/Loader";
 
 export default function ForGroups() {
   const { filter } = useSearch({ from: "/for-groups" });
@@ -44,7 +44,7 @@ export default function ForGroups() {
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 md:px-10 xl:px-6">
       <h1 className="mt-6 text-center text-3xl font-semibold">{heading}</h1>
       {isFetching ? (
-        <Loader className="my-20" />
+        <MainLoader className="my-20" />
       ) : (
         <VenueCardSM
           venues={filteredVenues}

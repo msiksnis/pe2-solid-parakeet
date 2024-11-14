@@ -30,7 +30,7 @@ import { fetchVenueById } from "./queries/fetchVenueById";
 import DescriptionModal from "../DescriptionModal";
 import { useBookingMutation } from "./mutations/useBookingMutation";
 import { Booking } from "./BookingValidation";
-import Loader from "../Loader";
+import MainLoader from "../Loader";
 
 export default function VenueById() {
   const { id } = useParams({ from: "/venue/$id" }) as { id: string };
@@ -82,7 +82,7 @@ export default function VenueById() {
     [galleryRef],
   );
 
-  if (isLoading) return <Loader className="mt-60" />;
+  if (isLoading) return <MainLoader className="mt-60" />;
 
   const errorMessage =
     error instanceof Error

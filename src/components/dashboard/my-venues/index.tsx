@@ -3,7 +3,7 @@ import { Venue } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 import OwnersVenuesCard from "./components/OwnersVenueCard";
 import { fetchVenuesByUser } from "./queries/fetchVenuesByUser";
-import Loader from "@/components/Loader";
+import MainLoader from "@/components/Loader";
 
 export default function MyVenues() {
   const {
@@ -31,7 +31,7 @@ export default function MyVenues() {
     <div className="mx-auto my-20 max-w-7xl px-4 sm:px-6 lg:px-10 xl:px-4">
       <h1 className="px-4 text-3xl">My all Venues</h1>
       {isFetching ? (
-        <Loader className="mt-24" />
+        <MainLoader className="mt-24" />
       ) : (
         <OwnersVenuesCard venues={venues} />
       )}

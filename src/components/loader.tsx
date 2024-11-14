@@ -4,7 +4,7 @@ interface LoaderProps {
   className?: string;
 }
 
-export default function Loader({ className }: LoaderProps) {
+export default function MainLoader({ className }: LoaderProps) {
   return (
     <div className={cn("flex justify-center", className)}>
       <div className="loader">

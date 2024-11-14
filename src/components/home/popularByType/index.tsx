@@ -10,7 +10,7 @@ import { FilterOption } from "../../../lib/types";
 import { filterVenuesByType } from "@/lib/filterVenues";
 import TabsBar from "@/components/TabsBar";
 import { useScreenSizes } from "@/lib/utils";
-import Loader from "@/components/Loader";
+import MainLoader from "@/components/Loader";
 
 export default function PopularByType() {
   const navigate = useNavigate({ from: Route.fullPath });
@@ -72,7 +72,7 @@ export default function PopularByType() {
         handleFilterChange={handleFilterChange}
       />
       {isFetching ? (
-        <Loader className="mt-24" />
+        <MainLoader className="mt-24" />
       ) : (
         <>
           <VenueCardSM
