@@ -1,11 +1,7 @@
-import { Venue } from "@/lib/types";
-import { calculateTotalPrice, cn, useScreenSizes } from "@/lib/utils";
-import { Route } from "@/routes/venue/$id";
 import { useNavigate } from "@tanstack/react-router";
 import {
   addDays,
   areIntervalsOverlapping,
-  differenceInCalendarDays,
   endOfDay,
   format,
   isWithinInterval,
@@ -15,16 +11,23 @@ import {
 import { motion } from "framer-motion";
 import { CalendarDays, ChevronDown, Minus, Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { DayClickEventHandler } from "react-day-picker";
+import { toast } from "sonner";
+
+import { useAuthStatus } from "@/hooks/useAuthStatus";
+import { useSignInModalStore } from "@/hooks/useSignInModalStore";
+import { Venue } from "@/lib/types";
+import { calculateTotalPrice, cn, useScreenSizes } from "@/lib/utils";
+import { Route } from "@/routes/venue/$id";
 import { Button } from "../ui/button";
 import { Calendar } from "../ui/calendar";
 import { Separator } from "../ui/separator";
-import { useAuthStatus } from "@/hooks/useAuthStatus";
-import { toast } from "sonner";
-import { useSignInModalStore } from "@/hooks/useSignInModalStore";
+import { Booking } from "./BookingValidation";
+import { useDateRangeSelection } from "./hooks/useDateRangeSelection";
+import { calculateSingleDayGaps } from "./utils/utils";
 
 interface BookingDetailsProps {
   venue: Venue;
+  onReserve: (data: Booking) => void;
   className?: string;
 }
 
@@ -35,6 +38,7 @@ interface Range {
 
 export default function BookingDetails({
   venue,
+  onReserve,
   className,
 }: BookingDetailsProps) {
   const {
@@ -67,7 +71,7 @@ export default function BookingDetails({
           ...prev,
           end_date: undefined,
         }),
-        replace: true, // Replace the current history entry
+        replace: true, // Prevent adding a new history entry
       });
       setRange((prevRange) => ({ ...prevRange, to: undefined }));
     }
@@ -80,52 +84,14 @@ export default function BookingDetails({
     }))
     .sort((a, b) => a.from.getTime() - b.from.getTime());
 
-  const handleDateSelect: DayClickEventHandler = (selectedDate, modifiers) => {
-    if (modifiers.disabled) {
-      return; // Ignore clicks on disabled dates
-    }
-
-    if (isSelectingStartDate) {
-      // Reset the end date when selecting a new start date
-      setRange({ from: selectedDate, to: undefined });
-      setIsSelectingStartDate(false);
-
-      // Update URL parameters - reset end_date
-      navigate({
-        search: (prev) => ({
-          ...prev,
-          start_date: format(selectedDate, "yyyy-MM-dd"),
-          end_date: undefined,
-        }),
-        resetScroll: false,
-      });
-    } else {
-      if (range.from && selectedDate > range.from) {
-        const startDate = startOfDay(range.from);
-        const endDate = endOfDay(selectedDate);
-
-        // Check if the range overlaps with any booked dates
-        if (isDateRangeOverlapping(startDate, endDate, bookedDateRanges)) {
-          alert(
-            "The selected dates include unavailable dates. Please choose a different range.",
-          );
-          return;
-        }
-
-        // Update the end date
-        setRange((prevRange) => ({ ...prevRange, to: selectedDate }));
-
-        // Update end_date in URL parameters
-        navigate({
-          search: (prev) => ({
-            ...prev,
-            end_date: format(selectedDate, "yyyy-MM-dd"),
-          }),
-          resetScroll: false,
-        });
-      }
-    }
-  };
+  const { handleDateSelect } = useDateRangeSelection(
+    bookedDateRanges,
+    navigate,
+    range,
+    setRange,
+    isSelectingStartDate,
+    setIsSelectingStartDate,
+  );
 
   const toggleGuestControl = () => {
     setGuestControlExpanded((prev) => !prev);
@@ -187,25 +153,6 @@ export default function BookingDetails({
       ? calculateTotalPrice(range.from, range.to, venue.price)
       : 0;
 
-  const singleDayGaps: Date[] = [];
-
-  for (let i = 0; i < bookedDateRanges.length - 1; i++) {
-    const currentBooking = bookedDateRanges[i];
-    const nextBooking = bookedDateRanges[i + 1];
-
-    // The day after the current booking ends
-    const gapStart = addDays(currentBooking.to, 1);
-    // The day before the next booking starts
-    const gapEnd = addDays(nextBooking.from, -1);
-
-    const gapDays = differenceInCalendarDays(gapEnd, gapStart) + 1;
-
-    if (gapDays === 1) {
-      // Only one day available between bookings; disable it
-      singleDayGaps.push(gapStart);
-    }
-  }
-
   function isDateRangeOverlapping(
     startDate: Date,
     endDate: Date,
@@ -222,7 +169,7 @@ export default function BookingDetails({
 
   const disabledDates = [
     ...bookedDateRanges,
-    ...singleDayGaps,
+    ...calculateSingleDayGaps(bookedDateRanges),
     (date: Date) => {
       const today = startOfDay(new Date());
       if (date < today) {
@@ -255,17 +202,28 @@ export default function BookingDetails({
     },
   ];
 
-  const handleReserve = () => {
+  const handleReserveClick = () => {
     if (!isLoggedIn) {
-      openSignInModal(); // Call the function to open the modal
-      return; // Exit the function early, so the reservation logic doesn't proceed
+      openSignInModal();
+      return;
     }
 
-    if (range.from && range.to) {
-      // Logic to reserve the venue will go here
-    } else {
+    if (!range.from || !range.to) {
       toast.warning("Please select dates to reserve the venue.");
+      return;
     }
+
+    const bookingData: Booking = {
+      id: "",
+      created: format(new Date(), "yyyy-MM-dd"),
+      updated: format(new Date(), "yyyy-MM-dd"),
+      venueId: venue.id,
+      guests,
+      dateFrom: format(range.from, "yyyy-MM-dd"),
+      dateTo: format(range.to, "yyyy-MM-dd"),
+    };
+
+    onReserve(bookingData);
   };
 
   return (
@@ -491,7 +449,7 @@ export default function BookingDetails({
                 <Button
                   size="lg"
                   variant={"gooeyLeft"}
-                  onClick={handleReserve}
+                  onClick={handleReserveClick}
                   className="h-14 w-full rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 text-lg font-semibold text-primary after:duration-700"
                 >
                   Reserve

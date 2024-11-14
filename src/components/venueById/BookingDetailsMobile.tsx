@@ -22,8 +22,10 @@ import { Separator } from "../ui/separator";
 import { useSignInModalStore } from "@/hooks/useSignInModalStore";
 import { useAuthStatus } from "@/hooks/useAuthStatus";
 import { toast } from "sonner";
+import { Booking } from "./BookingValidation";
 
 interface BookingDetailsProps {
+  onReserve: (data: Booking) => void;
   venue: Venue;
 }
 
@@ -32,7 +34,10 @@ interface Range {
   to: Date | undefined;
 }
 
-export default function BookingDetailsMobile({ venue }: BookingDetailsProps) {
+export default function BookingDetailsMobile({
+  venue,
+  onReserve,
+}: BookingDetailsProps) {
   const {
     guests,
     start_date: startDateParam,
@@ -196,17 +201,28 @@ export default function BookingDetailsMobile({ venue }: BookingDetailsProps) {
 
   const { smCalendarContainer } = useScreenSizes();
 
-  const handleReserve = () => {
+  const handleReserveClick = () => {
     if (!isLoggedIn) {
-      openSignInModal(); // Call the function to open the modal
-      return; // Exit the function early, so the reservation logic doesn't proceed
+      openSignInModal();
+      return;
     }
 
-    if (range.from && range.to) {
-      // Logic to reserve the venue will go here
-    } else {
+    if (!range.from || !range.to) {
       toast.warning("Please select dates to reserve the venue.");
+      return;
     }
+
+    const bookingData: Booking = {
+      id: "",
+      created: format(new Date(), "yyyy-MM-dd"),
+      updated: format(new Date(), "yyyy-MM-dd"),
+      venueId: venue.id,
+      guests,
+      dateFrom: format(range.from, "yyyy-MM-dd"),
+      dateTo: format(range.to, "yyyy-MM-dd"),
+    };
+
+    onReserve(bookingData);
   };
 
   return (
@@ -368,7 +384,7 @@ export default function BookingDetailsMobile({ venue }: BookingDetailsProps) {
           <Button
             size="lg"
             variant={"gooeyLeft"}
-            onClick={handleReserve}
+            onClick={handleReserveClick}
             className="h-14 w-full rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 text-lg font-semibold text-primary after:duration-700"
           >
             Reserve

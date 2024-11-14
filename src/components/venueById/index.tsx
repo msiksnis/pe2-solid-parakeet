@@ -1,6 +1,6 @@
 import { useRef, useCallback, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "@tanstack/react-router";
+import { useNavigate, useParams } from "@tanstack/react-router";
 import {
   Cat,
   ChevronRight,
@@ -29,15 +29,20 @@ import BookingDetails from "./BookingDetails";
 import BookingDetailsMobile from "./BookingDetailsMobile";
 import { fetchVenueById } from "./queries/fetchVenueById";
 import DescriptionModal from "../DescriptionModal";
+import { useBookingMutation } from "./mutations/useBookingMutation";
+import { Booking } from "./BookingValidation";
 
 export default function VenueById() {
   const { id } = useParams({ from: "/venue/$id" }) as { id: string };
+  const navigate = useNavigate();
 
   const [openDescriptionModal, sEtOpenDescriptionModal] = useState(false);
 
   const galleryRef = useRef<any>(null);
 
   const { smCalendarContainer } = useScreenSizes();
+
+  const bookingMutation = useBookingMutation();
 
   const {
     data: venue,
@@ -50,6 +55,23 @@ export default function VenueById() {
     enabled: !!id,
     retry: 2,
   });
+
+  const handleReserve = (data: Booking) => {
+    bookingMutation.mutate(
+      {
+        isUpdate: false,
+        data,
+      },
+      {
+        onSuccess: () => {
+          navigate({ to: "/manage-reservations" });
+        },
+        onError: (error) => {
+          console.error("Error reserving booking:", error);
+        },
+      },
+    );
+  };
 
   const handleOpenGallery = useCallback(
     (index: number) => {
@@ -174,7 +196,7 @@ export default function VenueById() {
       </div>
 
       {/* Venue Details and Booking */}
-      <div className="relative flex min-h-[500px] items-start justify-between px-0 pb-20 md:pb-32 xl:px-4">
+      <div className="relative flex min-h-[600px] items-start justify-between px-0 pb-20 md:pb-32 xl:px-4">
         <div
           className={cn(
             "w-[calc(100%-400px)] space-y-6 xl:w-[calc(100%-420px)]",
@@ -256,7 +278,7 @@ export default function VenueById() {
             </div>
           </div>
 
-          <BookingDetailsMobile venue={venue} />
+          <BookingDetailsMobile venue={venue} onReserve={handleReserve} />
           <div className="space-y-6 md:hidden">
             <Separator />
             <div className="flex items-center space-x-4">
@@ -278,7 +300,7 @@ export default function VenueById() {
           </div>
         </div>
         <div className="absolute right-0 xl:right-4">
-          <BookingDetails venue={venue} />
+          <BookingDetails venue={venue} onReserve={handleReserve} />
         </div>
 
         {/* LightGallery */}
