@@ -30,7 +30,7 @@ import { fetchVenueById } from "./queries/fetchVenueById";
 import DescriptionModal from "../DescriptionModal";
 import { useBookingMutation } from "./mutations/useBookingMutation";
 import { Booking } from "./BookingValidation";
-import MainLoader from "../Loader";
+import MainLoader from "../MainLoader";
 
 export default function VenueById() {
   const { id } = useParams({ from: "/venue/$id" }) as { id: string };

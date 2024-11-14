@@ -10,7 +10,7 @@ import { FilterOption } from "../../../lib/types";
 import { filterVenuesByType } from "@/lib/filterVenues";
 import TabsBar from "@/components/TabsBar";
 import { useScreenSizes } from "@/lib/utils";
-import MainLoader from "@/components/Loader";
+import MainLoader from "@/components/MainLoader";
 
 export default function PopularByType() {
   const navigate = useNavigate({ from: Route.fullPath });

@@ -4,7 +4,7 @@ import { filterVenuesByType } from "@/lib/filterVenues";
 import VenueCardSM from "@/components/VenueCardSM";
 import { fetchVenues } from "../queries/fetchVenues";
 import { useSearch } from "@tanstack/react-router";
-import MainLoader from "@/components/Loader";
+import MainLoader from "@/components/MainLoader";
 
 export default function ForGroups() {
   const { filter } = useSearch({ from: "/for-groups" });

@@ -1,10 +1,10 @@
 import { cn } from "@/lib/utils";
 
-interface LoaderProps {
+interface MainLoaderProps {
   className?: string;
 }
 
-export default function MainLoader({ className }: LoaderProps) {
+export default function MainLoader({ className }: MainLoaderProps) {
   return (
     <div className={cn("flex justify-center", className)}>
       <div className="loader">

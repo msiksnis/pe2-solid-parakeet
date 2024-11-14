@@ -34,7 +34,7 @@ import { defaultValues, VenueSchema } from "./VenueValidation";
 import { useDeleteVenueMutation } from "./mutations/useDeleteVenueMutation";
 import AlertModal from "@/components/AlertModal";
 import { Venue } from "@/lib/types";
-import MainLoader from "@/components/Loader";
+import MainLoader from "@/components/MainLoader";
 
 export default function HostVenueForm() {
   const [openAlertModal, setOpenAlertModal] = useState(false);

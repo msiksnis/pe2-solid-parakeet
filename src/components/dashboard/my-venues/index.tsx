@@ -3,7 +3,7 @@ import { Venue } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 import OwnersVenuesCard from "./components/OwnersVenueCard";
 import { fetchVenuesByUser } from "./queries/fetchVenuesByUser";
-import MainLoader from "@/components/Loader";
+import MainLoader from "@/components/MainLoader";
 
 export default function MyVenues() {
   const {
