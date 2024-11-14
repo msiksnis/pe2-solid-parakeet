@@ -20,7 +20,6 @@ import "lightgallery/css/lightgallery.css";
 import { Venue } from "@/lib/types";
 import { cn, useScreenSizes } from "@/lib/utils";
 import ErrorLoadingButton from "../ErrorLoadingButton";
-import Loader from "../Loader";
 import RatingStars from "../RatingStars";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
@@ -31,6 +30,7 @@ import { fetchVenueById } from "./queries/fetchVenueById";
 import DescriptionModal from "../DescriptionModal";
 import { useBookingMutation } from "./mutations/useBookingMutation";
 import { Booking } from "./BookingValidation";
+import Loader from "../Loader";
 
 export default function VenueById() {
   const { id } = useParams({ from: "/venue/$id" }) as { id: string };

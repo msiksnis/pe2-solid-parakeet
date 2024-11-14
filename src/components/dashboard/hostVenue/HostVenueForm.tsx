@@ -11,7 +11,6 @@ import {
 import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 
-import Loader from "@/components/Loader";
 import {
   Form,
   FormControl,
@@ -35,6 +34,7 @@ import { defaultValues, VenueSchema } from "./VenueValidation";
 import { useDeleteVenueMutation } from "./mutations/useDeleteVenueMutation";
 import AlertModal from "@/components/AlertModal";
 import { Venue } from "@/lib/types";
+import Loader from "@/components/Loader";
 
 export default function HostVenueForm() {
   const [openAlertModal, setOpenAlertModal] = useState(false);

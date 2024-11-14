@@ -1,9 +1,9 @@
 import ErrorLoadingButton from "@/components/ErrorLoadingButton";
-import Loader from "@/components/Loader";
 import { Venue } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 import OwnersVenuesCard from "./components/OwnersVenueCard";
 import { fetchVenuesByUser } from "./queries/fetchVenuesByUser";
+import Loader from "@/components/Loader";
 
 export default function MyVenues() {
   const {
