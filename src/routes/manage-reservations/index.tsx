@@ -1,5 +1,6 @@
+import MyReservations from "@/components/manage-reservations/my-reservations";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/manage-reservations/")({
-  component: () => <div>Hello /asxaxasxasxasx-reservations/!</div>,
+  component: MyReservations,
 });
