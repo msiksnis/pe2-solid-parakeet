@@ -1,13 +1,15 @@
-import { useQuery } from "@tanstack/react-query";
-import { useNavigate, useParams } from "@tanstack/react-router";
-import { Reservation } from "../types";
-import MainLoader from "@/components/MainLoader";
 import ErrorLoadingButton from "@/components/ErrorLoadingButton";
-import { useUpdateReservationMutation } from "../mutations/useUpdateReservationMutation";
-import { Calendar } from "@/components/ui/calendar";
+import MainLoader from "@/components/MainLoader";
 import { Button } from "@/components/ui/button";
-import { CalendarDays } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Venue } from "@/lib/types";
 import { calculateSingleDayGaps, cn, useScreenSizes } from "@/lib/utils";
+import { Route } from "@/routes/manage-reservations/$id";
+import { useQuery } from "@tanstack/react-query";
+import {
+  // useNavigate,
+  useParams,
+} from "@tanstack/react-router";
 import {
   addDays,
   areIntervalsOverlapping,
@@ -17,11 +19,11 @@ import {
   parseISO,
   startOfDay,
 } from "date-fns";
+import { CalendarDays } from "lucide-react";
 import { useState } from "react";
-import { useDateRangeSelection } from "@/hooks/useDateRangeSelection";
+// import { useUpdateReservationMutation } from "../mutations/useUpdateReservationMutation";
 import { fetchVenueById } from "../queries/fetchVenueById";
-import { Venue } from "@/lib/types";
-import { Route } from "@/routes/manage-reservations/$id";
+// import { Reservation } from "../types";
 
 interface Range {
   from: Date | undefined;
@@ -33,7 +35,9 @@ export default function UpdateReservation() {
     id: string | undefined;
   };
   const { guests, start_date, end_date, reservationId } = Route.useSearch();
-  const navigate = useNavigate();
+  //   const navigate = useNavigate();
+
+  console.log(guests, start_date, end_date, reservationId);
 
   const [isSelectingStartDate, setIsSelectingStartDate] = useState(true);
   const [range, setRange] = useState<Range>({
@@ -41,7 +45,9 @@ export default function UpdateReservation() {
     to: end_date ? parseISO(end_date) : undefined,
   });
 
-  const updateReservationMutation = useUpdateReservationMutation();
+  console.log(setRange);
+
+  //   const updateReservationMutation = useUpdateReservationMutation();
   const { isMobile } = useScreenSizes();
 
   const {
@@ -136,19 +142,19 @@ export default function UpdateReservation() {
     },
   ];
 
-  const handleUpdate = (data: Reservation) => {
-    updateReservationMutation.mutate(
-      {
-        bookingId: id as string,
-        data,
-      },
-      {
-        onSuccess: () => {
-          navigate({ to: "/manage-reservations" });
-        },
-      },
-    );
-  };
+  //   const handleUpdate = (data: Reservation) => {
+  //     updateReservationMutation.mutate(
+  //       {
+  //         bookingId: id as string,
+  //         data,
+  //       },
+  //       {
+  //         onSuccess: () => {
+  //           navigate({ to: "/manage-reservations" });
+  //         },
+  //       },
+  //     );
+  //   };
 
   return (
     <div className="mx-auto my-20 max-w-4xl px-4 sm:px-6 lg:px-10 xl:px-4">
