@@ -13,7 +13,7 @@ export interface Booking {
 export const defaultValues = {
   dateFrom: "",
   dateTo: "",
-  guests: 2,
+  guests: 1,
   venueId: "",
 };
 
@@ -21,7 +21,7 @@ export const createTempBooking = (data: Partial<Booking>): Booking => ({
   id: `temp-${Date.now()}`,
   dateFrom: data.dateFrom ?? "Temporary Date From",
   dateTo: data.dateTo ?? "Temporary Date To",
-  guests: data.guests ?? 2,
+  guests: data.guests ?? 1,
   venueId: data.venueId ?? "Temporary Venue Id",
   created: format(new Date(), "yyyy-MM-dd"),
   updated: format(new Date(), "yyyy-MM-dd"),

@@ -11,7 +11,7 @@ import { updateBookingAction } from "../actions/updateBookingAction";
 
 export function useBookingMutation() {
   const queryClient = useQueryClient();
-  const queryKey: QueryKey = ["booking"];
+  const queryKey: QueryKey = ["reservationsByUser"];
 
   const handleCreateBooking = (data: Booking) => createBookingAction(data);
   const handleUpdateBooking = (bookingId: string, data: Booking) =>

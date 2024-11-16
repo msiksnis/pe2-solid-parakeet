@@ -2,7 +2,6 @@ import { Venue } from "@/lib/types";
 import { MapPinIcon, StarIcon } from "lucide-react";
 import BlurFade from "./ui/blur-fade";
 import { Link } from "@tanstack/react-router";
-import { format } from "date-fns";
 import {
   Carousel,
   CarouselBullets,
@@ -30,8 +29,10 @@ export default function VenueCardSM({ venues, currentFilter }: VenueCardProps) {
           <Link
             to={`/venue/${venue.id}`}
             search={{
-              guests: 2,
-              start_date: format(new Date(), "yyyy-MM-dd"),
+              guests: 1,
+              // ? Uncomment the following lines to pass the start_date and end_date to the venue page
+              // start_date: format(new Date(), "yyyy-MM-dd"),
+              // end_date: format(new Date(), "yyyy-MM-dd"),
             }}
             className="group/card relative mb-4 flex flex-col rounded-2xl border-primary/0 transition-all duration-200 hover:border-primary/100 sm:p-2 md:border"
           >

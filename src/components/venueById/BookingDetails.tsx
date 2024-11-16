@@ -22,8 +22,8 @@ import { Button } from "../ui/button";
 import { Calendar } from "../ui/calendar";
 import { Separator } from "../ui/separator";
 import { Booking } from "./BookingValidation";
-import { useDateRangeSelection } from "./hooks/useDateRangeSelection";
 import { calculateSingleDayGaps } from "./utils/utils";
+import { useDateRangeSelection } from "@/hooks/useDateRangeSelection";
 
 interface BookingDetailsProps {
   venue: Venue;

@@ -28,9 +28,9 @@ import BookingDetails from "./BookingDetails";
 import BookingDetailsMobile from "./BookingDetailsMobile";
 import { fetchVenueById } from "./queries/fetchVenueById";
 import DescriptionModal from "../DescriptionModal";
-import { useBookingMutation } from "./mutations/useBookingMutation";
 import { Booking } from "./BookingValidation";
 import MainLoader from "../MainLoader";
+import { useCreateReservationMutation } from "./mutations/useCreateReservationMutation";
 
 export default function VenueById() {
   const { id } = useParams({ from: "/venue/$id" }) as { id: string };
@@ -42,7 +42,7 @@ export default function VenueById() {
 
   const { smCalendarContainer } = useScreenSizes();
 
-  const bookingMutation = useBookingMutation();
+  const bookingMutation = useCreateReservationMutation();
 
   const {
     data: venue,
@@ -58,16 +58,10 @@ export default function VenueById() {
 
   const handleReserve = (data: Booking) => {
     bookingMutation.mutate(
-      {
-        isUpdate: false,
-        data,
-      },
+      { ...data },
       {
         onSuccess: () => {
           navigate({ to: "/manage-reservations" });
-        },
-        onError: (error) => {
-          console.error("Error reserving booking:", error);
         },
       },
     );
