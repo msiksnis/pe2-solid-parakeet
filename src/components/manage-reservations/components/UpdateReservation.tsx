@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "@tanstack/react-router";
 import { endOfDay, format, startOfDay } from "date-fns";
 import { motion } from "framer-motion";
 import { CalendarDays, ChevronDown, Minus, Plus } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import ErrorLoadingButton from "@/components/ErrorLoadingButton";
 import MainLoader from "@/components/MainLoader";
@@ -76,14 +76,10 @@ export default function UpdateReservation() {
     to: range.to,
   };
 
-  const bookedRanges = useMemo(
-    () =>
-      (venue?.bookings ?? []).map((booking) => ({
-        from: startOfDay(new Date(booking.dateFrom)),
-        to: endOfDay(new Date(booking.dateTo)),
-      })),
-    [venue?.bookings],
-  );
+  const bookedRanges = (venue?.bookings ?? []).map((booking) => ({
+    from: startOfDay(new Date(booking.dateFrom)),
+    to: endOfDay(new Date(booking.dateTo)),
+  }));
 
   const { isDateDisabled } = useDisabledDates({
     bookedRanges,
@@ -165,17 +161,6 @@ export default function UpdateReservation() {
     }
   };
 
-  const decrementGuests = () => {
-    if (guests > 1) {
-      navigate({
-        search: (prev) => ({
-          ...prev,
-          guests: guests - 1,
-        }),
-      });
-    }
-  };
-
   const incrementGuests = () => {
     if (guests < venue.maxGuests) {
       navigate({
@@ -183,6 +168,19 @@ export default function UpdateReservation() {
           ...prev,
           guests: guests + 1,
         }),
+        resetScroll: false,
+      });
+    }
+  };
+
+  const decrementGuests = () => {
+    if (guests > 1) {
+      navigate({
+        search: (prev) => ({
+          ...prev,
+          guests: guests - 1,
+        }),
+        resetScroll: false,
       });
     }
   };
@@ -297,7 +295,7 @@ export default function UpdateReservation() {
                     variant="outline"
                     size="icon"
                     className="size-6 rounded-full border-gray-500"
-                    onClick={decrementGuests} // min 1 guest
+                    onClick={decrementGuests}
                     disabled={guests <= 1}
                   >
                     <Minus />
@@ -309,7 +307,7 @@ export default function UpdateReservation() {
                     variant="outline"
                     size="icon"
                     className="size-6 rounded-full border-gray-500"
-                    onClick={incrementGuests} // max venue.maxGuests
+                    onClick={incrementGuests}
                     disabled={guests >= venue.maxGuests}
                   >
                     <Plus />
