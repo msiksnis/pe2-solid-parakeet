@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 
 import BlurFade from "@/components/ui/blur-fade";
-import { Reservation } from "../types";
+import { Reservation, Venue } from "../types";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { fetchReservationsByProfile } from "../queries/fetchReservationsByProfile";
@@ -22,8 +22,6 @@ export default function ReservationCard() {
     retry: 2,
   });
 
-  console.log("reservations", reservations);
-
   const errorMessage = isError
     ? `Error loading reservations: ${error.message}`
     : "An unexpected error occurred while loading the reservations.";
@@ -32,13 +30,18 @@ export default function ReservationCard() {
     return <ErrorLoadingButton errorMessage={errorMessage} onRetry={refetch} />;
   }
 
+  const preparedReservations = reservations.map((reservation) => ({
+    ...reservation,
+    venue: reservation.venue as Venue,
+  }));
+
   return (
     <>
       {isFetching ? (
         <MainLoader className="mt-24" />
       ) : (
         <div className="grid gap-4 pb-8 pt-8 md:grid-cols-3 lg:gap-y-0 xl:grid-cols-4">
-          {reservations.map((reservation, idx) => (
+          {preparedReservations.map((reservation, idx) => (
             <BlurFade
               key={reservation.id}
               delay={0.15 + idx * 0.05}

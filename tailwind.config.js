@@ -69,5 +69,9 @@ export default {
       },
     },
   },
-  plugins: [tailwindcssMotion, tailwindcssAnimate],
+  plugins: [
+    tailwindcssMotion,
+    tailwindcssAnimate,
+    require("@tailwindcss/container-queries"),
+  ],
 };

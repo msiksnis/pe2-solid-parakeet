@@ -41,5 +41,5 @@ export interface Reservation {
   guests: number;
   created: string;
   updated: string;
-  venue: Venue;
+  venue: Venue | string;
 }
