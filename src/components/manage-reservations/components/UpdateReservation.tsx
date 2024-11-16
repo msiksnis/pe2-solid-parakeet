@@ -1,18 +1,18 @@
-import { useState } from "react";
-import { endOfDay, format, isBefore, startOfDay } from "date-fns";
-import { CalendarDays, ChevronDown, Minus, Plus } from "lucide-react";
-import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "@tanstack/react-router";
+import { endOfDay, format, startOfDay } from "date-fns";
+import { motion } from "framer-motion";
+import { CalendarDays, ChevronDown, Minus, Plus } from "lucide-react";
+import { useMemo, useState } from "react";
 
 import ErrorLoadingButton from "@/components/ErrorLoadingButton";
 import MainLoader from "@/components/MainLoader";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { useDisabledDates } from "@/hooks/useDisabledDates";
 import { Venue } from "@/lib/types";
 import { cn, useScreenSizes } from "@/lib/utils";
 import { Route } from "@/routes/manage-reservations/$id";
-import { useDisabledDates } from "@/hooks/useDisabledDates";
 import { useUpdateReservationMutation } from "../mutations/useUpdateReservationMutation";
 import { fetchVenueById } from "../queries/fetchVenueById";
 
@@ -30,6 +30,10 @@ export default function UpdateReservation() {
 
   const [isSelectingStartDate, setIsSelectingStartDate] = useState(true);
   const [guestControlExpanded, setGuestControlExpanded] = useState(false);
+  const [originalRange] = useState<Range>({
+    from: start_date ? startOfDay(new Date(start_date)) : undefined,
+    to: end_date ? endOfDay(new Date(end_date)) : undefined,
+  });
   const [range, setRange] = useState<Range>({
     from: start_date ? startOfDay(new Date(start_date)) : undefined,
     to: end_date ? endOfDay(new Date(end_date)) : undefined,
@@ -72,43 +76,51 @@ export default function UpdateReservation() {
     to: range.to,
   };
 
-  const bookedRanges = (venue?.bookings ?? []).map((booking) => ({
-    from: startOfDay(new Date(booking.dateFrom)),
-    to: endOfDay(new Date(booking.dateTo)),
-  }));
-
-  const isPastDate = (date: Date) => isBefore(date, startOfDay(new Date()));
-
-  const originalRange = {
-    from: start_date ? startOfDay(new Date(start_date)) : undefined,
-    to: end_date ? endOfDay(new Date(end_date)) : undefined,
-  };
+  const bookedRanges = useMemo(
+    () =>
+      (venue?.bookings ?? []).map((booking) => ({
+        from: startOfDay(new Date(booking.dateFrom)),
+        to: endOfDay(new Date(booking.dateTo)),
+      })),
+    [venue?.bookings],
+  );
 
   const { isDateDisabled } = useDisabledDates({
     bookedRanges,
     currentRange: range as Range,
     originalRange: originalRange as Range,
     minimumDays: 2,
+    isSelectingStartDate,
   });
 
   const handleDayClick = (day: Date) => {
-    if (isPastDate(day)) return;
-
     const newDay = startOfDay(day);
 
     if (isSelectingStartDate) {
-      setRange({ from: newDay, to: undefined });
+      // Only reset the end date if the new start date is after the current end date
+      setRange((prevRange) => ({
+        from: newDay,
+        to: prevRange.to && newDay > prevRange.to ? undefined : prevRange.to,
+      }));
+
+      // Automatically switch to selecting the end date
       setIsSelectingStartDate(false);
+
       navigate({
         search: (prev) => ({
           ...prev,
           start_date: format(newDay, "yyyy-MM-dd"),
-          end_date: undefined,
+          end_date:
+            range.to && newDay <= range.to
+              ? format(range.to, "yyyy-MM-dd")
+              : undefined,
         }),
       });
     } else if (range.from && newDay > range.from) {
+      // If selecting an end date, ensure it is after the start date
       const newTo = endOfDay(day);
       setRange({ ...range, to: newTo });
+
       navigate({
         search: (prev) => ({
           ...prev,
@@ -117,9 +129,10 @@ export default function UpdateReservation() {
         }),
       });
     } else {
-      // Reset if clicked date is invalid
+      // Reset to a new start date if the range is invalid
       setRange({ from: newDay, to: undefined });
       setIsSelectingStartDate(false);
+
       navigate({
         search: (prev) => ({
           ...prev,

@@ -10,6 +10,7 @@ interface UseDisabledDatesParams {
   currentRange?: DateRange;
   originalRange?: DateRange;
   minimumDays?: number;
+  isSelectingStartDate: boolean; // New parameter to track the active date selection
 }
 
 export function useDisabledDates({
@@ -17,6 +18,7 @@ export function useDisabledDates({
   currentRange,
   originalRange,
   minimumDays = 2,
+  isSelectingStartDate,
 }: UseDisabledDatesParams) {
   const sortedRanges = [...bookedRanges].sort(
     (a, b) => (a.from?.getTime() ?? 0) - (b.from?.getTime() ?? 0),
@@ -56,11 +58,27 @@ export function useDisabledDates({
   };
 
   const isDateDisabled = (date: Date): boolean => {
-    if (isBefore(date, new Date())) return true;
-    if (currentRange?.from && isBefore(date, currentRange.from)) return true;
+    // Allow dates in the original range explicitly
     if (isDateInOriginalRange(date)) return false;
+
+    // Disable past dates unless in the original range
+    if (isBefore(date, new Date()) && !isDateInOriginalRange(date)) return true;
+
+    // Disable dates before the selected current start date (only if selecting the end date)
+    if (
+      !isSelectingStartDate &&
+      currentRange?.from &&
+      isBefore(date, currentRange.from)
+    )
+      return true;
+
+    // Disable dates within booked ranges
     if (isDateInBookedRanges(date)) return true;
+
+    // Disable dates between booked ranges that violate the minimum range
     if (isDateBetweenBookedRanges(date)) return true;
+
+    // Otherwise, the date is enabled
     return false;
   };
 
