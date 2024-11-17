@@ -13,7 +13,11 @@ import { useDisabledDates } from "@/hooks/useDisabledDates";
 import { Venue } from "@/lib/types";
 import { cn, useScreenSizes } from "@/lib/utils";
 import { Route } from "@/routes/manage-reservations/$id";
-import { decrementGuests, incrementGuests } from "@/utils/reservationUtils";
+import {
+  decrementGuests,
+  handleDateSelection,
+  incrementGuests,
+} from "@/utils/reservationUtils";
 import { useUpdateReservationMutation } from "../mutations/useUpdateReservationMutation";
 import { fetchVenueById } from "../queries/fetchVenueById";
 import DateSelectionControls from "./DateSelectionControls";
@@ -108,40 +112,14 @@ export default function UpdateReservation() {
   };
 
   const handleDayClick = (day: Date) => {
-    const newDay = startOfDay(day);
-
-    if (isSelectingStartDate) {
-      // Only reset the end date if the new start date is after the current end date
-      setRange((prevRange) => ({
-        from: newDay,
-        to: prevRange.to && newDay > prevRange.to ? undefined : prevRange.to,
-      }));
-
-      // Automatically switch to selecting the end date
-      setIsSelectingStartDate(false);
-
-      updateDates(
-        format(newDay, "yyyy-MM-dd"),
-        range.to && newDay <= range.to
-          ? format(range.to, "yyyy-MM-dd")
-          : undefined,
-      );
-    } else if (range.from && newDay > range.from) {
-      // If selecting an end date, ensure it is after the start date
-      const newTo = endOfDay(day);
-      setRange({ ...range, to: newTo });
-
-      updateDates(
-        range.from ? format(range.from, "yyyy-MM-dd") : undefined,
-        format(newTo, "yyyy-MM-dd"),
-      );
-    } else {
-      // Reset to a new start date if the range is invalid
-      setRange({ from: newDay, to: undefined });
-      setIsSelectingStartDate(false);
-
-      updateDates(format(newDay, "yyyy-MM-dd"), undefined);
-    }
+    handleDateSelection({
+      day,
+      range,
+      isSelectingStartDate,
+      setRange,
+      setIsSelectingStartDate,
+      updateDates,
+    });
   };
 
   const handleUpdate = () => {

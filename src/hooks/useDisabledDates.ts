@@ -15,7 +15,7 @@ interface Range {
 interface UseDisabledDatesParams {
   bookedRanges: Range[];
   currentRange: Range;
-  originalRange: Range;
+  originalRange?: Range;
   minimumDays?: number;
   isSelectingStartDate: boolean;
 }
@@ -28,10 +28,10 @@ interface UseDisabledDatesParams {
  */
 export function useDisabledDates({
   bookedRanges,
-  // currentRange,
+  currentRange: _currentRange,
   originalRange,
   minimumDays = 1,
-  // isSelectingStartDate,
+  isSelectingStartDate: _isSelectingStartDate,
 }: UseDisabledDatesParams) {
   const timezone = "Europe/Oslo";
 
@@ -98,9 +98,9 @@ export function useDisabledDates({
 
     //* Uncomment this block to disable dates before the current start date
     // if (
-    //   !isSelectingStartDate &&
-    //   currentRange?.from &&
-    //   isBefore(normalizedDate, startOfDay(currentRange.from))
+    //   !_isSelectingStartDate &&
+    //   _currentRange?.from &&
+    //   isBefore(normalizedDate, startOfDay(_currentRange.from))
     // )
     //   return true;
 
