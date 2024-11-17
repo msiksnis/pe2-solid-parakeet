@@ -4,6 +4,12 @@ import { createVenueAction } from "../actions/createVenueAction";
 import { updateVenueAction } from "../actions/updateVenueAction";
 import { createTempVenue, Venue } from "../VenueValidation";
 
+/**
+ * Custom hook to handle the creation and updating of venues with optimistic updates.
+ * It updates the cache optimistically and rolls back in case of an error.
+ *
+ * @returns A mutation object from React Query for creating or updating a venue.
+ */
 export function useVenueMutation() {
   const queryClient = useQueryClient();
   const baseQueryKeys: QueryKey[] = [["venue"], ["venuesByUser"], ["venues"]];
@@ -30,7 +36,6 @@ export function useVenueMutation() {
 
       const previousData: Record<string, Venue[]> = {};
 
-      // Optimistically update all relevant query keys
       baseQueryKeys.forEach((key) => {
         const previous = queryClient.getQueryData<Venue[]>(key);
         if (previous) {
@@ -49,8 +54,7 @@ export function useVenueMutation() {
       return { previousData };
     },
 
-    onSuccess: (variables) => {
-      // Invalidate all relevant queries on success
+    onSuccess: (_data, variables) => {
       baseQueryKeys.forEach((key) =>
         queryClient.invalidateQueries({
           queryKey: key,
@@ -58,14 +62,13 @@ export function useVenueMutation() {
       );
 
       toast.success(
-        variables.updated
+        variables.isUpdate
           ? "Venue updated successfully!"
           : "Venue created successfully!",
       );
     },
 
     onError: (error, variables, context) => {
-      // Rollback to previous data for all affected queries
       if (context?.previousData) {
         Object.entries(context.previousData).forEach(([key, data]) => {
           queryClient.setQueryData(key.split(","), data);

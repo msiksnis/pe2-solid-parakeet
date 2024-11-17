@@ -1,6 +1,13 @@
 import { axiosInstance } from "@/lib/axiosInstance";
 import { Booking } from "../BookingValidation";
 
+/**
+ * Creates a new reservation (booking) for a venue.
+ *
+ * @param data - The booking data used to create the reservation.
+ * @returns A promise that resolves to the created booking.
+ * @throws Will throw an error if the user is not authenticated or if the creation fails.
+ */
 export async function createReservationAction(data: Booking): Promise<Booking> {
   const persistedState = JSON.parse(
     localStorage.getItem("auth-object") || "{}",

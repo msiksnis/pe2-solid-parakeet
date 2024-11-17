@@ -2,6 +2,14 @@ import { axiosInstance } from "@/lib/axiosInstance";
 import axios from "axios";
 import { Reservation } from "../types";
 
+/**
+ * Updates a reservation by its ID with the provided data.
+ *
+ * @param reservationId - The ID of the reservation to update.
+ * @param data - The data to update the reservation with.
+ * @returns A promise resolving to the updated reservation data.
+ * @throws Will throw an error if the user is not authenticated or if the update fails.
+ */
 export async function updateReservationsAction(
   reservationId: string,
   data: Partial<Reservation>,

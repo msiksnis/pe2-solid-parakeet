@@ -23,8 +23,14 @@ interface UseDisabledDatesParams {
 /**
  * Hook to determine whether specific dates should be disabled based on booked ranges,
  * current selection, original range, and other constraints like minimum days.
- * @param {Range[]} bookedRanges - The list of date ranges that are already booked.
- * @returns {Object} - An object containing the `isDateDisabled` function.
+ *
+ * @param {UseDisabledDatesParams} params - The parameters for the hook.
+ * @param {Range[]} params.bookedRanges - The list of date ranges that are already booked.
+ * @param {Range} params.currentRange - The currently selected date range.
+ * @param {Range} [params.originalRange] - The original date range to exclude from disabling.
+ * @param {number} [params.minimumDays=1] - The minimum number of days required between bookings.
+ * @param {boolean} params.isSelectingStartDate - Indicates if the start date is currently being selected.
+ * @returns {{ isDateDisabled: (date: Date) => boolean }} An object containing the `isDateDisabled` function.
  */
 export function useDisabledDates({
   bookedRanges,
@@ -32,7 +38,7 @@ export function useDisabledDates({
   originalRange,
   minimumDays = 1,
   isSelectingStartDate: _isSelectingStartDate,
-}: UseDisabledDatesParams) {
+}: UseDisabledDatesParams): { isDateDisabled: (date: Date) => boolean } {
   const timezone = "Europe/Oslo";
 
   const sortedRanges = [...bookedRanges]
@@ -83,7 +89,7 @@ export function useDisabledDates({
    * Determines if a given date should be disabled.
    *
    * @param {Date} date - The date to check.
-   * @returns {boolean} - Whether the date should be disabled.
+   * @returns {boolean} Whether the date should be disabled.
    */
   const isDateDisabled = (date: Date): boolean => {
     const normalizedDate = startOfDay(toZonedTime(date, timezone));
@@ -96,7 +102,7 @@ export function useDisabledDates({
     )
       return true;
 
-    //* Uncomment this block to disable dates before the current start date
+    // Uncomment this block to disable dates before the current start date
     // if (
     //   !_isSelectingStartDate &&
     //   _currentRange?.from &&

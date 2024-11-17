@@ -3,17 +3,23 @@ import { toast } from "sonner";
 import { updateReservationsAction } from "../actions/updateReservationAction";
 import { Reservation } from "../types";
 
+/**
+ * Custom hook to handle updating reservations with optimistic updates.
+ * It updates the cache optimistically and rolls back in case of an error.
+ *
+ * @returns A mutation object from React Query for updating a reservation.
+ */
 export function useUpdateReservationMutation() {
   const queryClient = useQueryClient();
 
-  const mutation = useMutation({
-    mutationFn: ({
-      reservationId,
-      data,
-    }: {
-      reservationId: string;
-      data: Partial<Reservation>;
-    }) => updateReservationsAction(reservationId, data),
+  const mutation = useMutation<
+    Reservation,
+    Error,
+    { reservationId: string; data: Partial<Reservation> },
+    { previousData: Reservation[] | undefined }
+  >({
+    mutationFn: ({ reservationId, data }) =>
+      updateReservationsAction(reservationId, data),
 
     onMutate: async ({ reservationId, data }) => {
       const queryKey: QueryKey = ["reservationsByUser"];
@@ -35,7 +41,7 @@ export function useUpdateReservationMutation() {
       return { previousData };
     },
 
-    onSuccess: async (updatedReservation) => {
+    onSuccess: (updatedReservation) => {
       const queryKey: QueryKey = ["reservationsByUser"];
 
       queryClient.setQueryData<Reservation[]>(

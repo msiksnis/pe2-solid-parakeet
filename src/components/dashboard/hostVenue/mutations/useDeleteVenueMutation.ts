@@ -3,27 +3,30 @@ import { QueryKey, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Venue } from "../VenueValidation";
 
+/**
+ * Custom hook to handle venue deletion with optimistic updates.
+ * It updates the cache to remove the deleted venue and handles rollback in case of failure.
+ *
+ * @returns A mutation object from React Query for deleting a venue.
+ */
 export const useDeleteVenueMutation = () => {
   const queryClient = useQueryClient();
   const baseQueryKeys: QueryKey[] = [["venuesByUser"], ["venues"]];
 
   const mutation = useMutation<
-    void, // Return type from mutationFn
-    Error, // Error type
-    string, // Input type to mutationFn (venueId)
-    { previousData: Record<string, Venue[] | undefined> } // Context type for rollback
+    void,
+    Error,
+    string,
+    { previousData: Record<string, Venue[] | undefined> }
   >({
     mutationFn: async (venueId) => {
       await authenticatedAxiosInstance.delete(`/venues/${venueId}`);
     },
     onMutate: async (venueId) => {
-      // Cancel any ongoing queries
       await queryClient.cancelQueries();
 
-      // Store previous data for all relevant query keys
       const previousData: Record<string, Venue[] | undefined> = {};
 
-      // Optimistically update all relevant queries
       baseQueryKeys.forEach((key) => {
         const previous = queryClient.getQueryData<Venue[]>(key);
         if (previous) {
@@ -34,16 +37,13 @@ export const useDeleteVenueMutation = () => {
         }
       });
 
-      // Return previous data for rollback
       return { previousData };
     },
-    onSuccess: (venueId) => {
-      // Invalidate all relevant queries to refetch fresh data
+    onSuccess: (_data, venueId) => {
       baseQueryKeys.forEach((key) => {
         queryClient.invalidateQueries({ queryKey: key });
       });
 
-      // Remove individual venue query cache
       queryClient.removeQueries({ queryKey: ["venue", venueId] });
 
       toast.success("Venue deleted successfully!");
