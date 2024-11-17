@@ -22,12 +22,27 @@ import { useUpdateReservationMutation } from "../mutations/useUpdateReservationM
 import { fetchVenueById } from "../queries/fetchVenueById";
 import DateSelectionControls from "./DateSelectionControls";
 import GuestControl from "./GuestNumberControl";
+import { useDeleteReservationMutation } from "../mutations/useDeleteReservationMutation";
+import { toast } from "sonner";
 
 interface Range {
   from?: Date | undefined;
   to?: Date | undefined;
 }
 
+/**
+ * Component for updating an existing reservation.
+ *
+ * This component allows users to:
+ * - Modify reservation dates.
+ * - Adjust the number of guests.
+ * - Cancel their reservation.
+ *
+ * It fetches the venue data based on the ID from the URL parameters and handles date selection,
+ * guest number adjustments, and updates or cancels the reservation via mutations.
+ *
+ * @returns The JSX element representing the UpdateReservation component.
+ */
 export default function UpdateReservation() {
   const { id } = useParams({ from: "/manage-reservations/$id" }) as {
     id: string | undefined;
@@ -47,6 +62,7 @@ export default function UpdateReservation() {
   });
 
   const updateReservationMutation = useUpdateReservationMutation();
+  const deleteReservationMutation = useDeleteReservationMutation();
 
   const { isMobile } = useScreenSizes();
 
@@ -97,6 +113,12 @@ export default function UpdateReservation() {
     isSelectingStartDate,
   });
 
+  /**
+   * Updates the URL search parameters with the new start and end dates.
+   *
+   * @param startDate - The new start date in 'yyyy-MM-dd' format.
+   * @param endDate - The new end date in 'yyyy-MM-dd' format.
+   */
   const updateDates = (
     startDate: string | undefined,
     endDate: string | undefined,
@@ -140,6 +162,23 @@ export default function UpdateReservation() {
         },
       );
     }
+  };
+
+  const cancelReservation = () => {
+    if (!reservationId) {
+      toast.error("Reservation ID is missing. Unable to cancel reservation.");
+      return;
+    }
+
+    deleteReservationMutation.mutate(reservationId, {
+      onSuccess: () => {
+        navigate({ to: "/manage-reservations" });
+      },
+      onError: (error) => {
+        console.error("Error cancelling reservation:", error);
+        toast.error("Failed to cancel reservation. Please try again later.");
+      },
+    });
   };
 
   const handleIncrementGuests = () => {
@@ -203,7 +242,7 @@ export default function UpdateReservation() {
         <Button
           size={"lg"}
           variant={"gooeyLeft"}
-          //   onClick={cancelReservation}
+          onClick={cancelReservation}
           className="w-52 border border-primary bg-muted from-gray-200 text-base text-primary after:duration-500"
         >
           {updateReservationMutation.isPending ? (
