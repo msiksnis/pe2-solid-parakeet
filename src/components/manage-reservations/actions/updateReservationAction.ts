@@ -3,7 +3,7 @@ import axios from "axios";
 import { Reservation } from "../types";
 
 export async function updateReservationsAction(
-  bookingId: string,
+  reservationId: string,
   data: Partial<Reservation>,
 ) {
   const persistedState = JSON.parse(
@@ -16,13 +16,17 @@ export async function updateReservationsAction(
   }
 
   try {
-    const response = await axiosInstance.put(`/bookings/${bookingId}`, data, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-        "X-Noroff-API-Key": import.meta.env.VITE_API_KEY,
+    const response = await axiosInstance.put(
+      `/bookings/${reservationId}`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          "X-Noroff-API-Key": import.meta.env.VITE_API_KEY,
+        },
       },
-    });
+    );
 
     if (response.status === 200 || response.status === 204) {
       return response.data.data;

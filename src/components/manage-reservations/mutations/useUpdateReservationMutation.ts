@@ -8,14 +8,14 @@ export function useUpdateReservationMutation() {
 
   const mutation = useMutation({
     mutationFn: ({
-      bookingId,
+      reservationId,
       data,
     }: {
-      bookingId: string;
+      reservationId: string;
       data: Partial<Reservation>;
-    }) => updateReservationsAction(bookingId, data),
+    }) => updateReservationsAction(reservationId, data),
 
-    onMutate: async ({ bookingId, data }) => {
+    onMutate: async ({ reservationId, data }) => {
       const queryKey: QueryKey = ["reservationsByUser"];
 
       await queryClient.cancelQueries({ queryKey });
@@ -26,7 +26,7 @@ export function useUpdateReservationMutation() {
         queryKey,
         (oldReservations = []) =>
           oldReservations.map((reservation) =>
-            reservation.id === bookingId
+            reservation.id === reservationId
               ? { ...reservation, ...data }
               : reservation,
           ),

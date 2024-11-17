@@ -15,6 +15,7 @@ import { cn, useScreenSizes } from "@/lib/utils";
 import { Route } from "@/routes/manage-reservations/$id";
 import { useUpdateReservationMutation } from "../mutations/useUpdateReservationMutation";
 import { fetchVenueById } from "../queries/fetchVenueById";
+import { toZonedTime } from "date-fns-tz";
 
 interface Range {
   from: Date | undefined;
@@ -77,17 +78,36 @@ export default function UpdateReservation() {
   };
 
   const bookedRanges = (venue?.bookings ?? []).map((booking) => ({
-    from: startOfDay(new Date(booking.dateFrom)),
-    to: endOfDay(new Date(booking.dateTo)),
+    from: startOfDay(toZonedTime(new Date(booking.dateFrom), "UTC")),
+    to: endOfDay(toZonedTime(new Date(booking.dateTo), "UTC")),
   }));
+
+  console.log("Mapped Booked Ranges:", bookedRanges);
 
   const { isDateDisabled } = useDisabledDates({
     bookedRanges,
     currentRange: range as Range,
     originalRange: originalRange as Range,
-    minimumDays: 2,
+    minimumDays: 1,
     isSelectingStartDate,
   });
+
+  console.log("Current Range:", range);
+  console.log("Original Range:", originalRange);
+
+  const updateNavigate = (
+    startDate: string | undefined,
+    endDate: string | undefined,
+  ) => {
+    navigate({
+      search: (prev) => ({
+        ...prev,
+        start_date: startDate,
+        end_date: endDate,
+      }),
+      resetScroll: false,
+    });
+  };
 
   const handleDayClick = (day: Date) => {
     const newDay = startOfDay(day);
@@ -102,40 +122,27 @@ export default function UpdateReservation() {
       // Automatically switch to selecting the end date
       setIsSelectingStartDate(false);
 
-      navigate({
-        search: (prev) => ({
-          ...prev,
-          start_date: format(newDay, "yyyy-MM-dd"),
-          end_date:
-            range.to && newDay <= range.to
-              ? format(range.to, "yyyy-MM-dd")
-              : undefined,
-        }),
-      });
+      updateNavigate(
+        format(newDay, "yyyy-MM-dd"),
+        range.to && newDay <= range.to
+          ? format(range.to, "yyyy-MM-dd")
+          : undefined,
+      );
     } else if (range.from && newDay > range.from) {
       // If selecting an end date, ensure it is after the start date
       const newTo = endOfDay(day);
       setRange({ ...range, to: newTo });
 
-      navigate({
-        search: (prev) => ({
-          ...prev,
-          start_date: range.from ? format(range.from, "yyyy-MM-dd") : undefined,
-          end_date: format(newTo, "yyyy-MM-dd"),
-        }),
-      });
+      updateNavigate(
+        range.from ? format(range.from, "yyyy-MM-dd") : undefined,
+        format(newTo, "yyyy-MM-dd"),
+      );
     } else {
       // Reset to a new start date if the range is invalid
       setRange({ from: newDay, to: undefined });
       setIsSelectingStartDate(false);
 
-      navigate({
-        search: (prev) => ({
-          ...prev,
-          start_date: format(newDay, "yyyy-MM-dd"),
-          end_date: undefined,
-        }),
-      });
+      updateNavigate(format(newDay, "yyyy-MM-dd"), undefined);
     }
   };
 
@@ -143,13 +150,11 @@ export default function UpdateReservation() {
     if (currentRange && currentRange.from && currentRange.to) {
       updateReservationMutation.mutate(
         {
-          bookingId: id as string,
+          reservationId,
           data: {
-            id: reservationId,
             dateFrom: format(currentRange.from, "yyyy-MM-dd"),
             dateTo: format(currentRange.to, "yyyy-MM-dd"),
             guests,
-            venue: venue.id,
           },
         },
         {

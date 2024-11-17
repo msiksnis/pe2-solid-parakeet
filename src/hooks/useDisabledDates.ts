@@ -1,43 +1,62 @@
-import { addDays, isBefore, isWithinInterval } from "date-fns";
+import {
+  startOfDay,
+  endOfDay,
+  isWithinInterval,
+  isBefore,
+  addDays,
+} from "date-fns";
+import { toZonedTime } from "date-fns-tz";
 
-interface DateRange {
-  from?: Date;
-  to?: Date;
+interface Range {
+  from: Date | undefined;
+  to: Date | undefined;
 }
 
 interface UseDisabledDatesParams {
-  bookedRanges: DateRange[];
-  currentRange?: DateRange;
-  originalRange?: DateRange;
+  bookedRanges: Range[];
+  currentRange: Range;
+  originalRange: Range;
   minimumDays?: number;
-  isSelectingStartDate: boolean; // New parameter to track the active date selection
+  isSelectingStartDate: boolean;
 }
 
+/**
+ * Hook to determine whether specific dates should be disabled based on booked ranges,
+ * current selection, original range, and other constraints like minimum days.
+ * @param {Range[]} bookedRanges - The list of date ranges that are already booked.
+ * @returns {Object} - An object containing the `isDateDisabled` function.
+ */
 export function useDisabledDates({
   bookedRanges,
   currentRange,
   originalRange,
-  minimumDays = 2,
+  minimumDays = 1,
   isSelectingStartDate,
 }: UseDisabledDatesParams) {
-  const sortedRanges = [...bookedRanges].sort(
-    (a, b) => (a.from?.getTime() ?? 0) - (b.from?.getTime() ?? 0),
-  );
+  const timezone = "Europe/Oslo";
 
-  const isDateInBookedRanges = (date: Date) => {
-    return sortedRanges.some(
+  const sortedRanges = [...bookedRanges]
+    .map((range) => ({
+      from: range.from
+        ? startOfDay(toZonedTime(range.from, timezone))
+        : undefined,
+      to: range.to ? endOfDay(toZonedTime(range.to, timezone)) : undefined,
+    }))
+    .sort((a, b) => (a.from?.getTime() ?? 0) - (b.from?.getTime() ?? 0));
+
+  const isDateInBookedRanges = (date: Date) =>
+    sortedRanges.some(
       (range) =>
         range.from &&
         range.to &&
         isWithinInterval(date, { start: range.from, end: range.to }),
     );
-  };
 
   const isDateInOriginalRange = (date: Date) => {
     if (!originalRange?.from || !originalRange?.to) return false;
     return isWithinInterval(date, {
-      start: originalRange.from,
-      end: originalRange.to,
+      start: startOfDay(originalRange.from),
+      end: endOfDay(originalRange.to),
     });
   };
 
@@ -49,36 +68,45 @@ export function useDisabledDates({
       const gapStart = addDays(range.to, 1);
       const gapEnd = addDays(nextRange.from, -1);
 
+      const gapSizeInDays = Math.ceil(
+        (gapEnd.getTime() - gapStart.getTime()) / (24 * 60 * 60 * 1000),
+      );
+
       return (
-        isWithinInterval(date, { start: gapStart, end: gapEnd }) &&
-        gapEnd.getTime() - gapStart.getTime() <
-          minimumDays * 24 * 60 * 60 * 1000
+        gapSizeInDays < minimumDays &&
+        isWithinInterval(date, { start: gapStart, end: gapEnd })
       );
     });
   };
 
+  /**
+   * Determines if a given date should be disabled.
+   *
+   * @param {Date} date - The date to check.
+   * @returns {boolean} - Whether the date should be disabled.
+   */
   const isDateDisabled = (date: Date): boolean => {
-    // Allow dates in the original range explicitly
-    if (isDateInOriginalRange(date)) return false;
+    const normalizedDate = startOfDay(toZonedTime(date, timezone));
 
-    // Disable past dates unless in the original range
-    if (isBefore(date, new Date()) && !isDateInOriginalRange(date)) return true;
+    if (isDateInOriginalRange(normalizedDate)) return false;
 
-    // Disable dates before the selected current start date (only if selecting the end date)
     if (
-      !isSelectingStartDate &&
-      currentRange?.from &&
-      isBefore(date, currentRange.from)
+      isBefore(normalizedDate, startOfDay(new Date())) &&
+      !isDateInOriginalRange(normalizedDate)
     )
       return true;
 
-    // Disable dates within booked ranges
-    if (isDateInBookedRanges(date)) return true;
+    if (
+      !isSelectingStartDate &&
+      currentRange?.from &&
+      isBefore(normalizedDate, startOfDay(currentRange.from))
+    )
+      return true;
 
-    // Disable dates between booked ranges that violate the minimum range
-    if (isDateBetweenBookedRanges(date)) return true;
+    if (isDateInBookedRanges(normalizedDate)) return true;
 
-    // Otherwise, the date is enabled
+    if (isDateBetweenBookedRanges(normalizedDate)) return true;
+
     return false;
   };
 
