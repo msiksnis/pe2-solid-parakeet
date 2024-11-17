@@ -1,25 +1,27 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { endOfDay, format, startOfDay } from "date-fns";
-import { motion } from "framer-motion";
-import { CalendarDays, ChevronDown, Minus, Plus } from "lucide-react";
+import { toZonedTime } from "date-fns-tz";
 import { useState } from "react";
 
 import ErrorLoadingButton from "@/components/ErrorLoadingButton";
 import MainLoader from "@/components/MainLoader";
+import { Spinner } from "@/components/Spinner";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { useDisabledDates } from "@/hooks/useDisabledDates";
 import { Venue } from "@/lib/types";
 import { cn, useScreenSizes } from "@/lib/utils";
 import { Route } from "@/routes/manage-reservations/$id";
+import { decrementGuests, incrementGuests } from "@/utils/reservationUtils";
 import { useUpdateReservationMutation } from "../mutations/useUpdateReservationMutation";
 import { fetchVenueById } from "../queries/fetchVenueById";
-import { toZonedTime } from "date-fns-tz";
+import DateSelectionControls from "./DateSelectionControls";
+import GuestControl from "./GuestNumberControl";
 
 interface Range {
-  from: Date | undefined;
-  to: Date | undefined;
+  from?: Date | undefined;
+  to?: Date | undefined;
 }
 
 export default function UpdateReservation() {
@@ -41,6 +43,7 @@ export default function UpdateReservation() {
   });
 
   const updateReservationMutation = useUpdateReservationMutation();
+
   const { isMobile } = useScreenSizes();
 
   const {
@@ -82,8 +85,6 @@ export default function UpdateReservation() {
     to: endOfDay(toZonedTime(new Date(booking.dateTo), "UTC")),
   }));
 
-  console.log("Mapped Booked Ranges:", bookedRanges);
-
   const { isDateDisabled } = useDisabledDates({
     bookedRanges,
     currentRange: range as Range,
@@ -92,10 +93,7 @@ export default function UpdateReservation() {
     isSelectingStartDate,
   });
 
-  console.log("Current Range:", range);
-  console.log("Original Range:", originalRange);
-
-  const updateNavigate = (
+  const updateDates = (
     startDate: string | undefined,
     endDate: string | undefined,
   ) => {
@@ -122,7 +120,7 @@ export default function UpdateReservation() {
       // Automatically switch to selecting the end date
       setIsSelectingStartDate(false);
 
-      updateNavigate(
+      updateDates(
         format(newDay, "yyyy-MM-dd"),
         range.to && newDay <= range.to
           ? format(range.to, "yyyy-MM-dd")
@@ -133,7 +131,7 @@ export default function UpdateReservation() {
       const newTo = endOfDay(day);
       setRange({ ...range, to: newTo });
 
-      updateNavigate(
+      updateDates(
         range.from ? format(range.from, "yyyy-MM-dd") : undefined,
         format(newTo, "yyyy-MM-dd"),
       );
@@ -142,7 +140,7 @@ export default function UpdateReservation() {
       setRange({ from: newDay, to: undefined });
       setIsSelectingStartDate(false);
 
-      updateNavigate(format(newDay, "yyyy-MM-dd"), undefined);
+      updateDates(format(newDay, "yyyy-MM-dd"), undefined);
     }
   };
 
@@ -166,28 +164,22 @@ export default function UpdateReservation() {
     }
   };
 
-  const incrementGuests = () => {
-    if (guests < venue.maxGuests) {
+  const handleIncrementGuests = () => {
+    incrementGuests(guests, venue.maxGuests, (newGuests) => {
       navigate({
-        search: (prev) => ({
-          ...prev,
-          guests: guests + 1,
-        }),
+        search: (prev) => ({ ...prev, guests: newGuests }),
         resetScroll: false,
       });
-    }
+    });
   };
 
-  const decrementGuests = () => {
-    if (guests > 1) {
+  const handleDecrementGuests = () => {
+    decrementGuests(guests, 1, (newGuests) => {
       navigate({
-        search: (prev) => ({
-          ...prev,
-          guests: guests - 1,
-        }),
+        search: (prev) => ({ ...prev, guests: newGuests }),
         resetScroll: false,
       });
-    }
+    });
   };
 
   return (
@@ -214,132 +206,54 @@ export default function UpdateReservation() {
           className={cn({ "max-w-[332px]": isMobile })}
         />
         <div className="@[520px]/calendar:max-w-40 w-full max-w-80 space-y-4">
-          <div className="@[520px]/calendar:flex-col mt-2 flex w-full items-center gap-4">
-            <Button
-              className={cn(
-                "grid h-fit w-full grid-cols-3 rounded-xl border border-gray-500 bg-card px-0 py-1 text-primary outline-none ring-offset-background transition-all duration-300 hover:bg-card",
-                {
-                  "ring-2 ring-primary ring-offset-2": isSelectingStartDate,
-                },
-              )}
-              onClick={() => {
-                setIsSelectingStartDate(true);
-              }}
-            >
-              <span className="col-span-1 m-auto">
-                <CalendarDays />
-              </span>
-              <div className="col-span-2 flex flex-col items-start">
-                <span className="whitespace-nowrap text-sm">Start date</span>
-                <span className={cn("whitespace-nowrap text-lg")}>
-                  {range.from ? format(range.from, "dd MMM") : "Select date"}
-                </span>
-              </div>
-            </Button>
-            <Button
-              className={cn(
-                "grid h-fit w-full grid-cols-3 rounded-xl border border-gray-500 bg-card px-0 py-1 text-primary outline-none ring-offset-background transition-all duration-300 hover:bg-card",
-                {
-                  "ring-2 ring-primary ring-offset-2": !isSelectingStartDate,
-                },
-              )}
-              onClick={() => {
-                if (range.from) {
-                  setIsSelectingStartDate(false);
-                }
-              }}
-              disabled={!range.from}
-            >
-              <span className="col-span-1 m-auto">
-                <CalendarDays />
-              </span>
-              <div className="col-span-2 flex flex-col items-start">
-                <span className="whitespace-nowrap text-sm">End date</span>
-                <span className={cn("whitespace-nowrap text-lg")}>
-                  {range.to ? format(range.to, "dd MMM") : "Select date"}
-                </span>
-              </div>
-            </Button>
-          </div>
-
-          <div className="relative h-32">
-            <div className="absolute w-full rounded-xl border border-gray-500 px-4 py-1">
-              <div
-                className="grid cursor-pointer grid-cols-5"
-                onClick={toggleGuestControl}
-              >
-                <div className="col-span-4 grid">
-                  <span className="whitespace-nowrap text-sm">Guests</span>
-                  <span className="whitespace-nowrap text-lg">
-                    {guests} {guests > 1 ? "guests" : "guest"}
-                  </span>
-                </div>
-                <ChevronDown
-                  className={cn(
-                    "ml-auto mt-2 opacity-60 transition duration-200",
-                    {
-                      "rotate-180": guestControlExpanded,
-                    },
-                  )}
-                />
-              </div>
-
-              {/* Guest control section */}
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{
-                  height: guestControlExpanded ? "auto" : 0,
-                  opacity: guestControlExpanded ? 1 : 0,
-                }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.15 }}
-                className="overflow-hidden"
-              >
-                <div className="col-span-5 mb-2 mt-4 flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="size-6 rounded-full border-gray-500"
-                    onClick={decrementGuests}
-                    disabled={guests <= 1}
-                  >
-                    <Minus />
-                  </Button>
-                  <span className="tabular-nums selection:bg-card">
-                    {guests}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="size-6 rounded-full border-gray-500"
-                    onClick={incrementGuests}
-                    disabled={guests >= venue.maxGuests}
-                  >
-                    <Plus />
-                  </Button>
-                </div>
-              </motion.div>
-            </div>
-          </div>
+          <DateSelectionControls
+            range={range}
+            setIsSelectingStartDate={setIsSelectingStartDate}
+            isSelectingStartDate={isSelectingStartDate}
+          />
+          <GuestControl
+            guests={guests}
+            maxGuests={venue.maxGuests}
+            incrementGuests={handleIncrementGuests}
+            decrementGuests={handleDecrementGuests}
+            guestControlExpanded={guestControlExpanded}
+            toggleGuestControl={toggleGuestControl}
+          />
         </div>
       </div>
-      <div className="mt-8 flex items-center justify-end gap-x-4">
+      <div className="mt-8 flex items-center justify-center gap-x-4 md:justify-end">
         <Button
           size={"lg"}
           variant={"gooeyLeft"}
           //   onClick={cancelReservation}
-          className="border border-primary bg-muted from-gray-200 text-base text-primary after:duration-500"
+          className="w-52 border border-primary bg-muted from-gray-200 text-base text-primary after:duration-500"
         >
-          Cancel reservation
+          {updateReservationMutation.isPending ? (
+            <span className="flex items-center">
+              Cancelling
+              <Spinner className="ml-2 text-white" />
+            </span>
+          ) : (
+            "Cancel reservation"
+          )}
         </Button>
         <Button
           size={"lg"}
           variant={"gooeyLeft"}
           onClick={handleUpdate}
-          disabled={!range.from || !range.to}
-          className="text-base after:duration-500"
+          disabled={
+            !range.from || !range.to || updateReservationMutation.isPending
+          }
+          className="w-52 text-base after:duration-500"
         >
-          Update reservation
+          {updateReservationMutation.isPending ? (
+            <span className="flex items-center">
+              Updating
+              <Spinner className="ml-2 text-white" />
+            </span>
+          ) : (
+            "Update reservation"
+          )}
         </Button>
       </div>
     </div>

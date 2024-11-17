@@ -8,8 +8,8 @@ import {
 import { toZonedTime } from "date-fns-tz";
 
 interface Range {
-  from: Date | undefined;
-  to: Date | undefined;
+  from?: Date | undefined;
+  to?: Date | undefined;
 }
 
 interface UseDisabledDatesParams {
@@ -28,10 +28,10 @@ interface UseDisabledDatesParams {
  */
 export function useDisabledDates({
   bookedRanges,
-  currentRange,
+  // currentRange,
   originalRange,
   minimumDays = 1,
-  isSelectingStartDate,
+  // isSelectingStartDate,
 }: UseDisabledDatesParams) {
   const timezone = "Europe/Oslo";
 
@@ -96,12 +96,13 @@ export function useDisabledDates({
     )
       return true;
 
-    if (
-      !isSelectingStartDate &&
-      currentRange?.from &&
-      isBefore(normalizedDate, startOfDay(currentRange.from))
-    )
-      return true;
+    //* Uncomment this block to disable dates before the current start date
+    // if (
+    //   !isSelectingStartDate &&
+    //   currentRange?.from &&
+    //   isBefore(normalizedDate, startOfDay(currentRange.from))
+    // )
+    //   return true;
 
     if (isDateInBookedRanges(normalizedDate)) return true;
 
