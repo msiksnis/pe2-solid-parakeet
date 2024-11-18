@@ -24,6 +24,7 @@ import DateSelectionControls from "./DateSelectionControls";
 import GuestControl from "./GuestNumberControl";
 import { useDeleteReservationMutation } from "../mutations/useDeleteReservationMutation";
 import { toast } from "sonner";
+import WarningModal from "@/components/WarningModal";
 
 interface Range {
   from?: Date | undefined;
@@ -51,6 +52,7 @@ export default function UpdateReservation() {
   const navigate = useNavigate({ from: Route.fullPath });
 
   const [isSelectingStartDate, setIsSelectingStartDate] = useState(true);
+  const [openWarningModal, setOpenWarningModal] = useState(false);
   const [guestControlExpanded, setGuestControlExpanded] = useState(false);
   const [originalRange] = useState<Range>({
     from: start_date ? startOfDay(new Date(start_date)) : undefined,
@@ -62,7 +64,8 @@ export default function UpdateReservation() {
   });
 
   const updateReservationMutation = useUpdateReservationMutation();
-  const deleteReservationMutation = useDeleteReservationMutation();
+  const { mutate: deleteReservation, isPending: isDeleting } =
+    useDeleteReservationMutation();
 
   const { isMobile } = useScreenSizes();
 
@@ -170,8 +173,9 @@ export default function UpdateReservation() {
       return;
     }
 
-    deleteReservationMutation.mutate(reservationId, {
+    deleteReservation(reservationId, {
       onSuccess: () => {
+        setOpenWarningModal(false);
         navigate({ to: "/manage-reservations" });
       },
       onError: (error) => {
@@ -200,7 +204,7 @@ export default function UpdateReservation() {
   };
 
   return (
-    <div className="@container/calendar mx-auto my-20 max-w-4xl px-4 sm:px-6 lg:px-10 xl:px-4">
+    <div className="mx-auto my-20 max-w-4xl px-4 @container/calendar sm:px-6 lg:px-10 xl:px-4">
       <h1 className="text-2xl">Your reservation for: {venue.name}</h1>
       <img
         src={venue.media[0].url}
@@ -222,7 +226,7 @@ export default function UpdateReservation() {
           disabled={(date) => isDateDisabled(date)}
           className={cn({ "max-w-[332px]": isMobile })}
         />
-        <div className="@[520px]/calendar:max-w-40 w-full max-w-80 space-y-4">
+        <div className="w-full max-w-80 space-y-4 @[520px]/calendar:max-w-40">
           <DateSelectionControls
             range={range}
             setIsSelectingStartDate={setIsSelectingStartDate}
@@ -238,11 +242,11 @@ export default function UpdateReservation() {
           />
         </div>
       </div>
-      <div className="mt-8 flex items-center justify-center gap-x-4 md:justify-end">
+      <div className="mt-4 flex items-center justify-center gap-x-4 md:mt-14 md:justify-end">
         <Button
           size={"lg"}
           variant={"gooeyLeft"}
-          onClick={cancelReservation}
+          onClick={() => setOpenWarningModal(true)}
           className="w-52 border border-primary bg-muted from-gray-200 text-base text-primary after:duration-500"
         >
           {updateReservationMutation.isPending ? (
@@ -273,6 +277,12 @@ export default function UpdateReservation() {
           )}
         </Button>
       </div>
+      <WarningModal
+        isOpen={openWarningModal}
+        onClose={() => setOpenWarningModal(false)}
+        onConfirm={cancelReservation}
+        loading={isDeleting}
+      />
     </div>
   );
 }

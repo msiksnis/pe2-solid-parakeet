@@ -104,7 +104,7 @@ export default function VenueById() {
   const mobileImages = venue.media?.slice(0, 3) || [];
 
   return (
-    <div className="mx-auto mt-10 max-w-7xl space-y-6 px-4 sm:px-6 md:px-10 xl:px-6">
+    <div className="mx-auto mt-4 max-w-7xl space-y-6 px-4 sm:px-6 md:px-10 xl:px-6">
       {/* Venue Header */}
       <div className="flex flex-col justify-between space-y-4 lg:flex-row lg:items-end lg:space-y-0">
         <div className="flex flex-col font-medium">

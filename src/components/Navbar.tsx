@@ -1,12 +1,16 @@
 import SignInModal from "@/auth/SignInModal";
 import { useAuthStatus } from "@/hooks/useAuthStatus";
 import { useSignInModalStore } from "@/hooks/useSignInModalStore";
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import { Button } from "./ui/button";
 import UserButton from "./UserButton";
 import SearchBar from "./SearchBar";
+import { cn } from "@/lib/utils";
 
 export default function Navbar() {
+  const location = useLocation();
+  const isHome = location.pathname === "/";
+
   const { isSignInModalOpen, openSignInModal, closeSignInModal } =
     useSignInModalStore();
 
@@ -32,8 +36,13 @@ export default function Navbar() {
           )}
         </div>
       </header>
-      <div className="mx-auto mt-2 max-w-2xl lg:-mt-12 lg:mb-0">
-        <h1 className="relative mx-auto mb-10 mt-14 max-w-96 text-balance text-center text-5xl sm:hidden">
+      <div className="mx-auto mt-4 max-w-2xl lg:-mt-12 lg:mb-0">
+        <h1
+          className={cn(
+            "relative mx-auto mb-10 mt-14 max-w-96 text-balance text-center text-5xl sm:hidden",
+            { hidden: !isHome },
+          )}
+        >
           Find your best place to stay
           <div className="absolute left-10 right-10 top-0 -z-10 h-3/5 rounded-full bg-orange-100/60 blur-[90px] sm:hidden" />
         </h1>

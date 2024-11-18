@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { Search } from "lucide-react";
 
 export default function SearchBar() {
   const [isVenueFocused, setIsVenueFocused] = useState(false);
@@ -83,7 +84,10 @@ export default function SearchBar() {
             variant={"gooeyRight"}
             className="h-full w-full rounded-e-full bg-card from-amber-400 to-amber-500 px-4 text-[#222832] md:text-lg"
           >
-            Search
+            <span className="hidden sm:block">Search</span>
+            <span className="sm:hidden">
+              <Search className="text-[#222832]" />
+            </span>
           </Button>
         </div>
       </div>
