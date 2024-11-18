@@ -4,6 +4,7 @@ import { useSignInModalStore } from "@/hooks/useSignInModalStore";
 import { Link } from "@tanstack/react-router";
 import { Button } from "./ui/button";
 import UserButton from "./UserButton";
+import SearchBar from "./SearchBar";
 
 export default function Navbar() {
   const { isSignInModalOpen, openSignInModal, closeSignInModal } =
@@ -12,26 +13,12 @@ export default function Navbar() {
   const { isLoggedIn } = useAuthStatus();
 
   return (
-    <>
-      <header className="mx-auto flex w-full max-w-[1920px] items-center px-4 py-4">
-        <Link to="/">
+    <div className="px-4 py-4">
+      <header className="flex max-w-[1920px] items-center justify-between">
+        <Link to="/" className="">
           <img src="/Logo.png" className="max-h-14" />
         </Link>
-        <nav className="ml-auto flex items-center space-x-32">
-          <div className="hidden space-x-10 sm:flex">
-            <Link
-              to="/"
-              className="text-lg underline-offset-4 [&.active]:underline"
-            >
-              Home
-            </Link>
-            <Link
-              to="/explore-venues"
-              className="text-lg underline-offset-4 [&.active]:underline"
-            >
-              Explore Venues
-            </Link>
-          </div>
+        <div className="flex items-center justify-end">
           {isLoggedIn ? (
             <UserButton />
           ) : (
@@ -43,13 +30,20 @@ export default function Navbar() {
               Log in
             </Button>
           )}
-        </nav>
+        </div>
       </header>
+      <div className="mx-auto mt-2 max-w-2xl lg:-mt-12 lg:mb-0">
+        <h1 className="relative mx-auto mb-10 mt-14 max-w-96 text-balance text-center text-5xl sm:hidden">
+          Find your best place to stay
+          <div className="absolute left-10 right-10 top-0 -z-10 h-3/5 rounded-full bg-orange-100/60 blur-[90px] sm:hidden" />
+        </h1>
+        <SearchBar />
+      </div>
       <SignInModal
         isOpen={isSignInModalOpen}
         onClose={closeSignInModal}
         loading={false}
       />
-    </>
+    </div>
   );
 }

@@ -18,7 +18,7 @@ export default function PopularByType() {
   const filterValue = filter ?? null;
 
   const { isMobile, isMedium, isExtraLarge } = useScreenSizes();
-  const sliceCount = isMobile ? 4 : isMedium ? 6 : isExtraLarge ? 8 : 12;
+  const sliceCount = isMobile ? 8 : isMedium ? 9 : isExtraLarge ? 12 : 12;
 
   // Handles filter change, uses null for "All Venues"
   const handleFilterChange = useCallback(
