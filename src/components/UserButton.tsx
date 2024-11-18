@@ -32,7 +32,7 @@ export default function UserButton({}: UserButtonProps) {
       {isLoggedIn && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Avatar className="size-10 transform cursor-pointer transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-lg">
+            <Avatar className="size-10 cursor-pointer transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl">
               <AvatarImage src={userAvatar?.url} alt={`${userName}'s avatar`} />
               <AvatarFallback>
                 <UserIcon className="size-5" />
@@ -44,7 +44,7 @@ export default function UserButton({}: UserButtonProps) {
             align="end"
           >
             <DropdownMenuGroup className="flex gap-x-2 px-4 py-2 pb-1">
-              <Avatar className="size-12 transform cursor-pointer transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-lg">
+              <Avatar className="size-12">
                 <AvatarImage
                   src={userAvatar?.url}
                   alt={`${userName}'s avatar`}

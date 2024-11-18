@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 export default function Navbar() {
   const location = useLocation();
   const isHome = location.pathname === "/";
+  const isDashboard = location.pathname.startsWith("/manage-venues");
 
   const { isSignInModalOpen, openSignInModal, closeSignInModal } =
     useSignInModalStore();
@@ -36,7 +37,11 @@ export default function Navbar() {
           )}
         </div>
       </header>
-      <div className="mx-auto mt-4 max-w-2xl lg:-mt-12 lg:mb-0">
+      <div
+        className={cn("mx-auto mt-4 max-w-2xl lg:-mt-12 lg:mb-0", {
+          hidden: isDashboard,
+        })}
+      >
         <h1
           className={cn(
             "relative mx-auto mb-10 mt-14 max-w-96 text-balance text-center text-5xl sm:hidden",
