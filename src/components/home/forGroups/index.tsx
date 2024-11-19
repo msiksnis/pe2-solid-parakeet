@@ -1,49 +1,61 @@
-import { useQuery } from "@tanstack/react-query";
-import { Venue } from "@/lib/types";
-import { filterVenuesByType } from "@/lib/filterVenues";
-import VenueCardSM from "@/components/VenueCardSM";
-import { fetchVenues } from "../queries/fetchVenues";
-import { useSearch } from "@tanstack/react-router";
+import ErrorLoadingButton from "@/components/ErrorLoadingButton";
 import MainLoader from "@/components/MainLoader";
+import VenueCardSM from "@/components/VenueCardSM";
+import { useSearch } from "@tanstack/react-router";
+import { ForGroups } from "./filterVenuesForGroups";
+import { useFilteredVenuesGroups } from "./useFilteredVenuesGroups";
 
-export default function ForGroups() {
+const VALID_FILTERS: (ForGroups | "all")[] = [
+  "summer-escape",
+  "explore-mountains",
+  "all",
+];
+
+export default function ForGroupsPage() {
   const { filter } = useSearch({ from: "/for-groups" });
-  const filterValue = filter ?? null;
+  const filterValue = VALID_FILTERS.includes(filter as ForGroups | "all")
+    ? (filter as ForGroups | "all")
+    : "all";
 
-  const {
-    data: venues = [],
-    isError,
-    isFetching,
-  } = useQuery<Venue[]>({
-    queryKey: ["venues"],
-    queryFn: () => fetchVenues(),
-    staleTime: 1000 * 60 * 5,
-  });
+  const { filteredVenues, isLoading, isError, error, refetch } =
+    useFilteredVenuesGroups(filterValue);
 
-  if (isError) return <p>Something went wrong...</p>;
+  const heading =
+    filterValue === "all"
+      ? "Explore All Venues"
+      : filterValue === "summer-escape"
+        ? "Summer Escape Venues for Groups"
+        : filterValue === "explore-mountains"
+          ? "Explore Mountains Venues for Groups"
+          : "Explore Venues";
 
-  const filteredVenues = filterVenuesByType(filterValue, venues).filter(
-    (venue) => venue.maxGuests >= 6,
-  );
+  const noVenueMessage =
+    filterValue === "all"
+      ? "Check back soon for new venues!"
+      : "No venues found. Check back soon!";
 
-  // Dynamic heading based on filter value
-  const getHeading = (filter: string | null) => {
-    switch (filter) {
-      case "summer-escape":
-        return "Summer Escape Venues for Groups";
-      case "explore-mountains":
-        return "Mountain Venues for Groups";
-      default:
-        return "Venues for Groups";
-    }
-  };
+  const errorMessage = isError
+    ? `Error loading venues: ${error?.message}`
+    : "An unexpected error occurred while loading the venues.";
 
-  const heading = getHeading(filterValue);
+  if (isError) {
+    return <ErrorLoadingButton errorMessage={errorMessage} onRetry={refetch} />;
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 md:px-10 xl:px-6">
-      <h1 className="mt-6 text-center text-3xl font-semibold">{heading}</h1>
-      {isFetching ? (
+      <h1
+        className="mt-6 text-center text-3xl font-semibold"
+        role="heading"
+        aria-level={1}
+      >
+        {isLoading && !filteredVenues.length
+          ? "Loading venues..."
+          : filteredVenues.length > 0
+            ? heading
+            : noVenueMessage}
+      </h1>
+      {isLoading && !filteredVenues.length ? (
         <MainLoader className="my-20" />
       ) : (
         <VenueCardSM

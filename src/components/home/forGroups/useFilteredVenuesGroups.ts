@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Venue } from "@/lib/types";
 import { axiosInstance } from "@/lib/axiosInstance";
-import { Continent, filterVenuesByContinent } from "./filterVenuesByContinent";
+import { filterVenuesForGroups, ForGroups } from "./filterVenuesForGroups";
 
 type UseFilteredVenuesReturn = {
   filteredVenues: Venue[];
@@ -12,8 +12,8 @@ type UseFilteredVenuesReturn = {
   refetch: () => void;
 };
 
-export function useFilteredVenues(
-  filter: Continent | "all",
+export function useFilteredVenuesGroups(
+  filter: ForGroups | "all",
 ): UseFilteredVenuesReturn {
   const {
     data: venues = [],
@@ -29,7 +29,9 @@ export function useFilteredVenues(
   });
 
   const filteredVenues = useMemo(() => {
-    return filterVenuesByContinent(venues, filter);
+    return filterVenuesForGroups(venues, filter).filter(
+      (venue) => venue.maxGuests >= 6,
+    );
   }, [venues, filter]);
 
   return {

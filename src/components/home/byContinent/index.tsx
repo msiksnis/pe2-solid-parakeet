@@ -3,7 +3,7 @@ import MainLoader from "@/components/MainLoader";
 import VenueCardSM from "@/components/VenueCardSM";
 import { Route } from "@/routes/by-continent";
 import { Continent, CONTINENT_CONFIG } from "./filterVenuesByContinent";
-import { useFilteredVenues } from "./useFilteredVenues";
+import { useFilteredVenuesContinent } from "./useFilteredVenuesContinent";
 
 const VALID_FILTERS: (Continent | "all")[] = [
   "africa",
@@ -23,7 +23,7 @@ export default function ByContinent() {
     : "all";
 
   const { filteredVenues, isLoading, isError, error, refetch } =
-    useFilteredVenues(filterValue);
+    useFilteredVenuesContinent(filterValue);
 
   const heading =
     filterValue === "all"
