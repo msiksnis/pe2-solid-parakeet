@@ -14,6 +14,7 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as ForGroupsImport } from './routes/for-groups'
 import { Route as FavoritesImport } from './routes/favorites'
 import { Route as ExploreVenuesImport } from './routes/explore-venues'
+import { Route as AllVenuesImport } from './routes/all-venues'
 import { Route as AccountImport } from './routes/account'
 import { Route as AuthenticatedImport } from './routes/_authenticated'
 import { Route as IndexImport } from './routes/index'
@@ -40,6 +41,12 @@ const FavoritesRoute = FavoritesImport.update({
 const ExploreVenuesRoute = ExploreVenuesImport.update({
   id: '/explore-venues',
   path: '/explore-venues',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AllVenuesRoute = AllVenuesImport.update({
+  id: '/all-venues',
+  path: '/all-venues',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -115,6 +122,13 @@ declare module '@tanstack/react-router' {
       path: '/account'
       fullPath: '/account'
       preLoaderRoute: typeof AccountImport
+      parentRoute: typeof rootRoute
+    }
+    '/all-venues': {
+      id: '/all-venues'
+      path: '/all-venues'
+      fullPath: '/all-venues'
+      preLoaderRoute: typeof AllVenuesImport
       parentRoute: typeof rootRoute
     }
     '/explore-venues': {
@@ -197,6 +211,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '': typeof AuthenticatedRouteWithChildren
   '/account': typeof AccountRoute
+  '/all-venues': typeof AllVenuesRoute
   '/explore-venues': typeof ExploreVenuesRoute
   '/favorites': typeof FavoritesRoute
   '/for-groups': typeof ForGroupsRoute
@@ -211,6 +226,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '': typeof AuthenticatedRouteWithChildren
   '/account': typeof AccountRoute
+  '/all-venues': typeof AllVenuesRoute
   '/explore-venues': typeof ExploreVenuesRoute
   '/favorites': typeof FavoritesRoute
   '/for-groups': typeof ForGroupsRoute
@@ -226,6 +242,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/account': typeof AccountRoute
+  '/all-venues': typeof AllVenuesRoute
   '/explore-venues': typeof ExploreVenuesRoute
   '/favorites': typeof FavoritesRoute
   '/for-groups': typeof ForGroupsRoute
@@ -242,6 +259,7 @@ export interface FileRouteTypes {
     | '/'
     | ''
     | '/account'
+    | '/all-venues'
     | '/explore-venues'
     | '/favorites'
     | '/for-groups'
@@ -255,6 +273,7 @@ export interface FileRouteTypes {
     | '/'
     | ''
     | '/account'
+    | '/all-venues'
     | '/explore-venues'
     | '/favorites'
     | '/for-groups'
@@ -268,6 +287,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/account'
+    | '/all-venues'
     | '/explore-venues'
     | '/favorites'
     | '/for-groups'
@@ -283,6 +303,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AccountRoute: typeof AccountRoute
+  AllVenuesRoute: typeof AllVenuesRoute
   ExploreVenuesRoute: typeof ExploreVenuesRoute
   FavoritesRoute: typeof FavoritesRoute
   ForGroupsRoute: typeof ForGroupsRoute
@@ -295,6 +316,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AccountRoute: AccountRoute,
+  AllVenuesRoute: AllVenuesRoute,
   ExploreVenuesRoute: ExploreVenuesRoute,
   FavoritesRoute: FavoritesRoute,
   ForGroupsRoute: ForGroupsRoute,
@@ -318,6 +340,7 @@ export const routeTree = rootRoute
         "/",
         "/_authenticated",
         "/account",
+        "/all-venues",
         "/explore-venues",
         "/favorites",
         "/for-groups",
@@ -338,6 +361,9 @@ export const routeTree = rootRoute
     },
     "/account": {
       "filePath": "account.tsx"
+    },
+    "/all-venues": {
+      "filePath": "all-venues.tsx"
     },
     "/explore-venues": {
       "filePath": "explore-venues.tsx"

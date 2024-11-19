@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 
 import { fetchVenues } from "../queries/fetchVenues";
 import { Venue } from "@/lib/types.ts";
@@ -11,6 +11,8 @@ import { filterVenuesByType } from "@/lib/filterVenues";
 import TabsBar from "@/components/TabsBar";
 import { useScreenSizes } from "@/lib/utils";
 import MainLoader from "@/components/MainLoader";
+import { Button } from "@/components/ui/button";
+import { ChevronRight } from "lucide-react";
 
 export default function PopularByType() {
   const navigate = useNavigate({ from: Route.fullPath });
@@ -80,6 +82,18 @@ export default function PopularByType() {
             venues={sortedVenues}
             currentFilter={filter || "all"}
           />
+          <Link
+            to={"/all-venues"}
+            className="mr-2 mt-4 flex items-center justify-end hover:motion-translate-x-out-[5px]"
+          >
+            <Button
+              variant={"linkHover1"}
+              className="px-0 text-base after:w-full"
+            >
+              See all Venues
+            </Button>
+            <ChevronRight className="ml-1 size-5" />
+          </Link>
         </>
       )}
     </div>

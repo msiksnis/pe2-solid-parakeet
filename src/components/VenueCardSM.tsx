@@ -18,13 +18,13 @@ interface VenueCardProps {
 
 export default function VenueCardSM({ venues, currentFilter }: VenueCardProps) {
   return (
-    <div className="grid gap-4 pb-8 pt-8 md:grid-cols-3 lg:gap-y-0 xl:grid-cols-4">
+    <div className="grid gap-4 pt-8 md:grid-cols-3 lg:gap-y-0 xl:grid-cols-4">
       {venues.map((venue, idx) => (
         <BlurFade
           key={`${venue.id}-${currentFilter}-${idx}`}
-          delay={0.15 + idx * 0.05}
+          delay={0.05 + idx * 0.05}
           inView
-          inViewMargin="150px"
+          inViewMargin="100px"
         >
           <Link
             to={`/venue/${venue.id}`}
@@ -38,16 +38,23 @@ export default function VenueCardSM({ venues, currentFilter }: VenueCardProps) {
           >
             <Carousel className="w-full">
               <CarouselContent>
-                {venue.media?.length > 0 &&
+                {venue.media?.length > 0 ? (
                   venue.media.map((media, i) => (
                     <CarouselItem key={i}>
                       <img
-                        src={media.url || "/default-image.jpg"}
-                        alt={media.alt || "Venue Image"}
+                        src={media.url}
+                        alt={media.alt}
                         className="h-60 w-full rounded-2xl object-cover md:h-48"
                       />
                     </CarouselItem>
-                  ))}
+                  ))
+                ) : (
+                  <img
+                    src="/default-image.jpg"
+                    alt="Venue placeholder"
+                    className="h-60 w-full rounded-2xl object-cover md:h-48"
+                  />
+                )}
               </CarouselContent>
               <CarouselPrevious />
               <CarouselNext />
@@ -68,7 +75,7 @@ export default function VenueCardSM({ venues, currentFilter }: VenueCardProps) {
               </div>
               <div className="mt-auto flex items-end justify-between">
                 <div>
-                  {venue.location.city && (
+                  {venue.location && venue.location.city && (
                     <div className="flex items-center capitalize">
                       <MapPinIcon className="-ml-0.5 mb-0.5 size-4" />
                       <span className="text-muted-foreground">

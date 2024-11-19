@@ -65,4 +65,24 @@ export interface Venue {
   };
 }
 
+export interface ApiMeta {
+  isFirstPage: boolean;
+  isLastPage: boolean;
+  currentPage: number;
+  previousPage: number | null;
+  nextPage: number | null;
+  pageCount: number;
+  totalCount: number;
+}
+
+export interface VenuesApiResponse {
+  data: Venue[];
+  meta: ApiMeta;
+}
+
+export interface AllVenuesProps {
+  data: Venue[];
+  nextPage?: number | null;
+}
+
 export type FilterOption = (typeof FILTER_OPTIONS)[number];
