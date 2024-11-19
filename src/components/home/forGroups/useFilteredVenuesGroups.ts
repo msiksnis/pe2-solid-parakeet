@@ -1,7 +1,7 @@
-import { useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { Venue } from "@/lib/types";
-import { axiosInstance } from "@/lib/axiosInstance";
+import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
+import { fetchVenues } from "../queries/fetchVenues";
 import { filterVenuesForGroups, ForGroups } from "./filterVenuesForGroups";
 
 type UseFilteredVenuesReturn = {
@@ -23,7 +23,7 @@ export function useFilteredVenuesGroups(
     refetch,
   } = useQuery<Venue[], Error>({
     queryKey: ["venues"],
-    queryFn: () => axiosInstance.get("/venues").then((res) => res.data.data),
+    queryFn: fetchVenues,
     staleTime: 1000 * 60 * 5,
     retry: 1,
   });
