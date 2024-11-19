@@ -1,10 +1,11 @@
-import { useMatches } from "@tanstack/react-router";
+import { useMatches, useNavigate } from "@tanstack/react-router";
 
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 
 export default function Footer() {
+  const navigate = useNavigate();
   const matches = useMatches();
 
   const hideFooter = matches.some(
@@ -59,39 +60,75 @@ export default function Footer() {
             <div className="flex flex-col">
               <Button
                 variant={"linkHover2"}
+                onClick={() =>
+                  navigate({
+                    to: "/by-continent",
+                    search: { filter: "europe" },
+                  })
+                }
                 className="w-fit justify-start px-0 text-lg font-normal after:w-full"
               >
                 Europe
               </Button>
               <Button
                 variant={"linkHover2"}
+                onClick={() =>
+                  navigate({
+                    to: "/by-continent",
+                    search: { filter: "asia" },
+                  })
+                }
                 className="w-fit justify-start px-0 text-lg font-normal after:w-full"
               >
                 Asia
               </Button>
               <Button
                 variant={"linkHover2"}
+                onClick={() =>
+                  navigate({
+                    to: "/by-continent",
+                    search: { filter: "north-america" },
+                  })
+                }
                 className="w-fit justify-start px-0 text-lg font-normal after:w-full"
               >
                 North America
               </Button>
               <Button
                 variant={"linkHover2"}
+                onClick={() =>
+                  navigate({
+                    to: "/by-continent",
+                    search: { filter: "south-america" },
+                  })
+                }
                 className="w-fit justify-start px-0 text-lg font-normal after:w-full"
               >
                 South America
               </Button>
               <Button
                 variant={"linkHover2"}
+                onClick={() =>
+                  navigate({
+                    to: "/by-continent",
+                    search: { filter: "africa" },
+                  })
+                }
                 className="w-fit justify-start px-0 text-lg font-normal after:w-full"
               >
                 Africa
               </Button>
               <Button
                 variant={"linkHover2"}
+                onClick={() =>
+                  navigate({
+                    to: "/by-continent",
+                    search: { filter: "oceania" },
+                  })
+                }
                 className="w-fit justify-start px-0 text-lg font-normal after:w-full"
               >
-                Australia
+                Oceania
               </Button>
             </div>
           </div>

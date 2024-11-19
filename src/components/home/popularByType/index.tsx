@@ -84,7 +84,7 @@ export default function PopularByType() {
           />
           <Link
             to={"/all-venues"}
-            className="mr-2 mt-4 flex items-center justify-end hover:motion-translate-x-out-[5px]"
+            className="mb-8 mr-2 flex items-center justify-end hover:motion-translate-x-out-[5px]"
           >
             <Button
               variant={"linkHover1"}

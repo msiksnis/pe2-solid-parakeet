@@ -1,6 +1,7 @@
 import PopularByType from "./popularByType";
 import LandingSection from "./LandingSection";
 import CardMD from "./popularByType/CardMD";
+import ByContinentCards from "./byContinent/ByContinentCards";
 
 export default function HomePage() {
   return (
@@ -8,6 +9,7 @@ export default function HomePage() {
       <LandingSection />
       <PopularByType />
       <CardMD />
+      <ByContinentCards />
     </div>
   );
 }

@@ -51,13 +51,13 @@ export interface Venue {
   name: string;
   description: string;
   media: MediaObject[];
+  location: Location;
   price: number;
   maxGuests: number;
   rating: number;
   created: string;
   updated: string;
   meta: MetaData;
-  location: Location;
   owner?: Owner;
   bookings?: Booking[];
   _count: {

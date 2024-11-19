@@ -13,7 +13,7 @@ export default function CardMD() {
           <img
             src="/assets/sunny-for-groups.webp"
             alt="Sunny place for groups"
-            className="h-60 w-full rounded-2xl object-cover lg:h-80"
+            className="h-80 w-full rounded-2xl object-cover"
           />
           <p className="pt-4 text-sm font-semibold uppercase text-muted-foreground">
             Summer escape for everyone
@@ -30,7 +30,7 @@ export default function CardMD() {
           <img
             src="/assets/explore-mountains.webp"
             alt="Mountains for groups"
-            className="h-60 w-full rounded-2xl object-cover lg:h-80"
+            className="h-80 w-full rounded-2xl object-cover"
           />
           <p className="pt-4 text-sm font-semibold uppercase text-muted-foreground">
             Explore mysterious mountains
