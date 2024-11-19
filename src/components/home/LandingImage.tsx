@@ -1,7 +1,11 @@
+import { useState } from "react";
+import Skeleton from "../Skeleton";
+
 export default function LandingImage() {
+  const [isLoading, setIsLoading] = useState(true);
+
   return (
     <div className="relative z-10 hidden w-full max-w-7xl overflow-hidden sm:block">
-      {/* Embed the SVG shape as clip-path */}
       <svg width="0" height="0" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <clipPath id="clip-path-id" clipPathUnits="objectBoundingBox">
@@ -10,12 +14,20 @@ export default function LandingImage() {
         </defs>
       </svg>
 
-      {/* Apply the clip path to the image */}
+      {isLoading && (
+        <Skeleton
+          className="absolute inset-0"
+          style={{ clipPath: "url(#clip-path-id)" }}
+        />
+      )}
+
       <img
         src="/img_for_shape.webp"
         alt="Image with Shape"
         className="h-full w-full object-cover"
         style={{ clipPath: "url(#clip-path-id)" }}
+        onLoad={() => setIsLoading(false)}
+        onError={() => setIsLoading(false)}
       />
     </div>
   );
