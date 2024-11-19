@@ -1,5 +1,14 @@
 import { Venue } from "@/lib/types";
 
+export const CONTINENT_FILTERS = [
+  "africa",
+  "asia",
+  "europe",
+  "north-america",
+  "oceania",
+  "south-america",
+] as const;
+
 export type Continent =
   | "africa"
   | "asia"

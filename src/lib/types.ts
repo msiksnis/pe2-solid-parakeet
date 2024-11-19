@@ -1,5 +1,3 @@
-import { FILTER_OPTIONS } from "./filterVenues";
-
 export interface MediaObject {
   url: string;
   alt: string;
@@ -84,5 +82,3 @@ export interface AllVenuesProps {
   data: Venue[];
   nextPage?: number | null;
 }
-
-export type FilterOption = (typeof FILTER_OPTIONS)[number];

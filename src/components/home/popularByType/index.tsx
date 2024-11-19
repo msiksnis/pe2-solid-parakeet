@@ -1,30 +1,33 @@
-import { useCallback } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useCallback } from "react";
+import { ChevronRight } from "lucide-react";
 
-import { fetchVenues } from "../queries/fetchVenues";
-import { Venue } from "@/lib/types.ts";
+import ErrorLoadingButton from "@/components/ErrorLoadingButton";
+import MainLoader from "@/components/MainLoader";
+import TabsBar from "@/components/TabsBar";
+import { Button } from "@/components/ui/button";
 import VenueCardSM from "@/components/VenueCardSM";
 import { Route } from "@/routes";
-import { FilterOption } from "../../../lib/types";
-import { filterVenuesByType } from "@/lib/filterVenues";
-import TabsBar from "@/components/TabsBar";
-import { useScreenSizes } from "@/lib/utils";
-import MainLoader from "@/components/MainLoader";
-import { Button } from "@/components/ui/button";
-import { ChevronRight } from "lucide-react";
+import {
+  FOR_TABS_FILTERS,
+  ForTabs,
+  VALID_FILTERS,
+} from "./filterVenuesForTabs";
+import { useFilteredVenuesForTabs } from "./useFilteredVenuesForTabs";
 
 export default function PopularByType() {
   const navigate = useNavigate({ from: Route.fullPath });
   const { filter } = Route.useSearch();
-  const filterValue = filter ?? null;
 
-  const { isMobile, isMedium, isExtraLarge } = useScreenSizes();
-  const sliceCount = isMobile ? 8 : isMedium ? 9 : isExtraLarge ? 12 : 12;
+  const filterValue = VALID_FILTERS.includes(filter as ForTabs | "all")
+    ? (filter as ForTabs | "all")
+    : "all";
 
-  // Handles filter change, uses null for "All Venues"
+  const { filteredVenues, isLoading, isError, error, refetch } =
+    useFilteredVenuesForTabs(filterValue);
+
   const handleFilterChange = useCallback(
-    (newFilter: FilterOption | null) => {
+    (newFilter: FOR_TABS_FILTERS | null) => {
       navigate({
         search: (prev) => {
           const updatedSearch = { ...prev };
@@ -43,45 +46,32 @@ export default function PopularByType() {
     [navigate],
   );
 
-  const {
-    data: venues = [],
-    isError,
-    isFetching,
-  } = useQuery<Venue[]>({
-    queryKey: ["venues"],
-    queryFn: () => fetchVenues(),
-    staleTime: 1000 * 60 * 5,
-  });
+  const noVenueMessage =
+    filterValue === "all"
+      ? "Check back soon for new venues!"
+      : "No venues found. Check back soon!";
 
-  if (isError) return <p>Something went wrong...</p>;
+  const errorMessage = isError
+    ? `Error loading venues: ${error?.message}`
+    : "An unexpected error occurred while loading the venues.";
 
-  const filteredVenues = filterVenuesByType(filterValue, venues);
-
-  const sortedVenues = [...filteredVenues]
-    .filter((venue) => venue.rating >= 0)
-    .sort((a, b) => {
-      if (a.location.city && !b.location.city) return -1;
-      if (!a.location.city && b.location.city) return 1;
-
-      return b.created?.localeCompare(a.created || "") || 0;
-    })
-    .slice(0, sliceCount);
+  if (isError) {
+    return <ErrorLoadingButton errorMessage={errorMessage} onRetry={refetch} />;
+  }
 
   return (
     <div>
-      <TabsBar
-        filter={filter || null}
-        handleFilterChange={handleFilterChange}
-      />
-      {isFetching ? (
+      <TabsBar filter={filterValue} handleFilterChange={handleFilterChange} />
+      {isLoading && !filteredVenues.length ? (
         <MainLoader className="mt-24" />
       ) : (
         <>
-          <VenueCardSM
-            key={filter || "all"}
-            venues={sortedVenues}
-            currentFilter={filter || "all"}
-          />
+          <VenueCardSM venues={filteredVenues} currentFilter={filterValue} />
+          {!filteredVenues.length && (
+            <span className="mb-10 mt-4 flex justify-center text-2xl">
+              {noVenueMessage}
+            </span>
+          )}
           <Link
             to={"/all-venues"}
             className="mb-8 mr-2 flex items-center justify-end hover:motion-translate-x-out-[5px]"

@@ -1,5 +1,10 @@
 import { Venue } from "@/lib/types";
 
+export const FOR_GROUPS_FILTERS = [
+  "summer-escape",
+  "explore-mountains",
+] as const;
+
 export type ForGroups = "summer-escape" | "explore-mountains";
 
 interface ForGroupsConfig {

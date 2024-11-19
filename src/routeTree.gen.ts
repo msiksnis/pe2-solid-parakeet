@@ -11,12 +11,6 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as VenuesSouthAmericaImport } from './routes/venues-south-america'
-import { Route as VenuesNorthAmericaImport } from './routes/venues-north-america'
-import { Route as VenuesEuropeImport } from './routes/venues-europe'
-import { Route as VenuesAustraliaImport } from './routes/venues-australia'
-import { Route as VenuesAsiaImport } from './routes/venues-asia'
-import { Route as VenuesAfricaImport } from './routes/venues-africa'
 import { Route as ForGroupsImport } from './routes/for-groups'
 import { Route as FavoritesImport } from './routes/favorites'
 import { Route as ExploreVenuesImport } from './routes/explore-venues'
@@ -32,42 +26,6 @@ import { Route as AuthenticatedManageVenuesIndexImport } from './routes/_authent
 import { Route as AuthenticatedManageVenuesHostVenueIdImport } from './routes/_authenticated/manage-venues/host-venue/$id'
 
 // Create/Update Routes
-
-const VenuesSouthAmericaRoute = VenuesSouthAmericaImport.update({
-  id: '/venues-south-america',
-  path: '/venues-south-america',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const VenuesNorthAmericaRoute = VenuesNorthAmericaImport.update({
-  id: '/venues-north-america',
-  path: '/venues-north-america',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const VenuesEuropeRoute = VenuesEuropeImport.update({
-  id: '/venues-europe',
-  path: '/venues-europe',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const VenuesAustraliaRoute = VenuesAustraliaImport.update({
-  id: '/venues-australia',
-  path: '/venues-australia',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const VenuesAsiaRoute = VenuesAsiaImport.update({
-  id: '/venues-asia',
-  path: '/venues-asia',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const VenuesAfricaRoute = VenuesAfricaImport.update({
-  id: '/venues-africa',
-  path: '/venues-africa',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const ForGroupsRoute = ForGroupsImport.update({
   id: '/for-groups',
@@ -208,48 +166,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForGroupsImport
       parentRoute: typeof rootRoute
     }
-    '/venues-africa': {
-      id: '/venues-africa'
-      path: '/venues-africa'
-      fullPath: '/venues-africa'
-      preLoaderRoute: typeof VenuesAfricaImport
-      parentRoute: typeof rootRoute
-    }
-    '/venues-asia': {
-      id: '/venues-asia'
-      path: '/venues-asia'
-      fullPath: '/venues-asia'
-      preLoaderRoute: typeof VenuesAsiaImport
-      parentRoute: typeof rootRoute
-    }
-    '/venues-australia': {
-      id: '/venues-australia'
-      path: '/venues-australia'
-      fullPath: '/venues-australia'
-      preLoaderRoute: typeof VenuesAustraliaImport
-      parentRoute: typeof rootRoute
-    }
-    '/venues-europe': {
-      id: '/venues-europe'
-      path: '/venues-europe'
-      fullPath: '/venues-europe'
-      preLoaderRoute: typeof VenuesEuropeImport
-      parentRoute: typeof rootRoute
-    }
-    '/venues-north-america': {
-      id: '/venues-north-america'
-      path: '/venues-north-america'
-      fullPath: '/venues-north-america'
-      preLoaderRoute: typeof VenuesNorthAmericaImport
-      parentRoute: typeof rootRoute
-    }
-    '/venues-south-america': {
-      id: '/venues-south-america'
-      path: '/venues-south-america'
-      fullPath: '/venues-south-america'
-      preLoaderRoute: typeof VenuesSouthAmericaImport
-      parentRoute: typeof rootRoute
-    }
     '/manage-reservations/$id': {
       id: '/manage-reservations/$id'
       path: '/manage-reservations/$id'
@@ -314,12 +230,6 @@ export interface FileRoutesByFullPath {
   '/explore-venues': typeof ExploreVenuesRoute
   '/favorites': typeof FavoritesRoute
   '/for-groups': typeof ForGroupsRoute
-  '/venues-africa': typeof VenuesAfricaRoute
-  '/venues-asia': typeof VenuesAsiaRoute
-  '/venues-australia': typeof VenuesAustraliaRoute
-  '/venues-europe': typeof VenuesEuropeRoute
-  '/venues-north-america': typeof VenuesNorthAmericaRoute
-  '/venues-south-america': typeof VenuesSouthAmericaRoute
   '/manage-reservations/$id': typeof ManageReservationsIdRoute
   '/venue/$id': typeof VenueIdRoute
   '/manage-reservations': typeof ManageReservationsIndexRoute
@@ -336,12 +246,6 @@ export interface FileRoutesByTo {
   '/explore-venues': typeof ExploreVenuesRoute
   '/favorites': typeof FavoritesRoute
   '/for-groups': typeof ForGroupsRoute
-  '/venues-africa': typeof VenuesAfricaRoute
-  '/venues-asia': typeof VenuesAsiaRoute
-  '/venues-australia': typeof VenuesAustraliaRoute
-  '/venues-europe': typeof VenuesEuropeRoute
-  '/venues-north-america': typeof VenuesNorthAmericaRoute
-  '/venues-south-america': typeof VenuesSouthAmericaRoute
   '/manage-reservations/$id': typeof ManageReservationsIdRoute
   '/venue/$id': typeof VenueIdRoute
   '/manage-reservations': typeof ManageReservationsIndexRoute
@@ -359,12 +263,6 @@ export interface FileRoutesById {
   '/explore-venues': typeof ExploreVenuesRoute
   '/favorites': typeof FavoritesRoute
   '/for-groups': typeof ForGroupsRoute
-  '/venues-africa': typeof VenuesAfricaRoute
-  '/venues-asia': typeof VenuesAsiaRoute
-  '/venues-australia': typeof VenuesAustraliaRoute
-  '/venues-europe': typeof VenuesEuropeRoute
-  '/venues-north-america': typeof VenuesNorthAmericaRoute
-  '/venues-south-america': typeof VenuesSouthAmericaRoute
   '/manage-reservations/$id': typeof ManageReservationsIdRoute
   '/venue/$id': typeof VenueIdRoute
   '/manage-reservations/': typeof ManageReservationsIndexRoute
@@ -383,12 +281,6 @@ export interface FileRouteTypes {
     | '/explore-venues'
     | '/favorites'
     | '/for-groups'
-    | '/venues-africa'
-    | '/venues-asia'
-    | '/venues-australia'
-    | '/venues-europe'
-    | '/venues-north-america'
-    | '/venues-south-america'
     | '/manage-reservations/$id'
     | '/venue/$id'
     | '/manage-reservations'
@@ -404,12 +296,6 @@ export interface FileRouteTypes {
     | '/explore-venues'
     | '/favorites'
     | '/for-groups'
-    | '/venues-africa'
-    | '/venues-asia'
-    | '/venues-australia'
-    | '/venues-europe'
-    | '/venues-north-america'
-    | '/venues-south-america'
     | '/manage-reservations/$id'
     | '/venue/$id'
     | '/manage-reservations'
@@ -425,12 +311,6 @@ export interface FileRouteTypes {
     | '/explore-venues'
     | '/favorites'
     | '/for-groups'
-    | '/venues-africa'
-    | '/venues-asia'
-    | '/venues-australia'
-    | '/venues-europe'
-    | '/venues-north-america'
-    | '/venues-south-america'
     | '/manage-reservations/$id'
     | '/venue/$id'
     | '/manage-reservations/'
@@ -448,12 +328,6 @@ export interface RootRouteChildren {
   ExploreVenuesRoute: typeof ExploreVenuesRoute
   FavoritesRoute: typeof FavoritesRoute
   ForGroupsRoute: typeof ForGroupsRoute
-  VenuesAfricaRoute: typeof VenuesAfricaRoute
-  VenuesAsiaRoute: typeof VenuesAsiaRoute
-  VenuesAustraliaRoute: typeof VenuesAustraliaRoute
-  VenuesEuropeRoute: typeof VenuesEuropeRoute
-  VenuesNorthAmericaRoute: typeof VenuesNorthAmericaRoute
-  VenuesSouthAmericaRoute: typeof VenuesSouthAmericaRoute
   ManageReservationsIdRoute: typeof ManageReservationsIdRoute
   VenueIdRoute: typeof VenueIdRoute
   ManageReservationsIndexRoute: typeof ManageReservationsIndexRoute
@@ -468,12 +342,6 @@ const rootRouteChildren: RootRouteChildren = {
   ExploreVenuesRoute: ExploreVenuesRoute,
   FavoritesRoute: FavoritesRoute,
   ForGroupsRoute: ForGroupsRoute,
-  VenuesAfricaRoute: VenuesAfricaRoute,
-  VenuesAsiaRoute: VenuesAsiaRoute,
-  VenuesAustraliaRoute: VenuesAustraliaRoute,
-  VenuesEuropeRoute: VenuesEuropeRoute,
-  VenuesNorthAmericaRoute: VenuesNorthAmericaRoute,
-  VenuesSouthAmericaRoute: VenuesSouthAmericaRoute,
   ManageReservationsIdRoute: ManageReservationsIdRoute,
   VenueIdRoute: VenueIdRoute,
   ManageReservationsIndexRoute: ManageReservationsIndexRoute,
@@ -499,12 +367,6 @@ export const routeTree = rootRoute
         "/explore-venues",
         "/favorites",
         "/for-groups",
-        "/venues-africa",
-        "/venues-asia",
-        "/venues-australia",
-        "/venues-europe",
-        "/venues-north-america",
-        "/venues-south-america",
         "/manage-reservations/$id",
         "/venue/$id",
         "/manage-reservations/"
@@ -537,24 +399,6 @@ export const routeTree = rootRoute
     },
     "/for-groups": {
       "filePath": "for-groups.tsx"
-    },
-    "/venues-africa": {
-      "filePath": "venues-africa.tsx"
-    },
-    "/venues-asia": {
-      "filePath": "venues-asia.tsx"
-    },
-    "/venues-australia": {
-      "filePath": "venues-australia.tsx"
-    },
-    "/venues-europe": {
-      "filePath": "venues-europe.tsx"
-    },
-    "/venues-north-america": {
-      "filePath": "venues-north-america.tsx"
-    },
-    "/venues-south-america": {
-      "filePath": "venues-south-america.tsx"
     },
     "/manage-reservations/$id": {
       "filePath": "manage-reservations/$id.tsx"

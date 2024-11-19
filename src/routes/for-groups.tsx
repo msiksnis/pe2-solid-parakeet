@@ -2,10 +2,10 @@ import { z } from "zod";
 import { createFileRoute } from "@tanstack/react-router";
 
 import ForGroups from "@/components/home/forGroups";
-import { FILTER_OPTIONS } from "@/lib/filterVenues";
+import { FOR_GROUPS_FILTERS } from "@/components/home/forGroups/filterVenuesForGroups";
 
 const forGroupsFilterSchema = z.object({
-  filter: z.enum(FILTER_OPTIONS).optional(),
+  filter: z.enum(FOR_GROUPS_FILTERS).optional(),
 });
 
 export const Route = createFileRoute("/for-groups")({

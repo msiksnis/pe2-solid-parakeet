@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { FilterOption } from "@/lib/types";
+import { FOR_TABS_FILTERS } from "./home/popularByType/filterVenuesForTabs";
 
-const TABS: { name: string; value: FilterOption | null }[] = [
+const TABS: { name: string; value: FOR_TABS_FILTERS | null }[] = [
   { name: "All Venues", value: null },
   { name: "Cabins", value: "cabins" },
   { name: "Sunny Beaches", value: "sunny-beaches" },
@@ -9,8 +9,8 @@ const TABS: { name: string; value: FilterOption | null }[] = [
 ];
 
 interface TabsBarProps {
-  filter: string | null;
-  handleFilterChange: (newFilter: FilterOption | null) => void;
+  filter: FOR_TABS_FILTERS | "all" | null;
+  handleFilterChange: (newFilter: FOR_TABS_FILTERS | null) => void;
 }
 
 export default function TabsBar({ filter, handleFilterChange }: TabsBarProps) {
@@ -29,7 +29,7 @@ export default function TabsBar({ filter, handleFilterChange }: TabsBarProps) {
     } else {
       setActiveTab(TABS[0].name); // Default to "All Venues"
     }
-  }, [filter]);
+  }, [filter, TABS]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -52,7 +52,11 @@ export default function TabsBar({ filter, handleFilterChange }: TabsBarProps) {
 
   return (
     <div className="sticky top-4 z-50 mx-auto mt-14 hidden w-fit items-center gap-x-2 rounded-full bg-gradient-to-tr from-[#E9E9E9] to-[#F2EDE9] px-2 py-1.5 shadow-sm sm:flex md:gap-x-4 lg:gap-x-6 xl:gap-x-12">
-      <div className="relative flex flex-col">
+      <div
+        className="relative flex flex-col"
+        role="tablist"
+        aria-label="Venue Filters"
+      >
         <ul className="flex w-full justify-center gap-x-2 md:gap-x-4 lg:gap-x-6 xl:gap-x-12">
           {TABS.map((tab) => (
             <li key={tab.name}>
