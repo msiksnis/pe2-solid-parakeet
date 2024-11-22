@@ -11,6 +11,7 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as SearchImport } from './routes/search'
 import { Route as ForGroupsImport } from './routes/for-groups'
 import { Route as FavoritesImport } from './routes/favorites'
 import { Route as ExploreVenuesImport } from './routes/explore-venues'
@@ -26,6 +27,12 @@ import { Route as AuthenticatedManageVenuesIndexImport } from './routes/_authent
 import { Route as AuthenticatedManageVenuesHostVenueIdImport } from './routes/_authenticated/manage-venues/host-venue/$id'
 
 // Create/Update Routes
+
+const SearchRoute = SearchImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const ForGroupsRoute = ForGroupsImport.update({
   id: '/for-groups',
@@ -166,6 +173,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForGroupsImport
       parentRoute: typeof rootRoute
     }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchImport
+      parentRoute: typeof rootRoute
+    }
     '/manage-reservations/$id': {
       id: '/manage-reservations/$id'
       path: '/manage-reservations/$id'
@@ -230,6 +244,7 @@ export interface FileRoutesByFullPath {
   '/explore-venues': typeof ExploreVenuesRoute
   '/favorites': typeof FavoritesRoute
   '/for-groups': typeof ForGroupsRoute
+  '/search': typeof SearchRoute
   '/manage-reservations/$id': typeof ManageReservationsIdRoute
   '/venue/$id': typeof VenueIdRoute
   '/manage-reservations': typeof ManageReservationsIndexRoute
@@ -246,6 +261,7 @@ export interface FileRoutesByTo {
   '/explore-venues': typeof ExploreVenuesRoute
   '/favorites': typeof FavoritesRoute
   '/for-groups': typeof ForGroupsRoute
+  '/search': typeof SearchRoute
   '/manage-reservations/$id': typeof ManageReservationsIdRoute
   '/venue/$id': typeof VenueIdRoute
   '/manage-reservations': typeof ManageReservationsIndexRoute
@@ -263,6 +279,7 @@ export interface FileRoutesById {
   '/explore-venues': typeof ExploreVenuesRoute
   '/favorites': typeof FavoritesRoute
   '/for-groups': typeof ForGroupsRoute
+  '/search': typeof SearchRoute
   '/manage-reservations/$id': typeof ManageReservationsIdRoute
   '/venue/$id': typeof VenueIdRoute
   '/manage-reservations/': typeof ManageReservationsIndexRoute
@@ -281,6 +298,7 @@ export interface FileRouteTypes {
     | '/explore-venues'
     | '/favorites'
     | '/for-groups'
+    | '/search'
     | '/manage-reservations/$id'
     | '/venue/$id'
     | '/manage-reservations'
@@ -296,6 +314,7 @@ export interface FileRouteTypes {
     | '/explore-venues'
     | '/favorites'
     | '/for-groups'
+    | '/search'
     | '/manage-reservations/$id'
     | '/venue/$id'
     | '/manage-reservations'
@@ -311,6 +330,7 @@ export interface FileRouteTypes {
     | '/explore-venues'
     | '/favorites'
     | '/for-groups'
+    | '/search'
     | '/manage-reservations/$id'
     | '/venue/$id'
     | '/manage-reservations/'
@@ -328,6 +348,7 @@ export interface RootRouteChildren {
   ExploreVenuesRoute: typeof ExploreVenuesRoute
   FavoritesRoute: typeof FavoritesRoute
   ForGroupsRoute: typeof ForGroupsRoute
+  SearchRoute: typeof SearchRoute
   ManageReservationsIdRoute: typeof ManageReservationsIdRoute
   VenueIdRoute: typeof VenueIdRoute
   ManageReservationsIndexRoute: typeof ManageReservationsIndexRoute
@@ -342,6 +363,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExploreVenuesRoute: ExploreVenuesRoute,
   FavoritesRoute: FavoritesRoute,
   ForGroupsRoute: ForGroupsRoute,
+  SearchRoute: SearchRoute,
   ManageReservationsIdRoute: ManageReservationsIdRoute,
   VenueIdRoute: VenueIdRoute,
   ManageReservationsIndexRoute: ManageReservationsIndexRoute,
@@ -367,6 +389,7 @@ export const routeTree = rootRoute
         "/explore-venues",
         "/favorites",
         "/for-groups",
+        "/search",
         "/manage-reservations/$id",
         "/venue/$id",
         "/manage-reservations/"
@@ -399,6 +422,9 @@ export const routeTree = rootRoute
     },
     "/for-groups": {
       "filePath": "for-groups.tsx"
+    },
+    "/search": {
+      "filePath": "search.tsx"
     },
     "/manage-reservations/$id": {
       "filePath": "manage-reservations/$id.tsx"

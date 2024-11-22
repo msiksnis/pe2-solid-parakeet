@@ -1,10 +1,11 @@
-"use client";
-
-import { cn } from "@/lib/utils";
-import { Button } from "./ui/button";
-import { useState } from "react";
+import { useLocation, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { Search } from "lucide-react";
+import { useEffect, useState } from "react";
+
+import { cn } from "@/lib/utils.ts";
+import { Route } from "@/routes/search.tsx";
+import { Search, X } from "lucide-react";
+import { Button } from "../ui/button.tsx";
 
 export default function SearchBar() {
   const [isVenueFocused, setIsVenueFocused] = useState(false);
@@ -12,11 +13,15 @@ export default function SearchBar() {
   const [venueValue, setVenueValue] = useState("");
   const [cityValue, setCityValue] = useState("");
 
+  const navigate = useNavigate({ from: Route.fullPath });
+
+  const location = useLocation();
+
   const labelVariants = {
     initial: {
       top: "1.1rem",
       fontSize: "1.125rem",
-      color: "#222832",
+      color: "#676A6E",
     },
     floating: {
       top: "0.4rem",
@@ -24,6 +29,41 @@ export default function SearchBar() {
       color: "#6B7280",
     },
   };
+
+  const handleSearch = () => {
+    const searchParams: Record<string, string> = {};
+
+    if (venueValue.trim() !== "") {
+      searchParams.q = venueValue.trim();
+    }
+
+    if (cityValue.trim() !== "") {
+      searchParams.city = cityValue.trim();
+    }
+
+    navigate({
+      to: "/search",
+      search: {
+        q: venueValue.trim() || undefined,
+        city: cityValue.trim() || undefined,
+      },
+      replace: true,
+      resetScroll: false,
+    });
+  };
+
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      handleSearch();
+    }
+  };
+
+  useEffect(() => {
+    if (location.pathname !== "/search") {
+      setVenueValue("");
+      setCityValue("");
+    }
+  }, [location.pathname]);
 
   return (
     <div
@@ -53,7 +93,18 @@ export default function SearchBar() {
             onChange={(e) => setVenueValue(e.target.value)}
             onFocus={() => setIsVenueFocused(true)}
             onBlur={() => setIsVenueFocused(false)}
+            onKeyDown={handleKeyPress}
             className="h-full w-full border-transparent pt-4 text-lg capitalize focus:outline-none"
+            placeholder=" "
+          />
+          <X
+            className={cn(
+              "mr-2 mt-4 size-7 cursor-pointer bg-card p-0.5 opacity-0 transition-opacity",
+              {
+                "opacity-100": venueValue,
+              },
+            )}
+            onClick={() => setVenueValue("")}
           />
         </div>
         {/* City Search Input */}
@@ -75,16 +126,29 @@ export default function SearchBar() {
             onChange={(e) => setCityValue(e.target.value)}
             onFocus={() => setIsCityFocused(true)}
             onBlur={() => setIsCityFocused(false)}
+            onKeyDown={handleKeyPress}
             className="h-full w-full border-transparent pt-4 text-lg capitalize focus:outline-none"
+            placeholder=" "
+          />
+          <X
+            className={cn(
+              "mr-2 mt-4 size-7 cursor-pointer bg-card p-0.5 opacity-0 transition-opacity",
+              {
+                "opacity-100": cityValue,
+              },
+            )}
+            onClick={() => setCityValue("")}
           />
         </div>
         {/* Search Button */}
         <div className="col-span-2 flex items-center">
           <Button
             variant={"gooeyRight"}
-            className="h-full w-full rounded-e-full bg-card from-amber-400 to-amber-500 px-4 text-[#222832] md:text-lg"
+            onClick={handleSearch}
+            disabled={venueValue.trim() === "" && cityValue.trim() === ""}
+            className="h-full w-full overflow-hidden rounded-e-full bg-card from-amber-400 to-amber-500 px-4 text-[#222832] before:duration-500 disabled:opacity-80 disabled:before:opacity-0 md:text-lg"
           >
-            <span className="hidden sm:flex">
+            <span className="hidden opacity-95 sm:flex">
               <Search className="mr-2 mt-0.5 size-[1.325rem] text-[#222832]" />
               Search
             </span>

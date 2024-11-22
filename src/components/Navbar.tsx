@@ -4,7 +4,7 @@ import { useSignInModalStore } from "@/hooks/useSignInModalStore";
 import { Link, useLocation } from "@tanstack/react-router";
 import { Button } from "./ui/button";
 import UserButton from "./UserButton";
-import SearchBar from "./SearchBar";
+import SearchBar from "./search/SearchBar.tsx";
 import { cn } from "@/lib/utils";
 
 export default function Navbar() {

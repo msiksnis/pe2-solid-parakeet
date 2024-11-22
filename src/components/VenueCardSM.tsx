@@ -30,7 +30,7 @@ export default function VenueCardSM({ venues, currentFilter }: VenueCardProps) {
             to={`/venue/${venue.id}`}
             search={{
               guests: 1,
-              // ? Uncomment the following lines to pass the start_date and end_date to the venue page
+              //  Uncomment the following lines to pass the start_date and end_date to the venue page
               // start_date: format(new Date(), "yyyy-MM-dd"),
               // end_date: format(new Date(), "yyyy-MM-dd"),
             }}
