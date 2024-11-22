@@ -3,12 +3,12 @@ import { Venue } from "@/lib/types";
 
 interface FetchVenuesParams {
   q?: string;
-  city?: string;
+  destination?: string;
 }
 
 export const fetchVenues = async ({
   q,
-  city,
+  destination,
 }: FetchVenuesParams): Promise<Venue[]> => {
   try {
     let data: Venue[] = [];
@@ -19,14 +19,18 @@ export const fetchVenues = async ({
       });
       data = response.data.data;
     } else {
-      // Fetch limited venues when only city is specified
       const response = await axiosInstance.get("/venues?sort=created");
       data = response.data.data;
     }
 
-    if (city) {
+    if (destination) {
       data = data.filter(
-        (venue) => venue.location?.city?.toLowerCase() === city.toLowerCase(),
+        (venue) =>
+          venue.location?.city?.toLowerCase() === destination.toLowerCase() ||
+          venue.location?.country?.toLowerCase() ===
+            destination.toLowerCase() ||
+          venue.location?.continent?.toLowerCase() ===
+            destination.toLowerCase(),
       );
     }
 

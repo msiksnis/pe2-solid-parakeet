@@ -7,7 +7,7 @@ import { fetchVenues } from "./queries/fetchVenuesForSearch";
 import MainLoader from "../MainLoader";
 
 export default function SearchPage() {
-  const { q, city } = Route.useSearch();
+  const { q, destination } = Route.useSearch();
 
   const {
     data: venues = [],
@@ -16,8 +16,8 @@ export default function SearchPage() {
     error,
     refetch,
   } = useQuery<Venue[], Error>({
-    queryKey: ["venues", { q, city }],
-    queryFn: () => fetchVenues({ q, city }),
+    queryKey: ["venues", { q, destination }],
+    queryFn: () => fetchVenues({ q, destination }),
     retry: 1,
   });
 

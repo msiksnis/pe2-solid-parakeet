@@ -4,7 +4,7 @@ import SearchPage from "@/components/search";
 
 const validateSearch = z.object({
   q: z.string().optional(),
-  city: z.string().optional(),
+  destination: z.string().optional(),
 });
 
 export const Route = createFileRoute("/search")({

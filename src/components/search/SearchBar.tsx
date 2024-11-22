@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
-import { cn } from "@/lib/utils.ts";
+import { cn, useScreenSizes } from "@/lib/utils.ts";
 import { Route } from "@/routes/search.tsx";
 import { Search, X } from "lucide-react";
 import { Button } from "../ui/button.tsx";
@@ -17,10 +17,15 @@ export default function SearchBar() {
 
   const location = useLocation();
 
+  const { isMobile } = useScreenSizes();
+
+  const labelSize = isMobile ? "1rem" : "1.125rem";
+  const labelTop = isMobile ? "1.3rem" : "1.1rem";
+
   const labelVariants = {
     initial: {
-      top: "1.1rem",
-      fontSize: "1.125rem",
+      top: labelTop,
+      fontSize: labelSize,
       color: "#676A6E",
     },
     floating: {
@@ -45,7 +50,7 @@ export default function SearchBar() {
       to: "/search",
       search: {
         q: venueValue.trim() || undefined,
-        city: cityValue.trim() || undefined,
+        destination: cityValue.trim() || undefined,
       },
       replace: true,
       resetScroll: false,
@@ -71,12 +76,12 @@ export default function SearchBar() {
         "shadow-search lg:shadow-custom flex h-16 w-full max-w-7xl justify-center rounded-full bg-card",
       )}
     >
-      <div className="grid h-full w-full grid-cols-10 divide-x divide-primary/20">
+      <div className="grid h-full w-full grid-cols-12 divide-x divide-primary/20 md:grid-cols-10">
         {/* Venue Search Input */}
-        <div className="relative col-span-4 flex items-center py-2 pl-6 md:text-lg">
+        <div className="relative col-span-5 flex items-center py-2 pl-6 md:col-span-4 md:text-lg">
           <motion.label
             htmlFor="search-venue"
-            className="pointer-events-none absolute left-6"
+            className="pointer-events-none absolute left-6 md:left-6"
             variants={labelVariants}
             initial="initial"
             animate={
@@ -84,7 +89,7 @@ export default function SearchBar() {
             }
             transition={{ duration: 0.2, ease: "easeOut" }}
           >
-            <span className="sm:hidden">Search Venue</span>
+            <span className="sm:hidden">Search venue</span>
             <span className="hidden sm:block">Search by venue</span>
           </motion.label>
           <input
@@ -107,18 +112,18 @@ export default function SearchBar() {
             onClick={() => setVenueValue("")}
           />
         </div>
-        {/* City Search Input */}
-        <div className="relative col-span-4 flex items-center py-2 pl-6 md:text-lg">
+        {/* Destination Search Input */}
+        <div className="relative col-span-5 flex items-center py-2 pl-4 md:col-span-4 md:pl-6 md:text-lg">
           <motion.label
             htmlFor="search-city"
-            className="pointer-events-none absolute left-6"
+            className="pointer-events-none absolute md:left-6"
             variants={labelVariants}
             initial="initial"
             animate={isCityFocused || cityValue !== "" ? "floating" : "initial"}
             transition={{ duration: 0.2, ease: "easeOut" }}
           >
-            <span className="sm:hidden">Search City</span>
-            <span className="hidden sm:block">Search by city</span>
+            <span className="sm:hidden">Search destination</span>
+            <span className="hidden sm:block">Search destination</span>
           </motion.label>
           <input
             id="search-city"
@@ -153,7 +158,7 @@ export default function SearchBar() {
               Search
             </span>
             <span className="sm:hidden">
-              <Search className="text-[#222832]" />
+              <Search className="size-5 text-[#222832] md:size-6" />
             </span>
           </Button>
         </div>
