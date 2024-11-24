@@ -12,7 +12,6 @@ const VALID_FILTERS: (Continent | "all")[] = [
   "north-america",
   "south-america",
   "oceania",
-  "australia",
   "all",
 ];
 
