@@ -1,8 +1,8 @@
-import { useAuthStatus } from "@/hooks/useAuthStatus";
-import { useSignInModalStore } from "@/hooks/useSignInModalStore";
-import { Venue } from "@/lib/types";
-import { calculateTotalPrice, cn, useScreenSizes } from "@/lib/utils";
-import { Route } from "@/routes/venue/$id";
+import { useAuthStatus } from "@/hooks/useAuthStatus.ts";
+import { useSignInModalStore } from "@/hooks/useSignInModalStore.ts";
+import { Venue } from "@/lib/types.ts";
+import { calculateTotalPrice, cn, useScreenSizes } from "@/lib/utils.ts";
+import { Route } from "@/routes/venue/$id.tsx";
 import { useNavigate } from "@tanstack/react-router";
 import {
   addDays,
@@ -17,12 +17,12 @@ import { motion } from "framer-motion";
 import { CalendarDays, ChevronDown, Minus, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Button } from "../ui/button";
-import { Calendar } from "../ui/calendar";
-import { Separator } from "../ui/separator";
-import { Booking } from "./BookingValidation";
-import { calculateSingleDayGaps } from "./utils/utils";
-import { useDateRangeSelection } from "@/hooks/useDateRangeSelection";
+import { Button } from "../../ui/button.tsx";
+import { Calendar } from "../../ui/calendar.tsx";
+import { Separator } from "../../ui/separator.tsx";
+import { Booking } from "../utils/BookingValidation.ts";
+import { calculateSingleDayGaps } from "../utils/utils.ts";
+import { useDateRangeSelection } from "@/hooks/useDateRangeSelection.ts";
 
 interface BookingDetailsProps {
   onReserve: (data: Booking) => void;

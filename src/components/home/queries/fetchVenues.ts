@@ -3,7 +3,9 @@ import { Venue } from "@/lib/types";
 
 export const fetchVenues = async (): Promise<Venue[]> => {
   try {
-    const { data } = await axiosInstance.get("/venues");
+    const { data } = await axiosInstance.get(
+      "/venues?sort=created&sortOrder=desc",
+    );
     return data.data;
   } catch (error: any) {
     if (error.code === "ECONNABORTED") {

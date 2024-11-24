@@ -15,8 +15,7 @@ export type Continent =
   | "europe"
   | "north-america"
   | "south-america"
-  | "oceania"
-  | "australia";
+  | "oceania";
 
 interface ContinentConfig {
   displayName: string;
@@ -47,10 +46,6 @@ export const CONTINENT_CONFIG: Record<Continent, ContinentConfig> = {
   oceania: {
     displayName: "Oceania",
     continents: ["Oceania", "Australia"],
-  },
-  australia: {
-    displayName: "Australia",
-    continents: ["Australia"],
   },
 };
 

@@ -1,4 +1,3 @@
-import { useRef, useCallback, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import {
@@ -6,39 +5,39 @@ import {
   ChevronRight,
   CircleParking,
   HeartIcon,
-  ImagesIcon,
   ShareIcon,
   User,
   Utensils,
   Wifi,
 } from "lucide-react";
+import { useRef, useState } from "react";
 import { titleCase } from "title-case";
-
-import LightGallery from "lightgallery/react";
-import "lightgallery/css/lightgallery.css";
+import { LightGallery as LightGalleryProps } from "lightgallery/lightgallery";
 
 import { Venue } from "@/lib/types";
 import { cn, useScreenSizes } from "@/lib/utils";
+import DescriptionModal from "../DescriptionModal";
 import ErrorLoadingButton from "../ErrorLoadingButton";
+import MainLoader from "../MainLoader";
 import RatingStars from "../RatingStars";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
-import BookingDetails from "./BookingDetails";
-import BookingDetailsMobile from "./BookingDetailsMobile";
-import { fetchVenueById } from "./queries/fetchVenueById";
-import DescriptionModal from "../DescriptionModal";
-import { Booking } from "./BookingValidation";
-import MainLoader from "../MainLoader";
+import BookingDetails from "./components/BookingDetails.tsx";
+import BookingDetailsMobile from "./components/BookingDetailsMobile.tsx";
+import { Booking } from "./utils/BookingValidation.ts";
+import Gallery from "./components/Gallery";
+import VenueImages from "./components/VenueImages";
 import { useCreateReservationMutation } from "./mutations/useCreateReservationMutation";
+import { fetchVenueById } from "./queries/fetchVenueById";
 
 export default function VenueById() {
   const { id } = useParams({ from: "/venue/$id" }) as { id: string };
   const navigate = useNavigate();
 
-  const [openDescriptionModal, sEtOpenDescriptionModal] = useState(false);
+  const [openDescriptionModal, setOpenDescriptionModal] = useState(false);
 
-  const galleryRef = useRef<any>(null);
+  const galleryRef = useRef<LightGalleryProps | null>(null);
 
   const { smCalendarContainer } = useScreenSizes();
 
@@ -67,15 +66,6 @@ export default function VenueById() {
     );
   };
 
-  const handleOpenGallery = useCallback(
-    (index: number) => {
-      if (galleryRef.current) {
-        galleryRef.current.openGallery(index);
-      }
-    },
-    [galleryRef],
-  );
-
   if (isLoading) return <MainLoader className="mt-60" />;
 
   const errorMessage =
@@ -88,20 +78,6 @@ export default function VenueById() {
   }
 
   if (!venue) return <p className="my-20">Venue not found.</p>;
-
-  const images = venue.media?.slice(0, 5) || [];
-  const totalImages = venue.media?.length || 0;
-
-  const gridClasses =
-    images.length === 1
-      ? "grid-cols-1 grid-rows-1"
-      : images.length === 2
-        ? "grid-cols-2 grid-rows-1"
-        : images.length >= 3 && images.length < 5
-          ? "grid-cols-3 grid-rows-2"
-          : "grid-cols-4 grid-rows-2";
-
-  const mobileImages = venue.media?.slice(0, 3) || [];
 
   return (
     <div className="mx-auto mt-4 max-w-7xl space-y-6 px-4 sm:px-6 md:px-10 xl:px-6">
@@ -134,60 +110,7 @@ export default function VenueById() {
       </div>
 
       {/* Image Gallery */}
-      <div className="relative w-full overflow-hidden md:aspect-[2/1] md:rounded-2xl">
-        <div className={`hidden md:grid ${gridClasses} h-full gap-2`}>
-          {images.map((media, index) => (
-            <img
-              key={media.url}
-              src={media.url}
-              alt={media.alt || "Venue image"}
-              className={`h-full w-full cursor-pointer object-cover ${
-                index === 0 && images.length >= 3 ? "col-span-2 row-span-2" : ""
-              }`}
-              onClick={() => handleOpenGallery(index)}
-            />
-          ))}
-        </div>
-        <div className="grid w-[calc(100vw)] grid-cols-2 grid-rows-2 gap-2 md:hidden">
-          {mobileImages.map((media, index) => {
-            const className = cn(
-              "w-full object-cover",
-              mobileImages.length === 1
-                ? "col-span-2 row-span-2"
-                : mobileImages.length === 2
-                  ? index === 0
-                    ? "col-span-2 row-start-1 aspect-[2/1]"
-                    : "col-span-2 row-start-2 aspect-[2/1]"
-                  : mobileImages.length === 3 && index === 0
-                    ? "col-span-2 row-start-1 aspect-[2/1]"
-                    : index === 1
-                      ? "col-span-1 row-start-2 aspect-square"
-                      : "col-span-1 col-start-2 row-start-2 aspect-square",
-            );
-
-            return (
-              <img
-                key={media.url}
-                src={media.url}
-                alt={media.alt || "Venue image"}
-                className={className}
-                onClick={() => handleOpenGallery(index)}
-              />
-            );
-          })}
-        </div>
-        {totalImages > 5 && (
-          <div className="absolute bottom-4 right-4">
-            <Button
-              onClick={() => handleOpenGallery(0)}
-              className="bg-primary/80 text-lg transition-all duration-300 hover:bg-primary/100"
-            >
-              <ImagesIcon className="mr-1 size-6" />
-              {`${totalImages} photos`}
-            </Button>
-          </div>
-        )}
-      </div>
+      <VenueImages venue={venue} galleryRef={galleryRef} />
 
       {/* Venue Details and Booking */}
       <div className="relative flex min-h-[600px] items-start justify-between px-0 pb-20 md:pb-32 xl:px-4">
@@ -207,7 +130,7 @@ export default function VenueById() {
             <Button
               variant={"linkHover1"}
               className="group/button px-0 after:w-full"
-              onClick={() => sEtOpenDescriptionModal(true)}
+              onClick={() => setOpenDescriptionModal(true)}
             >
               <span className="">Show more</span>
               <ChevronRight className="ml-1 size-4 transition-transform duration-300 group-hover/button:translate-x-1" />
@@ -215,7 +138,7 @@ export default function VenueById() {
             <DescriptionModal
               description={venue.description}
               isOpen={openDescriptionModal}
-              onClose={() => sEtOpenDescriptionModal(false)}
+              onClose={() => setOpenDescriptionModal(false)}
             />
           </div>
           <Separator />
@@ -298,22 +221,7 @@ export default function VenueById() {
         </div>
 
         {/* LightGallery */}
-        <LightGallery
-          onInit={(detail) => {
-            galleryRef.current = detail.instance;
-          }}
-          // plugins={[lgZoom]}
-          dynamic
-          dynamicEl={venue.media?.map((media) => ({
-            src: media.url,
-            thumb: media.url,
-            subHtml: `<div class="lightGallery-caption">${media.alt || ""}</div>`,
-          }))}
-          index={0}
-          closable
-          hideBarsDelay={2000}
-          counter
-        />
+        <Gallery venue={venue} galleryRef={galleryRef} />
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import { QueryKey, useMutation, useQueryClient } from "@tanstack/react-query";
 import { createReservationAction } from "../actions/createReservationAction";
-import { Booking } from "../BookingValidation";
+import { Booking } from "../utils/BookingValidation.ts";
 import { toast } from "sonner";
 
 /**

@@ -1,5 +1,5 @@
 import { axiosInstance } from "@/lib/axiosInstance";
-import { Booking } from "../BookingValidation";
+import { Booking } from "../utils/BookingValidation.ts";
 
 /**
  * Creates a new reservation (booking) for a venue.
