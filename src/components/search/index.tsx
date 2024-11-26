@@ -37,7 +37,7 @@ export default function SearchPage() {
       {venues.length > 0 ? (
         <VenueCardSM venues={venues} />
       ) : (
-        <p>No venues found.</p>
+        <p className="px-4 text-paragraph">No venues found.</p>
       )}
     </div>
   );

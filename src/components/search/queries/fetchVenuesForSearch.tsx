@@ -24,14 +24,17 @@ export const fetchVenues = async ({
     }
 
     if (destination) {
-      data = data.filter(
-        (venue) =>
-          venue.location?.city?.toLowerCase() === destination.toLowerCase() ||
-          venue.location?.country?.toLowerCase() ===
-            destination.toLowerCase() ||
-          venue.location?.continent?.toLowerCase() ===
-            destination.toLowerCase(),
-      );
+      const destLower = destination.trim().toLowerCase();
+      data = data.filter((venue) => {
+        const city = venue.location.city?.toLowerCase() || "";
+        const country = venue.location.country?.toLowerCase() || "";
+        const continent = venue.location.continent?.toLowerCase() || "";
+        return (
+          city.includes(destLower) ||
+          country.includes(destLower) ||
+          continent.includes(destLower)
+        );
+      });
     }
 
     return data;

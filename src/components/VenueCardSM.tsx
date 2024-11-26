@@ -22,7 +22,7 @@ export default function VenueCardSM({ venues, currentFilter }: VenueCardProps) {
       {venues.map((venue, idx) => (
         <BlurFade
           key={`${venue.id}-${currentFilter}-${idx}`}
-          delay={0.05 + idx * 0.05}
+          delay={0.15 + idx * 0.05}
           inView
           inViewMargin="100px"
         >

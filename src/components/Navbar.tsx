@@ -11,6 +11,7 @@ export default function Navbar() {
   const location = useLocation();
   const isHome = location.pathname === "/";
   const isDashboard = location.pathname.startsWith("/manage-venues");
+  const isAccount = location.pathname.startsWith("/account");
 
   const { isSignInModalOpen, openSignInModal, closeSignInModal } =
     useSignInModalStore();
@@ -39,7 +40,7 @@ export default function Navbar() {
       </header>
       <div
         className={cn("mx-auto mt-4 max-w-2xl lg:-mt-12 lg:mb-0", {
-          hidden: isDashboard,
+          hidden: isDashboard || isAccount,
         })}
       >
         <h1

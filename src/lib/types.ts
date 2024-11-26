@@ -82,3 +82,13 @@ export interface AllVenuesProps {
   data: Venue[];
   nextPage?: number | null;
 }
+
+export interface User {
+  name: string;
+  email: string;
+  bio: string;
+  avatar: MediaObject;
+  venueManager: boolean;
+  created: string;
+  updated: string;
+}

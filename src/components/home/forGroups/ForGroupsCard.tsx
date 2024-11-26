@@ -1,7 +1,7 @@
 import BlurFade from "@/components/ui/blur-fade";
 import { Link } from "@tanstack/react-router";
 
-export default function ForGroupsCard() {
+export default function () {
   return (
     <BlurFade delay={0.15} inView>
       <div className="grid gap-y-8 pb-20 pt-4 md:grid-cols-2 md:gap-x-4 md:gap-y-0">

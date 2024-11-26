@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { useImperativeHandle } from "react";
+import { useImperativeHandle, useRef, useState } from "react";
 
 interface UseAutosizeTextAreaProps {
   textAreaRef: React.MutableRefObject<HTMLTextAreaElement | null>;
@@ -32,18 +32,19 @@ export const useAutosizeTextArea = ({
       textAreaElement.style.height = `${minHeight + offsetBorder}px`;
       const scrollHeight = textAreaElement.scrollHeight;
       // We then set the height directly, outside of the render loop
-      // Trying to set this with state or a ref will product an incorrect value.
+      // Trying to set this with state or a ref will produce an incorrect value.
       if (scrollHeight > maxHeight) {
         textAreaElement.style.height = `${maxHeight}px`;
       } else {
         textAreaElement.style.height = `${scrollHeight + offsetBorder}px`;
       }
     }
-  }, [textAreaRef.current, triggerAutoSize]);
+  }, [triggerAutoSize, minHeight, maxHeight]);
 };
 
 export type AutosizeTextAreaRef = {
   textArea: HTMLTextAreaElement;
+  focus: () => void;
   maxHeight: number;
   minHeight: number;
 };
@@ -68,8 +69,8 @@ export const AutosizeTextarea = React.forwardRef<
     }: AutosizeTextAreaProps,
     ref: React.Ref<AutosizeTextAreaRef>,
   ) => {
-    const textAreaRef = React.useRef<HTMLTextAreaElement | null>(null);
-    const [triggerAutoSize, setTriggerAutoSize] = React.useState("");
+    const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
+    const [triggerAutoSize, setTriggerAutoSize] = useState("");
 
     useAutosizeTextArea({
       textAreaRef,
@@ -80,7 +81,7 @@ export const AutosizeTextarea = React.forwardRef<
 
     useImperativeHandle(ref, () => ({
       textArea: textAreaRef.current as HTMLTextAreaElement,
-      focus: () => textAreaRef?.current?.focus(),
+      focus: () => textAreaRef.current?.focus(),
       maxHeight,
       minHeight,
     }));
@@ -96,7 +97,6 @@ export const AutosizeTextarea = React.forwardRef<
         ref={textAreaRef}
         className={cn(
           "flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-
           className,
         )}
         onChange={(e) => {

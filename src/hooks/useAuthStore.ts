@@ -9,11 +9,13 @@ interface Avatar {
 interface AuthState {
   token: string | null;
   userName: string | null;
+  bio: string | null;
   venueManager: boolean;
   userAvatar: Avatar | null;
   setAuth: (
     token: string,
     name: string,
+    bio: string,
     avatar: Avatar,
     venueManager: boolean,
   ) => void;
@@ -25,15 +27,17 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       token: null,
       userName: null,
+      bio: null,
       userAvatar: null,
       venueManager: false,
-      setAuth: (token, name, avatar, venueManager) => {
-        set({ token, userName: name, userAvatar: avatar, venueManager });
+      setAuth: (token, name, bio, avatar, venueManager) => {
+        set({ token, userName: name, bio, userAvatar: avatar, venueManager });
       },
       clearAuth: () => {
         set({
           token: null,
           userName: null,
+          bio: null,
           userAvatar: null,
           venueManager: false,
         });
