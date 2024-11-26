@@ -15,9 +15,9 @@ interface AuthState {
   setAuth: (
     token: string,
     name: string,
-    bio: string,
     avatar: Avatar,
     venueManager: boolean,
+    bio?: string,
   ) => void;
   clearAuth: () => void;
 }
@@ -30,8 +30,14 @@ export const useAuthStore = create<AuthState>()(
       bio: null,
       userAvatar: null,
       venueManager: false,
-      setAuth: (token, name, bio, avatar, venueManager) => {
-        set({ token, userName: name, bio, userAvatar: avatar, venueManager });
+      setAuth: (token, name, avatar, venueManager, bio) => {
+        set((state) => ({
+          token,
+          userName: name,
+          userAvatar: avatar,
+          venueManager,
+          bio: bio !== undefined ? bio : state.bio,
+        }));
       },
       clearAuth: () => {
         set({
