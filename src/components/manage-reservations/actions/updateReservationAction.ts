@@ -1,5 +1,5 @@
-import { axiosInstance } from "@/lib/axiosInstance";
-import axios from "axios";
+import { authenticatedAxiosInstance } from "@/lib/axiosInstance";
+import axios, { AxiosError } from "axios";
 import { Reservation } from "../types";
 
 /**
@@ -13,45 +13,32 @@ import { Reservation } from "../types";
 export async function updateReservationsAction(
   reservationId: string,
   data: Partial<Reservation>,
-) {
-  const persistedState = JSON.parse(
-    localStorage.getItem("auth-object") || "{}",
-  );
-  const token = persistedState?.state?.token || null;
-
-  if (!token) {
-    throw new Error("Unauthorized: You must be logged in to update a booking.");
-  }
-
+): Promise<Reservation> {
   try {
-    const response = await axiosInstance.put(
+    const response = await authenticatedAxiosInstance.put(
       `/bookings/${reservationId}`,
       data,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-          "X-Noroff-API-Key": import.meta.env.VITE_API_KEY,
-        },
-      },
     );
 
     if (response.status === 200 || response.status === 204) {
-      return response.data.data;
+      return response.data.data as Reservation;
     }
 
     throw new Error(`Unexpected response status: ${response.status}`);
   } catch (error) {
     console.error("Error updating booking:", error);
+
     if (axios.isAxiosError(error)) {
       console.error("Error Response:", error.response?.data);
-    } else {
-      console.error("Error Response:", error);
-    }
+      const axiosError = error as AxiosError<{ message: string }>;
 
-    const errorMessage =
-      (error as any).response?.data?.message ||
-      "Booking update failed. Please try again later.";
-    throw new Error(errorMessage);
+      const errorMessage =
+        axiosError.response?.data?.message ||
+        "Booking update failed. Please try again later.";
+
+      throw new Error(errorMessage);
+    } else {
+      throw new Error("An unexpected error occurred.");
+    }
   }
 }

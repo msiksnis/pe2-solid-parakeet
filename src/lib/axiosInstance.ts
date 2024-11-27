@@ -1,3 +1,4 @@
+import { useAuthStore } from "@/hooks/useAuthStore";
 import axios from "axios";
 
 export const authClient = axios.create({
@@ -19,11 +20,7 @@ const authenticatedAxiosInstance = axios.create({
 
 authenticatedAxiosInstance.interceptors.request.use(
   (config) => {
-    const persistedState = JSON.parse(
-      localStorage.getItem("auth-object") || "{}",
-    );
-
-    const token = persistedState?.state?.token || null;
+    const { token } = useAuthStore.getState();
 
     const apiKey = import.meta.env.VITE_API_KEY;
 

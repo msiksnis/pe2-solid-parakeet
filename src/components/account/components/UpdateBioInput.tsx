@@ -10,15 +10,21 @@ import {
   AutosizeTextAreaRef,
 } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Control } from "react-hook-form";
 import { UpdateUserType } from "../AccountValidation";
 
 interface UpdateBioInputProps {
   control: Control<UpdateUserType>;
+  bio: string;
+  resetFocus: boolean;
 }
 
-export default function UpdateBioInput({ control }: UpdateBioInputProps) {
+export default function UpdateBioInput({
+  control,
+  bio,
+  resetFocus,
+}: UpdateBioInputProps) {
   const [isUpdating, setIsUpdating] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
@@ -27,6 +33,13 @@ export default function UpdateBioInput({ control }: UpdateBioInputProps) {
   const focusTextArea = () => {
     textareaRef.current?.focus();
   };
+
+  useEffect(() => {
+    if (resetFocus) {
+      setIsFocused(false);
+      setIsUpdating(false);
+    }
+  }, [resetFocus]);
 
   const handleEditClick = () => {
     setIsUpdating(true);
@@ -75,7 +88,10 @@ export default function UpdateBioInput({ control }: UpdateBioInputProps) {
         />
       ) : (
         <>
-          <div className="text-paragraph">BIO</div>
+          <div>
+            <div className="text-paragraph">BIO</div>
+            <div className="text-lg font-semibold">{bio}</div>
+          </div>
           <Button
             variant={"linkHover2"}
             onClick={handleEditClick}

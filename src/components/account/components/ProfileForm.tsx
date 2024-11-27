@@ -4,48 +4,70 @@ import {
   FormField,
   FormItem,
   FormLabel,
-} from "@/components/ui/form";
-import { User } from "@/lib/types";
+} from "@/components/ui/form.tsx";
+import { User } from "@/lib/types.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Avatar } from "../ui/avatar";
-import { Checkbox } from "../ui/checkbox";
-import { Separator } from "../ui/separator";
-import { UpdateUserSchema, UpdateUserType } from "./AccountValidation";
-import UpdateAvatarInput from "./components/UpdateAvatarInput";
-import UpdateBioInput from "./components/UpdateBioInput";
-import { Button } from "../ui/button";
+import { Avatar } from "../../ui/avatar.tsx";
+import { Button } from "../../ui/button.tsx";
+import { Checkbox } from "../../ui/checkbox.tsx";
+import { Separator } from "../../ui/separator.tsx";
+import { UpdateUserSchema, UpdateUserType } from "../AccountValidation.ts";
+import { useUpdateUserMutation } from "../mutations/useUpdateUserMutation.ts";
+import UpdateAvatarInput from "./UpdateAvatarInput.tsx";
+import UpdateBioInput from "./UpdateBioInput.tsx";
 
 interface ProfileFormProps {
-  user?: User;
+  user: User;
 }
 
 export default function ProfileForm({ user }: ProfileFormProps) {
+  const [mutationSuccess, setMutationSuccess] = useState(false);
+
+  const mutation = useUpdateUserMutation(user.name);
+
+  const avatarObject = { url: user.avatar.url, alt: user.avatar.alt };
+
   const form = useForm<UpdateUserType>({
     resolver: zodResolver(UpdateUserSchema),
     defaultValues: {
-      avatar: {
-        url: "",
-        alt: "",
-      },
-      bio: "",
-      venueManager: false,
+      avatar: avatarObject,
+      bio: user.bio || "",
+      venueManager: user.venueManager || false,
     },
   });
 
-  const {
-    control,
-    handleSubmit,
-    // formState,
-    // reset
-  } = form;
+  const { control, handleSubmit, reset } = form;
 
-  const isPending = false;
-  const onSubmit = () =>
-    // data: UpdateUserType
-    {
-      // mutation.mutate(data);
-    };
+  const onSubmit = (data: UpdateUserType) => {
+    mutation.mutate(data, {
+      onSuccess: (updatedUser) => {
+        reset({
+          avatar: { url: updatedUser.avatar.url, alt: updatedUser.avatar.alt },
+          bio: updatedUser.bio || "",
+          venueManager: updatedUser.venueManager || false,
+        });
+        setMutationSuccess(true);
+      },
+    });
+  };
+
+  useEffect(() => {
+    if (user) {
+      reset({
+        avatar: avatarObject,
+        bio: user.bio || "",
+        venueManager: user.venueManager || false,
+      });
+    }
+  }, [user, reset]);
+
+  useEffect(() => {
+    if (mutationSuccess) {
+      setMutationSuccess(false);
+    }
+  }, [mutationSuccess]);
 
   return (
     <Form {...form}>
@@ -65,7 +87,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
                 className="size-40 rounded-full object-cover"
               />
             </Avatar>
-            <UpdateAvatarInput control={control} />
+            <UpdateAvatarInput control={control} resetFocus={mutationSuccess} />
           </div>
         </>
         <Separator className="mt-4" />
@@ -76,7 +98,11 @@ export default function ProfileForm({ user }: ProfileFormProps) {
         </div>
         <Separator className="mt-4" />
 
-        <UpdateBioInput control={control} />
+        <UpdateBioInput
+          control={control}
+          bio={user.bio}
+          resetFocus={mutationSuccess}
+        />
         <Separator className="mt-4" />
 
         <div>
@@ -108,9 +134,17 @@ export default function ProfileForm({ user }: ProfileFormProps) {
         </div>
         <Separator className="mt-4" />
 
-        <Button type="submit" disabled={isPending} className="mt-4">
-          {isPending ? "Updating..." : "Save Changes"}
-        </Button>
+        <div className="flex justify-end py-10">
+          <Button
+            type="submit"
+            variant={"gooeyRight"}
+            size={"lg"}
+            disabled={mutation.isPending}
+            className="before:duration-500"
+          >
+            {mutation.isPending ? "Updating..." : "Save Changes"}
+          </Button>
+        </div>
       </form>
     </Form>
   );

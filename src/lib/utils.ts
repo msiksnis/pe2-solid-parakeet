@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
+import axios from "axios";
 import { addDays, differenceInCalendarDays } from "date-fns";
 import { useMediaQuery } from "react-responsive";
 import { twMerge } from "tailwind-merge";
@@ -69,3 +70,20 @@ export function calculateSingleDayGaps(
 
   return singleDayGaps;
 }
+
+/**
+ * Extracts and returns a user-friendly error message from an Axios error or a generic message.
+ *
+ * @param error - The error object caught in a catch block.
+ * @returns A string representing the error message.
+ */
+export const handleApiError = (error: unknown): string => {
+  if (axios.isAxiosError(error)) {
+    const message = error.response?.data?.message;
+    return typeof message === "string"
+      ? message
+      : "An unexpected error occurred.";
+  }
+
+  return "An unexpected error occurred.";
+};
