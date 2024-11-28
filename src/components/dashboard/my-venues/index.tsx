@@ -1,9 +1,9 @@
 import ErrorLoadingButton from "@/components/ErrorLoadingButton";
 import { Venue } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
-import OwnersVenuesCard from "./components/OwnersVenueCard";
 import { fetchVenuesByUser } from "./queries/fetchVenuesByUser";
 import MainLoader from "@/components/MainLoader";
+import OwnersVenues from "./components/OwnersVenues";
 
 export default function MyVenues() {
   const {
@@ -33,7 +33,7 @@ export default function MyVenues() {
       {isFetching ? (
         <MainLoader className="mt-24" />
       ) : (
-        <OwnersVenuesCard venues={venues} />
+        <OwnersVenues venues={venues} />
       )}
     </div>
   );
