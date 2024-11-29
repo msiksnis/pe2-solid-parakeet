@@ -9,21 +9,24 @@ import {
   startOfDay,
 } from "date-fns";
 import { motion } from "framer-motion";
-import { CalendarDays, ChevronDown, Minus, Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import DateSelectionControls from "@/components/reservation-components/DateSelectionControls.tsx";
+import GuestControl from "@/components/reservation-components/GuestNumberControl.tsx";
 import { useAuthStatus } from "@/hooks/useAuthStatus.ts";
+import { useDateRangeSelection } from "@/hooks/useDateRangeSelection.ts";
 import { useSignInModalStore } from "@/hooks/useSignInModalStore.ts";
 import { Venue } from "@/lib/types.ts";
 import { calculateTotalPrice, cn, useScreenSizes } from "@/lib/utils.ts";
 import { Route } from "@/routes/venue/$id.tsx";
+import { decrementGuests, incrementGuests } from "@/utils/reservationUtils.ts";
 import { Button } from "../../ui/button.tsx";
 import { Calendar } from "../../ui/calendar.tsx";
 import { Separator } from "../../ui/separator.tsx";
 import { Booking } from "../utils/BookingValidation.ts";
 import { calculateSingleDayGaps } from "../utils/utils.ts";
-import { useDateRangeSelection } from "@/hooks/useDateRangeSelection.ts";
+import ReservationButton from "@/components/reservation-components/ReservationButton.tsx";
 
 interface BookingDetailsProps {
   venue: Venue;
@@ -226,6 +229,28 @@ export default function BookingDetails({
     onReserve(bookingData);
   };
 
+  const openCalendar = () => {
+    setIsExpanded(true);
+  };
+
+  const handleIncrementGuests = () => {
+    incrementGuests(guests, venue.maxGuests, (newGuests) => {
+      navigate({
+        search: (prev) => ({ ...prev, guests: newGuests }),
+        resetScroll: false,
+      });
+    });
+  };
+
+  const handleDecrementGuests = () => {
+    decrementGuests(guests, 1, (newGuests) => {
+      navigate({
+        search: (prev) => ({ ...prev, guests: newGuests }),
+        resetScroll: false,
+      });
+    });
+  };
+
   return (
     <div
       className={cn(
@@ -246,8 +271,10 @@ export default function BookingDetails({
             <div className="">
               <div className="text-2xl font-semibold">Select dates</div>
               <span className="text-sm text-muted-foreground">
-                {range.from ? format(range.from, "dd MMM") : "Select date"} -{" "}
-                {range.to ? format(range.to, "dd MMM") : "Select date"}
+                {range.from ? format(range.from, "dd MMM") : "Select dates"}{" "}
+                {range.to && (
+                  <span className=""> - {format(range.to, "dd MMM")}</span>
+                )}
               </span>
             </div>
           )}
@@ -293,172 +320,30 @@ export default function BookingDetails({
           </div>
 
           <div className="ml-auto flex w-[21rem] flex-col justify-between">
-            <>
-              <div className="space-y-4">
-                <div
-                  className="mt-2 flex w-full items-center justify-between gap-4"
-                  onClick={() => setIsExpanded(true)}
-                >
-                  <Button
-                    className={cn(
-                      "grid h-fit w-full grid-cols-3 rounded-xl border border-gray-500 bg-card px-0 py-1 text-primary outline-none ring-offset-background transition-all duration-300 hover:bg-card",
-                      {
-                        "ring-2 ring-primary ring-offset-2":
-                          isSelectingStartDate && isExpanded,
-                      },
-                    )}
-                    onClick={() => {
-                      setIsSelectingStartDate(true);
-                    }}
-                  >
-                    <span className="col-span-1 m-auto">
-                      <CalendarDays />
-                    </span>
-                    <div className="col-span-2 flex flex-col items-start">
-                      <span className="whitespace-nowrap text-sm">
-                        Start date
-                      </span>
-                      <span
-                        className={cn("whitespace-nowrap text-lg", {
-                          "text-base": smCalendarContainer,
-                        })}
-                      >
-                        {range.from
-                          ? format(range.from, "dd MMM")
-                          : "Select date"}
-                      </span>
-                    </div>
-                  </Button>
-                  <Button
-                    className={cn(
-                      "grid h-fit w-full grid-cols-3 rounded-xl border border-gray-500 bg-card px-0 py-1 text-primary outline-none ring-offset-background transition-all duration-300 hover:bg-card",
-                      {
-                        "ring-2 ring-primary ring-offset-2":
-                          !isSelectingStartDate && isExpanded,
-                      },
-                    )}
-                    onClick={() => {
-                      if (range.from) {
-                        setIsSelectingStartDate(false);
-                      }
-                    }}
-                    disabled={!range.from}
-                  >
-                    <span className="col-span-1 m-auto">
-                      <CalendarDays />
-                    </span>
-                    <div className="col-span-2 flex flex-col items-start">
-                      <span className="whitespace-nowrap text-sm">
-                        End date
-                      </span>
-                      <span
-                        className={cn("whitespace-nowrap text-lg", {
-                          "text-base": smCalendarContainer,
-                        })}
-                      >
-                        {range.to ? format(range.to, "dd MMM") : "Select date"}
-                      </span>
-                    </div>
-                  </Button>
-                </div>
-
-                <div
-                  ref={guestsRef}
-                  className="rounded-xl border border-gray-500 px-4 py-1"
-                >
-                  <div
-                    className="grid cursor-pointer grid-cols-5"
-                    onClick={toggleGuestControl}
-                  >
-                    <div className="col-span-4 grid">
-                      <span className="whitespace-nowrap text-sm">Guests</span>
-                      <span className="whitespace-nowrap text-lg">
-                        {guests} {guests > 1 ? "guests" : "guest"}
-                      </span>
-                    </div>
-                    <ChevronDown
-                      className={cn(
-                        "ml-auto mt-2 opacity-60 transition duration-200",
-                        {
-                          "rotate-180": guestControlExpanded,
-                        },
-                      )}
-                    />
-                  </div>
-
-                  {/* Guest control section */}
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{
-                      height: guestControlExpanded ? "auto" : 0,
-                      opacity: guestControlExpanded ? 1 : 0,
-                    }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.15 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="col-span-5 mb-2 mt-4 flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="size-6 rounded-full border-gray-500"
-                        onClick={() => {
-                          navigate({
-                            search: (prev) => ({
-                              ...prev,
-                              guests: Math.max(1, guests - 1),
-                            }),
-                            resetScroll: false,
-                          });
-                        }}
-                        disabled={guests <= 1}
-                      >
-                        <Minus />
-                      </Button>
-                      <span className="tabular-nums selection:bg-card">
-                        {guests}
-                      </span>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="size-6 rounded-full border-gray-500"
-                        onClick={() => {
-                          navigate({
-                            search: (prev) => ({
-                              ...prev,
-                              guests: Math.min(guests + 1, venue.maxGuests),
-                            }),
-                            resetScroll: false,
-                          });
-                        }}
-                        disabled={guests >= venue.maxGuests}
-                      >
-                        <Plus />
-                      </Button>
-                    </div>
-                  </motion.div>
-                </div>
+            <DateSelectionControls
+              range={range}
+              setIsSelectingStartDate={setIsSelectingStartDate}
+              isSelectingStartDate={isSelectingStartDate}
+              openCalendar={openCalendar}
+            />
+            <GuestControl
+              guests={guests}
+              maxGuests={venue.maxGuests}
+              incrementGuests={handleIncrementGuests}
+              decrementGuests={handleDecrementGuests}
+              guestControlExpanded={guestControlExpanded}
+              toggleGuestControl={toggleGuestControl}
+            />
+            <div className="space-y-4">
+              <div className="flex items-center justify-between px-2 text-lg font-bold">
+                <span className="selection:bg-card">Total</span>
+                <span>${totalPrice.toLocaleString()}</span>
               </div>
-            </>
-            <>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between px-2 text-lg font-bold">
-                  <span className="selection:bg-card">Total</span>
-                  <span>${totalPrice.toLocaleString()}</span>
-                </div>
-                <Button
-                  size="lg"
-                  variant={"gooeyLeft"}
-                  onClick={handleReserveClick}
-                  className="h-14 w-full rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 text-lg font-semibold text-primary after:duration-700"
-                >
-                  Reserve
-                </Button>
-                <p className="text-center text-muted-foreground">
-                  You will not be charged yet
-                </p>
-              </div>
-            </>
+              <ReservationButton handleReserveClick={handleReserveClick} />
+              <p className="text-center text-muted-foreground">
+                You will not be charged yet
+              </p>
+            </div>
           </div>
         </div>
       </div>

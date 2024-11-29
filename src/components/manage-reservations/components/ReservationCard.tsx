@@ -78,11 +78,11 @@ export default function ReservationCard() {
                   </h1>
                   <div className="flex items-center pt-1 text-paragraph">
                     <span className="">
-                      {format(reservation.dateFrom, "yyyy-MM-dd")}
+                      {format(reservation.dateFrom, "dd MMM yyyy")}
                     </span>
                     <span className="mx-1">-</span>
                     <span className="">
-                      {format(reservation.dateTo, "yyyy-MM-dd")}
+                      {format(reservation.dateTo, "dd MMM yyyy")}
                     </span>
                   </div>
                   <span className="text-paragraph">

@@ -20,8 +20,8 @@ import {
 } from "@/utils/reservationUtils";
 import { useUpdateReservationMutation } from "../mutations/useUpdateReservationMutation";
 import { fetchVenueById } from "../queries/fetchVenueById";
-import DateSelectionControls from "./DateSelectionControls";
-import GuestControl from "./GuestNumberControl";
+import DateSelectionControls from "@/components/reservation-components/DateSelectionControls.tsx";
+import GuestControl from "../../reservation-components/GuestNumberControl.tsx";
 import { useDeleteReservationMutation } from "../mutations/useDeleteReservationMutation";
 import { toast } from "sonner";
 import WarningModal from "@/components/WarningModal";

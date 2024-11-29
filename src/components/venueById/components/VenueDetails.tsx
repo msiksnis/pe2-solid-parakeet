@@ -1,19 +1,12 @@
+import { Cat, ChevronRight, CircleParking, Utensils, Wifi } from "lucide-react";
 import { useState } from "react";
-import {
-  Cat,
-  ChevronRight,
-  CircleParking,
-  User,
-  Utensils,
-  Wifi,
-} from "lucide-react";
 
 import DescriptionModal from "@/components/DescriptionModal";
 import RatingStars from "@/components/RatingStars";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Venue } from "@/lib/types";
+import HostedBy from "./HostedBy";
 
 interface VenueDetailsProps {
   venue: Venue;
@@ -42,20 +35,7 @@ export default function VenueDetails({ venue }: VenueDetailsProps) {
         />
       </div>
       <Separator />
-      <div className="hidden items-center space-x-4 md:flex">
-        <Avatar className="cursor-pointer">
-          <AvatarImage
-            src={venue.owner?.avatar.url}
-            alt={venue.owner?.avatar.alt}
-          />
-          <AvatarFallback>
-            <User className="h-5 w-5" />
-          </AvatarFallback>
-        </Avatar>
-        <span>
-          Hosted by <span className="capitalize">{venue.owner?.name}</span>
-        </span>
-      </div>
+      {venue.owner && <HostedBy owner={venue.owner} />}
       <Separator className="hidden md:flex" />
       <div>
         <h2 className="text-2xl font-semibold">Features and services</h2>
