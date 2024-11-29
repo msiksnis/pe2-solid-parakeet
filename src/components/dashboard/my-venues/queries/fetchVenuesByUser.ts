@@ -13,7 +13,7 @@ export const fetchVenuesByUser = async (): Promise<Venue[]> => {
 
   try {
     const { data } = await authenticatedAxiosInstance.get(
-      `/profiles/${userName}/venues?_owner=true&_bookings=true`,
+      `/profiles/${userName}/venues?_owner=true&_bookings=true&_customer=true`,
     );
     return data.data;
   } catch (error: any) {

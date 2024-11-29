@@ -1,10 +1,11 @@
+import { useMemo } from "react";
+
 import BlurFade from "@/components/ui/blur-fade";
 import { Venue } from "@/lib/types";
 import {
   UpcomingBookingsForVenue,
   upcomingVenueBookings,
 } from "../utils/upcomingVenueBookings";
-import { useMemo } from "react";
 import VenueCard from "./VenueCard";
 
 interface OwnersVenuesProps {

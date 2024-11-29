@@ -71,7 +71,7 @@ export default function BookingDetails({
           ...prev,
           end_date: undefined,
         }),
-        replace: true, // Prevent adding a new history entry
+        replace: true,
       });
       setRange((prevRange) => ({ ...prevRange, to: undefined }));
     }
@@ -173,7 +173,7 @@ export default function BookingDetails({
     (date: Date) => {
       const today = startOfDay(new Date());
       if (date < today) {
-        return true; // Disable past dates
+        return true;
       }
       if (isSelectingStartDate) {
         // Disable dates that cannot be used as start dates

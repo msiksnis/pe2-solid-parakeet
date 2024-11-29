@@ -1,11 +1,24 @@
+import { useEffect } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+
 import ErrorLoadingButton from "@/components/ErrorLoadingButton";
 import { Venue } from "@/lib/types";
-import { useQuery } from "@tanstack/react-query";
 import { fetchVenuesByUser } from "./queries/fetchVenuesByUser";
 import MainLoader from "@/components/MainLoader";
 import OwnersVenues from "./components/OwnersVenues";
+import { useAuthStatus } from "@/hooks/useAuthStatus";
 
 export default function MyVenues() {
+  const navigate = useNavigate();
+  const { isLoggedIn } = useAuthStatus();
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate({ to: "/" });
+    }
+  }, [isLoggedIn]);
+
   const {
     data: venues = [],
     error,

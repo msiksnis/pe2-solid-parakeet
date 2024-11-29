@@ -1,9 +1,6 @@
-import { useAuthStatus } from "@/hooks/useAuthStatus.ts";
-import { useSignInModalStore } from "@/hooks/useSignInModalStore.ts";
-import { Venue } from "@/lib/types.ts";
-import { calculateTotalPrice, cn, useScreenSizes } from "@/lib/utils.ts";
-import { Route } from "@/routes/venue/$id.tsx";
+import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 import {
   addDays,
   areIntervalsOverlapping,
@@ -14,15 +11,24 @@ import {
   startOfDay,
 } from "date-fns";
 import { motion } from "framer-motion";
-import { CalendarDays, ChevronDown, Minus, Plus } from "lucide-react";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { CalendarDays, ChevronDown, Minus, Plus, User } from "lucide-react";
+
+import { useAuthStatus } from "@/hooks/useAuthStatus.ts";
+import { useSignInModalStore } from "@/hooks/useSignInModalStore.ts";
+import { Venue } from "@/lib/types.ts";
+import { calculateTotalPrice, cn, useScreenSizes } from "@/lib/utils.ts";
+import { Route } from "@/routes/venue/$id.tsx";
 import { Button } from "../../ui/button.tsx";
 import { Calendar } from "../../ui/calendar.tsx";
 import { Separator } from "../../ui/separator.tsx";
 import { Booking } from "../utils/BookingValidation.ts";
 import { calculateSingleDayGaps } from "../utils/utils.ts";
 import { useDateRangeSelection } from "@/hooks/useDateRangeSelection.ts";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar.tsx";
 
 interface BookingDetailsProps {
   onReserve: (data: Booking) => void;
@@ -62,7 +68,7 @@ export default function BookingDetailsMobile({
           ...prev,
           end_date: undefined,
         }),
-        replace: true, // Replace the current history entry
+        replace: true,
       });
       setRange((prevRange) => ({ ...prevRange, to: undefined }));
     }
@@ -113,31 +119,27 @@ export default function BookingDetailsMobile({
     (date: Date) => {
       const today = startOfDay(new Date());
       if (date < today) {
-        return true; // Disable past dates
+        return true;
       }
       if (isSelectingStartDate) {
-        // Disable dates that cannot be used as start dates
-        // Check if there is at least one day available after the selected date
         const nextDay = addDays(date, 1);
         const isNextDayBooked = bookedDateRanges.some((range) =>
           isWithinInterval(nextDay, { start: range.from, end: range.to }),
         );
         if (isNextDayBooked) {
-          return true; // Cannot book at least one night
+          return true;
         }
         return false;
       } else {
         if (range.from) {
           if (date < range.from) {
-            return true; // Disable dates before the selected start date
+            return true;
           }
-          // Remove the equality check to keep the start date enabled
-          // Disable dates that would result in a range overlapping booked dates
           const startDate = startOfDay(range.from);
           const endDate = endOfDay(date);
           return isDateRangeOverlapping(startDate, endDate, bookedDateRanges);
         }
-        return true; // Disable all dates if start date is not selected
+        return true;
       }
     },
   ];
@@ -336,6 +338,24 @@ export default function BookingDetailsMobile({
             You will not be charged yet
           </p>
         </div>
+      </div>
+      <div className="mt-12 space-y-6 md:hidden">
+        <Separator />
+        <div className="flex items-center space-x-4">
+          <Avatar className="cursor-pointer">
+            <AvatarImage
+              src={venue.owner?.avatar.url}
+              alt={venue.owner?.avatar.alt}
+            />
+            <AvatarFallback>
+              <User className="h-5 w-5" />
+            </AvatarFallback>
+          </Avatar>
+          <span>
+            Hosted by <span className="capitalize">{venue.owner?.name}</span>
+          </span>
+        </div>
+        <Separator />
       </div>
     </div>
   );
