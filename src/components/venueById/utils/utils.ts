@@ -1,21 +1,22 @@
-import { addDays, differenceInCalendarDays } from "date-fns";
+import { format } from "date-fns";
+import { Booking } from "./BookingValidation";
 
-export function calculateSingleDayGaps(
-  bookedDateRanges: { from: Date; to: Date }[],
-) {
-  const singleDayGaps: Date[] = [];
-
-  for (let i = 0; i < bookedDateRanges.length - 1; i++) {
-    const current = bookedDateRanges[i];
-    const next = bookedDateRanges[i + 1];
-
-    const gapStart = addDays(current.to, 1);
-    const gapEnd = addDays(next.from, -1);
-
-    if (differenceInCalendarDays(gapEnd, gapStart) === 1) {
-      singleDayGaps.push(gapStart);
-    }
+export const createBooking = (
+  venueId: string,
+  guests: number,
+  rangeFrom: Date | undefined,
+  rangeTo: Date | undefined,
+): Omit<Booking, "id"> => {
+  if (!rangeFrom || !rangeTo) {
+    throw new Error("Both rangeFrom and rangeTo must be defined");
   }
 
-  return singleDayGaps;
-}
+  return {
+    created: format(new Date(), "yyyy-MM-dd"),
+    updated: format(new Date(), "yyyy-MM-dd"),
+    venueId,
+    guests,
+    dateFrom: format(rangeFrom, "yyyy-MM-dd"),
+    dateTo: format(rangeTo, "yyyy-MM-dd"),
+  };
+};

@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 
 export interface Booking {
-  id: string;
+  id?: string;
   venueId: string;
   dateFrom: string;
   dateTo: string;

@@ -1,13 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
-import {
-  addDays,
-  areIntervalsOverlapping,
-  endOfDay,
-  format,
-  isWithinInterval,
-  parseISO,
-  startOfDay,
-} from "date-fns";
+import { endOfDay, parseISO, startOfDay } from "date-fns";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -16,6 +8,7 @@ import GuestControl from "@/components/reservation-components/GuestNumberControl
 import ReservationButton from "@/components/reservation-components/ReservationButton.tsx";
 import { useAuthStatus } from "@/hooks/useAuthStatus.ts";
 import { useDateRangeSelection } from "@/hooks/useDateRangeSelection.ts";
+import { useDisabledDates } from "@/hooks/useDisabledDates.ts";
 import { useSignInModalStore } from "@/hooks/useSignInModalStore.ts";
 import { Venue } from "@/lib/types.ts";
 import { calculateTotalPrice, cn, useScreenSizes } from "@/lib/utils.ts";
@@ -24,7 +17,7 @@ import { decrementGuests, incrementGuests } from "@/utils/reservationUtils.ts";
 import { Calendar } from "../../ui/calendar.tsx";
 import { Separator } from "../../ui/separator.tsx";
 import { Booking } from "../utils/BookingValidation.ts";
-import { calculateSingleDayGaps } from "../utils/utils.ts";
+import { createBooking } from "../utils/utils.ts";
 import HostedBy from "./HostedBy.tsx";
 
 interface BookingDetailsProps {
@@ -41,17 +34,13 @@ export default function BookingDetailsMobile({
   venue,
   onReserve,
 }: BookingDetailsProps) {
-  const {
-    guests,
-    start_date: startDateParam,
-    end_date: endDateParam,
-  } = Route.useSearch();
+  const { guests, start_date, end_date } = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
 
-  const startDate = startDateParam ? parseISO(startDateParam) : undefined;
-  const endDate = endDateParam ? parseISO(endDateParam) : undefined;
-
-  const [range, setRange] = useState<Range>({ from: startDate, to: endDate });
+  const [range, setRange] = useState<Range>({
+    from: start_date ? startOfDay(new Date(start_date)) : undefined,
+    to: end_date ? endOfDay(new Date(end_date)) : undefined,
+  });
   const [guestControlExpanded, setGuestControlExpanded] = useState(false);
   const [isSelectingStartDate, setIsSelectingStartDate] = useState(true);
 
@@ -71,7 +60,7 @@ export default function BookingDetailsMobile({
     }
   }, [range.from, range.to, navigate]);
 
-  const bookedDateRanges = (venue.bookings ?? [])
+  const bookedRanges = (venue.bookings ?? [])
     .map((booking) => ({
       from: startOfDay(parseISO(booking.dateFrom)),
       to: endOfDay(parseISO(booking.dateTo)),
@@ -79,7 +68,7 @@ export default function BookingDetailsMobile({
     .sort((a, b) => a.from.getTime() - b.from.getTime());
 
   const { handleDateSelect } = useDateRangeSelection(
-    bookedDateRanges,
+    bookedRanges,
     navigate,
     range,
     setRange,
@@ -96,50 +85,12 @@ export default function BookingDetailsMobile({
       ? calculateTotalPrice(range.from, range.to, venue.price)
       : 0;
 
-  function isDateRangeOverlapping(
-    startDate: Date,
-    endDate: Date,
-    bookedRanges: { from: Date; to: Date }[],
-  ): boolean {
-    return bookedRanges.some((bookedRange) =>
-      areIntervalsOverlapping(
-        { start: startDate, end: endDate },
-        { start: bookedRange.from, end: bookedRange.to },
-        { inclusive: true },
-      ),
-    );
-  }
-
-  const disabledDates = [
-    ...bookedDateRanges,
-    ...calculateSingleDayGaps(bookedDateRanges),
-    (date: Date) => {
-      const today = startOfDay(new Date());
-      if (date < today) {
-        return true;
-      }
-      if (isSelectingStartDate) {
-        const nextDay = addDays(date, 1);
-        const isNextDayBooked = bookedDateRanges.some((range) =>
-          isWithinInterval(nextDay, { start: range.from, end: range.to }),
-        );
-        if (isNextDayBooked) {
-          return true;
-        }
-        return false;
-      } else {
-        if (range.from) {
-          if (date < range.from) {
-            return true;
-          }
-          const startDate = startOfDay(range.from);
-          const endDate = endOfDay(date);
-          return isDateRangeOverlapping(startDate, endDate, bookedDateRanges);
-        }
-        return true;
-      }
-    },
-  ];
+  const { isDateDisabled } = useDisabledDates({
+    bookedRanges,
+    currentRange: range as Range,
+    minimumDays: 1,
+    isSelectingStartDate,
+  });
 
   const { smCalendarContainer } = useScreenSizes();
 
@@ -154,17 +105,13 @@ export default function BookingDetailsMobile({
       return;
     }
 
-    const bookingData: Booking = {
-      id: "",
-      created: format(new Date(), "yyyy-MM-dd"),
-      updated: format(new Date(), "yyyy-MM-dd"),
-      venueId: venue.id,
-      guests,
-      dateFrom: format(range.from, "yyyy-MM-dd"),
-      dateTo: format(range.to, "yyyy-MM-dd"),
-    };
-
-    onReserve(bookingData);
+    try {
+      const bookingData = createBooking(venue.id, guests, range.from, range.to);
+      onReserve(bookingData);
+    } catch (error) {
+      console.error("Failed to create booking:", error);
+      toast.error("Failed to create booking. Please try again.");
+    }
   };
 
   const handleIncrementGuests = () => {
@@ -202,7 +149,8 @@ export default function BookingDetailsMobile({
               weekStartsOn={1}
               selected={range}
               onDayClick={handleDateSelect}
-              disabled={disabledDates}
+              // disabled={disabledDates}
+              disabled={(date) => isDateDisabled(date)}
             />
           </div>
           <GuestControl

@@ -1,32 +1,27 @@
 import { useNavigate } from "@tanstack/react-router";
-import {
-  addDays,
-  areIntervalsOverlapping,
-  endOfDay,
-  format,
-  isWithinInterval,
-  parseISO,
-  startOfDay,
-} from "date-fns";
+import { endOfDay, format, startOfDay } from "date-fns";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import DateSelectionControls from "@/components/reservation-components/DateSelectionControls.tsx";
 import GuestControl from "@/components/reservation-components/GuestNumberControl.tsx";
+import ReservationButton from "@/components/reservation-components/ReservationButton.tsx";
 import { useAuthStatus } from "@/hooks/useAuthStatus.ts";
 import { useDateRangeSelection } from "@/hooks/useDateRangeSelection.ts";
+import { useDisabledDates } from "@/hooks/useDisabledDates.ts";
 import { useSignInModalStore } from "@/hooks/useSignInModalStore.ts";
 import { Venue } from "@/lib/types.ts";
 import { calculateTotalPrice, cn, useScreenSizes } from "@/lib/utils.ts";
 import { Route } from "@/routes/venue/$id.tsx";
 import { decrementGuests, incrementGuests } from "@/utils/reservationUtils.ts";
+import { toZonedTime } from "date-fns-tz";
 import { Button } from "../../ui/button.tsx";
 import { Calendar } from "../../ui/calendar.tsx";
 import { Separator } from "../../ui/separator.tsx";
 import { Booking } from "../utils/BookingValidation.ts";
-import { calculateSingleDayGaps } from "../utils/utils.ts";
-import ReservationButton from "@/components/reservation-components/ReservationButton.tsx";
+import { useEscapeKey, useOutsideClick } from "../hooks/useOutsideClick.ts";
+import { createBooking } from "../utils/utils.ts";
 
 interface BookingDetailsProps {
   venue: Venue;
@@ -44,17 +39,13 @@ export default function BookingDetails({
   onReserve,
   className,
 }: BookingDetailsProps) {
-  const {
-    guests,
-    start_date: startDateParam,
-    end_date: endDateParam,
-  } = Route.useSearch();
+  const { guests, start_date, end_date } = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
 
-  const startDate = startDateParam ? parseISO(startDateParam) : undefined;
-  const endDate = endDateParam ? parseISO(endDateParam) : undefined;
-
-  const [range, setRange] = useState<Range>({ from: startDate, to: endDate });
+  const [range, setRange] = useState<Range>({
+    from: start_date ? startOfDay(new Date(start_date)) : undefined,
+    to: end_date ? endOfDay(new Date(end_date)) : undefined,
+  });
   const [isExpanded, setIsExpanded] = useState(false);
   const [guestControlExpanded, setGuestControlExpanded] = useState(false);
   const [isSelectingStartDate, setIsSelectingStartDate] = useState(true);
@@ -80,15 +71,13 @@ export default function BookingDetails({
     }
   }, [range.from, range.to, navigate]);
 
-  const bookedDateRanges = (venue.bookings ?? [])
-    .map((booking) => ({
-      from: startOfDay(parseISO(booking.dateFrom)),
-      to: endOfDay(parseISO(booking.dateTo)),
-    }))
-    .sort((a, b) => a.from.getTime() - b.from.getTime());
+  const bookedRanges = (venue?.bookings ?? []).map((booking) => ({
+    from: startOfDay(toZonedTime(new Date(booking.dateFrom), "UTC")),
+    to: endOfDay(toZonedTime(new Date(booking.dateTo), "UTC")),
+  }));
 
   const { handleDateSelect } = useDateRangeSelection(
-    bookedDateRanges,
+    bookedRanges,
     navigate,
     range,
     setRange,
@@ -96,114 +85,41 @@ export default function BookingDetails({
     setIsSelectingStartDate,
   );
 
+  useOutsideClick(calendarRef, () => {
+    setIsExpanded(false);
+  });
+
+  useEscapeKey(() => {
+    if (isExpanded) {
+      setIsExpanded(false);
+    }
+  });
+
+  useOutsideClick(guestsRef, () => {
+    setGuestControlExpanded(false);
+  });
+
+  useEscapeKey(() => {
+    if (guestControlExpanded) {
+      setGuestControlExpanded(false);
+    }
+  });
+
   const toggleGuestControl = () => {
     setGuestControlExpanded((prev) => !prev);
   };
-
-  useEffect(() => {
-    const handleOutsideClickForCalendar = (event: MouseEvent) => {
-      if (
-        calendarRef.current &&
-        !calendarRef.current.contains(event.target as Node)
-      ) {
-        setIsExpanded(false);
-      }
-    };
-
-    const handleEscapePress = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsExpanded(false);
-      }
-    };
-
-    if (isExpanded) {
-      document.addEventListener("mousedown", handleOutsideClickForCalendar);
-      document.addEventListener("keydown", handleEscapePress);
-    } else {
-      document.removeEventListener("mousedown", handleOutsideClickForCalendar);
-      document.removeEventListener("keydown", handleEscapePress);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClickForCalendar);
-      document.removeEventListener("keydown", handleEscapePress);
-    };
-  }, [isExpanded]);
-
-  useEffect(() => {
-    const handleOutsideClickForGuests = (event: MouseEvent) => {
-      if (
-        guestsRef.current &&
-        !guestsRef.current.contains(event.target as Node)
-      ) {
-        setGuestControlExpanded(false);
-      }
-    };
-
-    if (guestControlExpanded) {
-      document.addEventListener("mousedown", handleOutsideClickForGuests);
-    } else {
-      document.removeEventListener("mousedown", handleOutsideClickForGuests);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClickForGuests);
-    };
-  }, [guestControlExpanded]);
 
   const totalPrice =
     range.from && range.to
       ? calculateTotalPrice(range.from, range.to, venue.price)
       : 0;
 
-  function isDateRangeOverlapping(
-    startDate: Date,
-    endDate: Date,
-    bookedRanges: { from: Date; to: Date }[],
-  ): boolean {
-    return bookedRanges.some((bookedRange) =>
-      areIntervalsOverlapping(
-        { start: startDate, end: endDate },
-        { start: bookedRange.from, end: bookedRange.to },
-        { inclusive: true },
-      ),
-    );
-  }
-
-  const disabledDates = [
-    ...bookedDateRanges,
-    ...calculateSingleDayGaps(bookedDateRanges),
-    (date: Date) => {
-      const today = startOfDay(new Date());
-      if (date < today) {
-        return true;
-      }
-      if (isSelectingStartDate) {
-        // Disable dates that cannot be used as start dates
-        // Check if there is at least one day available after the selected date
-        const nextDay = addDays(date, 1);
-        const isNextDayBooked = bookedDateRanges.some((range) =>
-          isWithinInterval(nextDay, { start: range.from, end: range.to }),
-        );
-        if (isNextDayBooked) {
-          return true; // Cannot book at least one night
-        }
-        return false;
-      } else {
-        if (range.from) {
-          if (date < range.from) {
-            return true; // Disable dates before the selected start date
-          }
-          // Remove the equality check to keep the start date enabled
-          // Disable dates that would result in a range overlapping booked dates
-          const startDate = startOfDay(range.from);
-          const endDate = endOfDay(date);
-          return isDateRangeOverlapping(startDate, endDate, bookedDateRanges);
-        }
-        return true; // Disable all dates if start date is not selected
-      }
-    },
-  ];
+  const { isDateDisabled } = useDisabledDates({
+    bookedRanges,
+    currentRange: range as Range,
+    minimumDays: 1,
+    isSelectingStartDate,
+  });
 
   const handleReserveClick = () => {
     if (!isLoggedIn) {
@@ -216,17 +132,13 @@ export default function BookingDetails({
       return;
     }
 
-    const bookingData: Booking = {
-      id: "",
-      created: format(new Date(), "yyyy-MM-dd"),
-      updated: format(new Date(), "yyyy-MM-dd"),
-      venueId: venue.id,
-      guests,
-      dateFrom: format(range.from, "yyyy-MM-dd"),
-      dateTo: format(range.to, "yyyy-MM-dd"),
-    };
-
-    onReserve(bookingData);
+    try {
+      const bookingData = createBooking(venue.id, guests, range.from, range.to);
+      onReserve(bookingData);
+    } catch (error) {
+      console.error("Failed to create booking:", error);
+      toast.error("Failed to create booking. Please try again.");
+    }
   };
 
   const openCalendar = () => {
@@ -303,7 +215,7 @@ export default function BookingDetails({
                 weekStartsOn={1}
                 selected={range}
                 onDayClick={handleDateSelect}
-                disabled={disabledDates}
+                disabled={(date) => isDateDisabled(date)}
               />
             </motion.div>
           )}

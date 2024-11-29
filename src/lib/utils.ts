@@ -1,6 +1,6 @@
-import { clsx, type ClassValue } from "clsx";
 import axios from "axios";
-import { addDays, differenceInCalendarDays } from "date-fns";
+import { clsx, type ClassValue } from "clsx";
+import { differenceInCalendarDays } from "date-fns";
 import { useMediaQuery } from "react-responsive";
 import { twMerge } from "tailwind-merge";
 
@@ -51,31 +51,8 @@ export function getAuthStatus() {
   return { isLoggedIn, isVenueManager };
 }
 
-export function calculateSingleDayGaps(
-  bookedDateRanges: { from: Date; to: Date }[],
-) {
-  const singleDayGaps: Date[] = [];
-
-  for (let i = 0; i < bookedDateRanges.length - 1; i++) {
-    const current = bookedDateRanges[i];
-    const next = bookedDateRanges[i + 1];
-
-    const gapStart = addDays(current.to, 1);
-    const gapEnd = addDays(next.from, -1);
-
-    if (differenceInCalendarDays(gapEnd, gapStart) === 1) {
-      singleDayGaps.push(gapStart);
-    }
-  }
-
-  return singleDayGaps;
-}
-
 /**
  * Extracts and returns a user-friendly error message from an Axios error or a generic message.
- *
- * @param error - The error object caught in a catch block.
- * @returns A string representing the error message.
  */
 export const handleApiError = (error: unknown): string => {
   if (axios.isAxiosError(error)) {
