@@ -43,7 +43,7 @@ export default function AllVenues() {
       }}
     >
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 md:px-10 xl:px-6">
-        <h1 className="mt-6 text-center text-3xl font-semibold">All Venues</h1>
+        <h1 className="mt-6 text-3xl font-semibold">All Venues</h1>
         <VenueCardSM venues={allVenues} currentFilter={"all"} />
         {isFetchingNextPage && <MainLoader className="my-24" />}
       </div>

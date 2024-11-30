@@ -1,7 +1,8 @@
-import { Venue } from "@/lib/types";
-import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { fetchVenues } from "../queries/fetchVenues";
+import { useQuery } from "@tanstack/react-query";
+
+import { Venue } from "@/lib/types";
+import { fetchVenues } from "./queries/fetchVenues";
 import { Continent, filterVenuesByContinent } from "./filterVenuesByContinent";
 
 type UseFilteredVenuesReturn = {
@@ -27,6 +28,8 @@ export function useFilteredVenuesContinent(
     staleTime: 1000 * 60 * 5,
     retry: 1,
   });
+
+  console.log(venues);
 
   const filteredVenues = useMemo(() => {
     return filterVenuesByContinent(venues, filter);
