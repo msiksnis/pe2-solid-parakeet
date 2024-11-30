@@ -1,7 +1,8 @@
+import { useAuthStore } from "@/hooks/useAuthStore";
 import { Venue } from "@/lib/types";
-import { MapPinIcon, StarIcon } from "lucide-react";
-import BlurFade from "./ui/blur-fade";
+import { cn } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
+import { Heart, MapPinIcon, StarIcon } from "lucide-react";
 import {
   Carousel,
   CarouselBullets,
@@ -10,6 +11,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "./Carousel";
+import BlurFade from "./ui/blur-fade";
 
 interface VenueCardProps {
   venues: Venue[];
@@ -17,6 +19,16 @@ interface VenueCardProps {
 }
 
 export default function VenueCardSM({ venues, currentFilter }: VenueCardProps) {
+  const { favorites, addFavorite, removeFavorite } = useAuthStore();
+
+  const toggleFavorite = (venueId: string) => {
+    if (favorites.includes(venueId)) {
+      removeFavorite(venueId);
+    } else {
+      addFavorite(venueId);
+    }
+  };
+
   return (
     <div className="grid gap-4 pt-8 md:grid-cols-3 lg:gap-y-0 xl:grid-cols-4">
       {venues.map((venue, idx) => (
@@ -65,13 +77,33 @@ export default function VenueCardSM({ venues, currentFilter }: VenueCardProps) {
                 <h1 className="line-clamp-2 w-44 text-lg font-medium capitalize leading-6">
                   {venue.name}
                 </h1>
-                <span className="flex items-center">
-                  <StarIcon className="size-[1.125rem]" />
-                  <span className="mt-0.5 tabular-nums text-muted-foreground">
-                    &nbsp;{venue.rating}&nbsp;
-                  </span>
-                  <span className="mt-0.5 text-muted-foreground">Rating</span>
-                </span>
+                <div className="flex flex-col items-end">
+                  {venue.rating > 0 && (
+                    <span className="flex items-center">
+                      <StarIcon className="size-[1.125rem] fill-amber-500 text-amber-500" />
+                      <span className="mt-0.5 text-lg tabular-nums">
+                        &nbsp;{venue.rating}&nbsp;
+                      </span>
+                    </span>
+                  )}
+                  <div
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toggleFavorite(venue.id);
+                    }}
+                    className="group/heart rounded-full p-1"
+                  >
+                    <Heart
+                      className={cn(
+                        "size-5 text-primary transition-all duration-200 group-hover/heart:text-destructive",
+                        {
+                          "fill-destructive text-destructive":
+                            favorites.includes(venue.id),
+                        },
+                      )}
+                    />
+                  </div>
+                </div>
               </div>
               <div className="mt-auto flex items-end justify-between">
                 <div>

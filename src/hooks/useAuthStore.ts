@@ -12,6 +12,7 @@ interface AuthState {
   bio: string | null;
   venueManager: boolean;
   userAvatar: Avatar | null;
+  favorites: string[];
   setAuth: (
     token: string,
     name: string,
@@ -20,16 +21,19 @@ interface AuthState {
     bio?: string,
   ) => void;
   clearAuth: () => void;
+  addFavorite: (venueId: string) => void;
+  removeFavorite: (venueId: string) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       token: null,
       userName: null,
       bio: null,
       userAvatar: null,
       venueManager: false,
+      favorites: [],
       setAuth: (token, name, avatar, venueManager, bio) => {
         set((state) => ({
           token,
@@ -46,7 +50,18 @@ export const useAuthStore = create<AuthState>()(
           bio: null,
           userAvatar: null,
           venueManager: false,
+          favorites: [],
         });
+      },
+      addFavorite: (venueId) => {
+        const { favorites } = get();
+        if (!favorites.includes(venueId)) {
+          set({ favorites: [...favorites, venueId] });
+        }
+      },
+      removeFavorite: (venueId) => {
+        const { favorites } = get();
+        set({ favorites: favorites.filter((id) => id !== venueId) });
       },
     }),
     {
