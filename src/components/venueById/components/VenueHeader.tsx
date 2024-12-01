@@ -4,6 +4,7 @@ import { titleCase } from "title-case";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { Venue } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface VenueHeaderProps {
   venue: Venue;
@@ -18,6 +19,11 @@ export default function VenueHeader({ venue }: VenueHeaderProps) {
     } else {
       addFavorite(venueId);
     }
+  };
+
+  const copyUrlToShare = () => {
+    navigator.clipboard.writeText(window.location.href);
+    toast.success("Link copied to clipboard");
   };
 
   return (
@@ -37,15 +43,15 @@ export default function VenueHeader({ venue }: VenueHeaderProps) {
         </span>
       </div>
       <div className="flex items-center gap-8">
-        <button className="flex items-center rounded-md text-lg lg:px-4 lg:py-2 lg:hover:bg-accent lg:hover:text-accent-foreground">
+        <button
+          onClick={copyUrlToShare}
+          className="flex items-center rounded-md text-lg lg:px-4 lg:py-2 lg:hover:bg-accent lg:hover:text-accent-foreground"
+        >
           <ShareIcon className="mr-2 size-6" />
           Share
         </button>
         <button
-          onClick={(e) => {
-            e.preventDefault();
-            toggleFavorite(venue.id);
-          }}
+          onClick={() => toggleFavorite(venue.id)}
           className="flex items-center rounded-md text-lg lg:px-4 lg:py-2 lg:hover:bg-accent lg:hover:text-accent-foreground"
         >
           <HeartIcon
