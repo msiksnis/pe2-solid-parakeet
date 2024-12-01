@@ -5,7 +5,7 @@ export default function LandingImage() {
   const [isLoading, setIsLoading] = useState(true);
 
   return (
-    <div className="relative z-10 hidden aspect-[5/3] w-full max-w-7xl overflow-hidden sm:block">
+    <div className="relative z-10 hidden aspect-[2/1] w-full max-w-7xl overflow-hidden sm:block">
       {/* SVG Clip Path Definition */}
       <svg width="0" height="0" xmlns="http://www.w3.org/2000/svg">
         <defs>
