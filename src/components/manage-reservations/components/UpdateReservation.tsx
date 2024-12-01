@@ -205,7 +205,9 @@ export default function UpdateReservation() {
 
   return (
     <div className="mx-auto my-20 max-w-4xl px-4 @container/calendar sm:px-6 lg:px-10 xl:px-4">
-      <h1 className="text-2xl">Your reservation for: {venue.name}</h1>
+      <h1 className="text-3xl font-medium">
+        Your reservation for: {venue.name}
+      </h1>
       <img
         src={venue.media[0].url}
         alt={venue.media[0].alt}

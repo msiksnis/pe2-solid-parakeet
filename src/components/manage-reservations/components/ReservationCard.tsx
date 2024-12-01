@@ -73,9 +73,9 @@ export default function ReservationCard() {
                 )}
 
                 <div className="my-4 flex flex-col justify-between">
-                  <h1 className="line-clamp-2 text-lg font-medium capitalize leading-6">
+                  <h2 className="line-clamp-2 text-lg font-medium capitalize leading-6">
                     {reservation.venue.name}
-                  </h1>
+                  </h2>
                   <div className="flex items-center pt-1 text-paragraph">
                     <span className="">
                       {format(reservation.dateFrom, "dd MMM yyyy")}

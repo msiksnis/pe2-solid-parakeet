@@ -16,16 +16,18 @@ interface HostedByProps {
 export default function HostedBy({ owner, className }: HostedByProps) {
   const { name, avatar } = owner;
   return (
-    <div className={cn("flex items-center space-x-4", className)}>
-      <Avatar className="cursor-pointer">
-        <AvatarImage src={avatar.url} alt={avatar.alt} />
-        <AvatarFallback>
-          <User className="h-5 w-5" />
-        </AvatarFallback>
-      </Avatar>
-      <span>
-        Hosted by <span className="capitalize">{name}</span>
-      </span>
+    <div className={cn(className)}>
+      <div className="flex w-full items-center space-x-4">
+        <Avatar className="cursor-pointer">
+          <AvatarImage src={avatar.url} alt={avatar.alt} />
+          <AvatarFallback>
+            <User className="h-5 w-5" />
+          </AvatarFallback>
+        </Avatar>
+        <span>
+          Hosted by <span className="capitalize">{name}</span>
+        </span>
+      </div>
     </div>
   );
 }
