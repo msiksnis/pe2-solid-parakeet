@@ -10,7 +10,7 @@
 
 ## Features
 
-- **Homepage:** List of all latest venues, option to filter by 'All Venues', 'Cabins', 'Sunny Beaches', or 'Mountain Views'. Homepage also has a search functionality where a user can combine a search for a venue by a match in venues Name or Description with filter by destination.
+- **Homepage:** List of all latest venues, with filtering options for **'All Venues'**, **'Cabins'**, **'Sunny Beaches'**, or **'Mountain Views'**. Homepage also has a search functionality where a user can combine a search for a venue by a match in venues Name or Description with filter by destination.
 - **Venue by ID page:** Details of a single venue, image gallery, a calendar with available dates and a functionality to make a reservation for a venue for selected dates and number of guests.
 - **Profile page:** A users can see their profile details, update avatar and bio.
 - **Manage reservations page:** A page where a user can see all their reservations, cancel a reservation, and see the details of a reservation.
@@ -61,6 +61,10 @@
    ```bash
     npm run dev
    ```
+
+## Deployment
+
+The project is deployed on **Netlify** for easy access. Visit the [Live Demo](https://venue-booking-msiksnis.netlify.app/) to explore the app.
 
 ## Usage
 
