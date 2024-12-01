@@ -145,7 +145,6 @@ export default function SearchBar() {
             onClick={() => setCityValue("")}
           />
         </div>
-        {/* Search Button */}
         <div className="col-span-2 flex items-center">
           <Button
             variant={"gooeyRight"}

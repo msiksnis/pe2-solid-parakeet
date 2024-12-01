@@ -28,7 +28,6 @@ export function useFilteredVenuesForTabs(
     return VALID_FILTERS.includes(filter as ForTabs | "all");
   }
 
-  // Validate the filter before proceeding
   const validatedFilter = isValidFilter(filter) ? filter : "all";
 
   const {
@@ -38,7 +37,7 @@ export function useFilteredVenuesForTabs(
     error,
     refetch,
   } = useQuery<Venue[], Error>({
-    queryKey: ["venues", validatedFilter], // Include the filter in the query key
+    queryKey: ["venues", validatedFilter],
     queryFn: fetchVenues,
     staleTime: 1000 * 60 * 5,
     retry: 1,

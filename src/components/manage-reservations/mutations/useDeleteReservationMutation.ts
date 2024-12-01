@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { Reservation } from "../types";
 
 /**
- * Custom hook to handle reservation deletion/cancelation with optimistic updates.
+ * Custom hook to handle reservation deletion/cancellations with optimistic updates.
  * It updates the cache to remove the deleted reservation and handles rollback in case of failure.
  *
  * @returns A mutation object from React Query for deleting a reservation.

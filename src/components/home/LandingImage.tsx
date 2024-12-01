@@ -6,7 +6,6 @@ export default function LandingImage() {
 
   return (
     <div className="relative z-10 hidden aspect-[2/1] w-full max-w-7xl overflow-hidden sm:block">
-      {/* SVG Clip Path Definition */}
       <svg width="0" height="0" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <clipPath id="clip-path-id" clipPathUnits="objectBoundingBox">
@@ -22,7 +21,6 @@ export default function LandingImage() {
         </defs>
       </svg>
 
-      {/* Skeleton Loader */}
       {isLoading && (
         <Skeleton
           className="absolute inset-0 h-full w-full"
@@ -30,7 +28,6 @@ export default function LandingImage() {
         />
       )}
 
-      {/* Image with Clip Path */}
       <img
         src="/landing_img.webp"
         alt="Decorative background image"

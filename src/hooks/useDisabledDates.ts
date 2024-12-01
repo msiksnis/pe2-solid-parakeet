@@ -103,6 +103,7 @@ export function useDisabledDates({
       return true;
 
     // Uncomment this block to disable dates before the current start date
+
     // if (
     //   !_isSelectingStartDate &&
     //   _currentRange?.from &&

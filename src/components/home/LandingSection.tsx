@@ -46,11 +46,11 @@ export default function LandingSection(): JSX.Element {
 
   return (
     <div className="relative hidden sm:block">
-      <div className="text-container absolute left-10 top-5 z-20 h-2/5 w-[45%] text-center font-semibold lg:left-14 lg:top-10 xl:left-20 xl:w-[42%]">
+      <h1 className="text-container absolute left-10 top-5 z-20 h-2/5 w-[45%] text-center font-semibold lg:left-14 lg:top-10 xl:left-20 xl:w-[42%]">
         <span ref={textRef} className="block">
           Find your best place to stay
         </span>
-      </div>
+      </h1>
       <LandingImage />
       <div className="absolute left-0 top-0 z-0 h-4/5 w-full rounded-full bg-orange-100/60 blur-[90px]" />
     </div>

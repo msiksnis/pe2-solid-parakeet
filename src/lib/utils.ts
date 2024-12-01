@@ -51,9 +51,6 @@ export function getAuthStatus() {
   return { isLoggedIn, isVenueManager };
 }
 
-/**
- * Extracts and returns a user-friendly error message from an Axios error or a generic message.
- */
 export const handleApiError = (error: unknown): string => {
   if (axios.isAxiosError(error)) {
     const message = error.response?.data?.message;

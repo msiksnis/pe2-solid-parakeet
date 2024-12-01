@@ -149,7 +149,6 @@ export default function BookingDetailsMobile({
               weekStartsOn={1}
               selected={range}
               onDayClick={handleDateSelect}
-              // disabled={disabledDates}
               disabled={(date) => isDateDisabled(date)}
             />
           </div>

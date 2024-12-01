@@ -44,9 +44,9 @@ export default function Account() {
 
   return (
     <div className="mx-auto mt-8 max-w-2xl px-4 md:my-24 md:px-0">
-      <div className="text-2xl font-semibold md:text-3xl">
+      <h1 className="text-3xl font-semibold md:text-3xl">
         Manage your profile
-      </div>
+      </h1>
       <Separator className="mt-4" />
       {isFetching ? (
         <MainLoader className="mt-10" />
