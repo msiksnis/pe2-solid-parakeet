@@ -609,7 +609,7 @@ export default function HostVenueForm() {
                   render={({ field }) => (
                     <FormItem
                       className={cn(
-                        "relative h-14 space-y-0 rounded-md border border-gray-400 transition-all duration-300",
+                        "relative h-14 w-1/3 space-y-0 rounded-md border border-gray-400 transition-all duration-300",
                         {
                           "border-primary ring-2 ring-primary ring-offset-2 ring-offset-card":
                             focusStates["zip"],
