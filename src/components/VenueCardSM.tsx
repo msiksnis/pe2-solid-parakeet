@@ -12,6 +12,7 @@ import {
   CarouselPrevious,
 } from "./Carousel";
 import BlurFade from "./ui/blur-fade";
+import { titleCase } from "title-case";
 
 interface VenueCardProps {
   venues: Venue[];
@@ -42,9 +43,6 @@ export default function VenueCardSM({ venues, currentFilter }: VenueCardProps) {
             to={`/venue/${venue.id}`}
             search={{
               guests: 1,
-              //  Uncomment the following lines to pass the start_date and end_date to the venue page
-              // start_date: format(new Date(), "yyyy-MM-dd"),
-              // end_date: format(new Date(), "yyyy-MM-dd"),
             }}
             className="group/card relative mb-4 flex flex-col rounded-2xl border-primary/0 transition-all duration-200 hover:border-primary/100 sm:p-2 md:border"
           >
@@ -72,12 +70,12 @@ export default function VenueCardSM({ venues, currentFilter }: VenueCardProps) {
               <CarouselNext />
               <CarouselBullets />
             </Carousel>
-            <div className="flex h-[7.5rem] flex-col justify-between">
+            <div className="flex h-32 flex-col justify-between">
               <div className="mb-2 mt-4 flex h-12 items-start justify-between">
-                <h1 className="line-clamp-2 w-44 text-lg font-medium capitalize leading-6">
+                <h1 className="mr-4 line-clamp-2 w-60 truncate text-lg font-medium capitalize leading-6">
                   {venue.name}
                 </h1>
-                <div className="flex flex-col items-end">
+                <div className="-mt-1 flex flex-col items-end">
                   {venue.rating > 0 && (
                     <span className="flex items-center">
                       <StarIcon className="size-[1.125rem] fill-amber-500 text-amber-500" />
@@ -105,20 +103,18 @@ export default function VenueCardSM({ venues, currentFilter }: VenueCardProps) {
                   </div>
                 </div>
               </div>
-              <div className="mt-auto flex items-end justify-between">
-                <div>
-                  {venue.location && venue.location.city && (
-                    <div className="flex items-center capitalize">
-                      <MapPinIcon className="-ml-0.5 mb-0.5 size-4" />
-                      <span className="text-muted-foreground">
-                        &nbsp;{venue.location.city}
-                      </span>
-                    </div>
-                  )}
-                  <div className="flex items-center pt-1">
-                    <span className="">${venue.price}</span>
-                    <span className="text-muted-foreground">&nbsp;/night</span>
+              <div>
+                {venue.location && venue.location.city && (
+                  <div className="flex items-start">
+                    <MapPinIcon className="mt-0.5 size-[1.125rem]" />
+                    <span className="ml-0.5 max-w-60 text-pretty text-muted-foreground">
+                      {titleCase(venue.location.city)}
+                    </span>
                   </div>
+                )}
+                <div className="flex items-center pt-1">
+                  <span className="">${venue.price}</span>
+                  <span className="text-muted-foreground">&nbsp;/night</span>
                 </div>
               </div>
             </div>
