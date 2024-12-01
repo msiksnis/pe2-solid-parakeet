@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 import { User } from "lucide-react";
 
 interface HostedByProps {
@@ -9,12 +10,13 @@ interface HostedByProps {
     };
     name: string;
   };
+  className?: string;
 }
 
-export default function HostedBy({ owner }: HostedByProps) {
+export default function HostedBy({ owner, className }: HostedByProps) {
   const { name, avatar } = owner;
   return (
-    <div className="flex items-center space-x-4">
+    <div className={cn("flex items-center space-x-4", className)}>
       <Avatar className="cursor-pointer">
         <AvatarImage src={avatar.url} alt={avatar.alt} />
         <AvatarFallback>

@@ -35,7 +35,9 @@ export default function VenueDetails({ venue }: VenueDetailsProps) {
         />
       </div>
       <Separator />
-      {venue.owner && <HostedBy owner={venue.owner} />}
+      {venue.owner && (
+        <HostedBy className="hidden md:block" owner={venue.owner} />
+      )}
       <Separator className="hidden md:flex" />
       <div>
         <h2 className="text-2xl font-semibold">Features and services</h2>
