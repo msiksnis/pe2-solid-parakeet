@@ -1,4 +1,4 @@
-![Mr Cap's Store Logo](/public/assets/homepage.png)
+![Holidaze Logo](/public/assets/homepage.png)
 
 # An accommodation booking site Holidaze
 
